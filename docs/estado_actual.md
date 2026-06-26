@@ -1,7 +1,7 @@
 # Estado Actual — NexoExpress (Coordinador del Ecosistema)
 
 **Estado Global del Ecosistema:** 🟢 VERDE
-**Última Actualización:** 25-06-2026
+**Última Actualización:** 26-06-2026
 
 ---
 
@@ -11,42 +11,42 @@
 |---|---|---|---|
 | ActaExpressWeb | 🟢 Activo | ~82% | Enriquecer prompt Gemini con transcripción |
 | ActaExpress Android | 🟡 En pausa | ~60% | Paridad con Web (campo `plataforma`) |
-| BitácoraExpress | 🟢 Activo en Linux | ~48% | Migración Firebase + Push a GitHub |
+| BitácoraExpress | 🟢 Activo en Linux | ~48% | Completar migración a Firebase (Python local) |
+| NexoExpress | 🟢 Activo | 100% | Orquestación, RAG Docs y Mantenimiento |
 
 ---
 
 ## 📌 Hitos Recientes del Ecosistema
 
-- **NexoExpress creado** — El coordinador tiene identidad propia con skills, esquema Firestore y documentación.
-- **BitácoraExpress integrado** — Clonado, renombrado, cross-platform (Linux + Windows), levantado en `127.0.0.1:8001`.
-- **Esquema Firestore unificado** — `schemas/firestore_schema.md` define el contrato de datos para todos los proyectos.
-- **4 skills creados** — `auditor_paridad`, `documentador_sesion`, `arquitecto_firebase`, `roadmap_manager`.
-- **Path cross-platform resuelto** — `BitácoraExpress` ya no tiene hardcoded `C:\Users\...`. Usa `PROJECT_BASE_DIR` en `.env`.
-- **`start.py` creado** — Arranque limpio de BitácoraExpress en Linux: `python3 start.py`.
-- **Campo `plataforma: "web"` activo** — ActaExpressWeb ya lo guarda en cada acta nueva.
-- **Colección `sintesis/` implementada** — ActaExpressWeb guarda síntesis tras procesar cada audio.
-- **`firestoreSet` añadido** — `firebaseAdmin.ts` ahora soporta escritura con ID específico.
+- **Integración con GitHub exitosa:** Repositorios conectados y subidos correctamente usando PAT.
+- **Configuración de Firebase en Backend:** El SDK de Admin de Firebase ya está configurado en BitácoraExpress (`keys/`).
+- **Pipeline Documental Automatizado:** Script en Python que renderiza flujos de Mermaid a PNG y los empaqueta en `.docx` con timestamp.
+- **Definición de 3 Capas:** El ecosistema separa formalmente la Recolección (Apps), el Análisis (RAG Vectorial) y la Reportería.
+- **Privacidad y Vectorización:** Se decidió no usar texto crudo para RAG por costos (se usará Vector Search) y se delegó la privacidad al cliente (horarios laborales) para que Firestore sea un "Cerebro Aislado".
+- **Skills creados:** `arquitecto_ecosistema` y `disenador_flujos` añadidos a los 4 originales.
 
 ---
 
 ## 🚀 Próximos 5 Pasos Globales (priorizados)
 
-1. **[BitácoraExpress]** Migrar SQLite → Firebase Firestore (`be_proyectos/`, `be_actividades/`) ← requiere `GCP_PROJECT_ID` real
-2. **[BitácoraExpress]** Push a GitHub rama `desarrollo` (necesita PAT configurado)
-3. **[NexoExpress]** Crear repo en GitHub para el coordinador
-4. **[ActaExpressWeb]** Enriquecer `ACTA_PROMPT` para incluir transcripción completa → mejora síntesis
-5. **[ActaExpress Android]** Añadir campo `plataforma: "android"` al guardar actas
+1. **[BitácoraExpress]** Migrar escritura SQLite → Firebase Firestore (`be_proyectos/`, `be_actividades/`) usando el `GOOGLE_APPLICATION_CREDENTIALS`.
+2. **[ActaExpressWeb]** Enriquecer el prompt para incluir transcripción completa en la respuesta de Gemini, mejorando la `sintesis/`.
+3. **[BitácoraExpress]** Implementar frontend o configuración para establecer horario laboral y botón de pausa.
+4. **[ActaExpress Android]** Añadir campo `plataforma: "android"` al guardar actas y lograr paridad de exportación.
+5. **[NexoExpress]** Investigar costos de Cloud Functions para la futura vectorización con Vertex AI.
 
 ---
 
 ## 🔧 Skills Disponibles
 
-| Skill | Propósito | Cuándo usarlo |
-|---|---|---|
-| `auditor_paridad` | Revisa brechas entre proyectos | Al inicio de cada sesión |
-| `documentador_sesion` | Genera bitácora y actualiza estado | Al cerrar cada sesión |
-| `arquitecto_firebase` | Define/modifica esquema Firestore | Antes de crear colecciones nuevas |
-| `roadmap_manager` | Actualiza y prioriza el roadmap | Cuando hay cambios de prioridad |
+| Skill | Propósito |
+|---|---|
+| `auditor_paridad` | Revisa brechas funcionales entre proyectos. |
+| `documentador_sesion` | Genera bitácora y actualiza el estado (memoria a corto plazo). |
+| `arquitecto_firebase` | Define/modifica el esquema Firestore (`schemas/`). |
+| `roadmap_manager` | Compara avance vs `ECOSISTEMA_VISION.md` y prioriza tareas. |
+| `arquitecto_ecosistema` | Analiza viabilidad cloud, privacidad y arquitectura end-to-end. |
+| `disenador_flujos` | Traduce análisis arquitectónico a Mermaid (`docs/flujos/`). |
 
 ---
 
@@ -56,9 +56,7 @@
 # Desde el directorio del proyecto
 python3 start.py               # producción local
 python3 start.py --reload      # desarrollo (hot-reload)
-python3 start.py --port 8002   # en otro puerto
 ```
-
 La app queda disponible en `http://127.0.0.1:8001`
 
 ---
@@ -66,17 +64,18 @@ La app queda disponible en `http://127.0.0.1:8001`
 ## 📁 Estructura del Workspace
 
 ```
-Coordinador_ActaExpress/  (NexoExpress)
-├── .agents/skills/
-│   ├── auditor_paridad/
-│   ├── documentador_sesion/
-│   ├── arquitecto_firebase/
-│   └── roadmap_manager/
+NexoExpress/
+├── .agents/skills/             ← 6 Agentes IA configurados
 ├── docs/
 │   ├── estado_actual.md        ← este archivo
-│   ├── ECOSISTEMA_VISION.md    ← visión y roadmap completo
-│   ├── bitacora_24_06_2026.md  ← sesión fundacional
-│   └── bitacora_25_06_2026.md  ← sesión de hoy
-└── schemas/
-    └── firestore_schema.md     ← contrato de datos Firebase
+│   ├── ECOSISTEMA_VISION.md    ← arquitectura y roadmap
+│   ├── informe_arquitectura.md ← análisis profundo
+│   ├── flujos/                 ← diagramas en .mmd y .png
+│   ├── informes/               ← reportes generados en .docx
+│   └── bitacora_*.md           ← logs de sesión
+├── schemas/
+│   └── firestore_schema.md     ← contrato de datos Firebase
+├── scripts/
+│   └── generar_informe.py      ← pipeline de documentación
+└── scratch/                    ← scripts temporales
 ```

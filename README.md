@@ -1,18 +1,27 @@
 # NexoExpress 🔗
 
-**Coordinador del Ecosistema Express** — Repositorio central de documentación, esquemas y agentes del ecosistema de apps Express.
+**Coordinador del Ecosistema Express** — Repositorio central de documentación, esquemas y agentes IA del ecosistema de aplicaciones "Express" (ActaExpress y BitácoraExpress).
 
 ## 📦 Proyectos del Ecosistema
 
-| Proyecto | Repo | Estado | % MVP |
-|---|---|---|---|
-| [ActaExpressWeb](https://github.com/Pueblac/ActaExpressWeb) | `ActaExpressWeb` | 🟢 Activo | ~82% |
-| [BitacoraExpress](https://github.com/Pueblac/BitacoraExpress) | `BitacoraExpress` | 🟢 Activo | ~48% |
-| ActaExpress Android | `ActaExpress` | 🟡 En pausa | ~60% |
+| Proyecto | Repo | Estado | % MVP | Rol en el Ecosistema |
+|---|---|---|---|---|
+| [ActaExpressWeb](https://github.com/Pueblac/ActaExpressWeb) | `ActaExpressWeb` | 🟢 Activo | ~82% | Captura formal (Reuniones) vía Web. Prototipo principal. |
+| [BitacoraExpress](https://github.com/Pueblac/BitacoraExpress) | `BitacoraExpress` | 🟢 Activo | ~48% | Captura informal (Trabajo diario). Watcher Python multiplataforma. |
+| ActaExpress Android | `ActaExpress` | 🟡 En pausa | ~60% | Captura formal (Reuniones) en terreno vía dispositivo móvil. |
+| **NexoExpress** | `NexoExpress` | 🟢 Activo | 100% | Orquestador, fuente de verdad (schemas), memoria (bitácoras) e IA Agents. |
+
+## 🧠 La Visión (El Sistema de Inteligencia Contextual)
+
+El objetivo final del ecosistema no es solo tener aplicaciones aisladas, sino construir un **Sistema de Inteligencia Contextual (NotebookLM propio)** que una la información de todas ellas:
+- **ActaExpress** documenta las decisiones formales y compromisos a través de actas y síntesis completas.
+- **BitácoraExpress** cuantifica el esfuerzo real, contexto informal y herramientas usadas día a día sin fricción.
+
+En el futuro, un Motor de Profundización (RAG) consumirá toda esta información desde Firebase para responder preguntas, preparar contexto antes de reuniones y asistir en tiempo real, cruzando lo que se acordó formalmente con lo que realmente se ha trabajado. (Ver [ECOSISTEMA_VISION.md](ECOSISTEMA_VISION.md) para la arquitectura completa).
 
 ## 🗂️ Estructura
 
-```
+```text
 NexoExpress/
 ├── .agents/skills/          ← Agentes IA reutilizables
 │   ├── auditor_paridad/     ← Audita brechas entre proyectos
@@ -20,37 +29,36 @@ NexoExpress/
 │   ├── arquitecto_firebase/ ← Define el schema Firestore
 │   └── roadmap_manager/     ← Gestiona el roadmap global
 ├── docs/
-│   ├── estado_actual.md     ← Estado vivo del ecosistema
-│   ├── ECOSISTEMA_VISION.md ← Visión y roadmap completo
-│   └── bitacora_*.md        ← Bitácoras de sesión
-└── schemas/
-    └── firestore_schema.md  ← Contrato de datos Firebase (fuente de verdad)
+│   ├── estado_actual.md     ← Estado vivo y pendientes del ecosistema
+│   ├── ECOSISTEMA_VISION.md ← Visión a futuro y arquitectura completa
+│   └── bitacora_*.md        ← Bitácoras generadas en cada sesión
+├── schemas/
+│   └── firestore_schema.md  ← Contrato de datos Firebase (fuente de verdad)
+└── scratch/                 ← Scripts temporales y pruebas (ej. setups GitHub)
 ```
 
 ## 🔑 Reglas del Ecosistema
 
-1. **Web primero**: ninguna feature se implementa en Android antes que en Web.
-2. **Schema centralizado**: ningún proyecto crea colecciones Firestore sin documentarlas en `schemas/firestore_schema.md`.
-3. **Bitácora diaria**: cada sesión de desarrollo genera su `docs/bitacora_DD_MM_YYYY.md`.
-4. **Prefijos de colección**: BitacoraExpress usa `be_` en todas sus colecciones Firestore.
+1. **Web primero**: ninguna feature se implementa en Android antes de ser probada y validada en Web.
+2. **Schema centralizado**: ningún proyecto crea colecciones Firestore sin documentarlas primero en `schemas/firestore_schema.md`.
+3. **Bitácora diaria**: cada sesión de desarrollo en el ecosistema genera su propia `docs/bitacora_DD_MM_YYYY.md` para mantener la trazabilidad.
+4. **Prefijos y Trazabilidad**: BitacoraExpress usa `be_` en todas sus colecciones para evitar colisiones. Toda acta debe incluir el campo `plataforma` ("web" o "android").
 
-## 🏗️ Firebase / Firestore
+## 🏗️ Firebase / Firestore Centralizado
 
 Proyecto Firebase compartido: **`actaexpress`**
 
 Colecciones activas:
-- `users/{uid}` — Perfil y suscripción
-- `actas/{actaId}` — Actas generadas (con `plataforma: "web" | "android"`)
-- `sintesis/{actaId}` — Síntesis extendida separada del acta
-- `be_proyectos/{id}` — Proyectos de BitacoraExpress
-- `be_actividades/{id}` — Actividades trackeadas
-- `be_bitacoras/{fecha}` — Bitácoras generadas por IA
+- `users/{uid}` — Perfil y suscripción del usuario.
+- `actas/{actaId}` — Actas de reuniones.
+- `sintesis/{actaId}` — Transcripción extendida y análisis profundo.
+- `be_proyectos/{id}` — Proyectos organizados de BitácoraExpress.
+- `be_actividades/{id}` — Registros de ventana activa y duración.
+- `be_bitacoras/{fecha}` — Resúmenes diarios generados por IA a partir del trabajo.
 
 ## 🤖 Cómo usar los Skills
 
-Los skills están en `.agents/skills/` y son instrucciones para agentes IA (Antigravity/Gemini).
-Al abrir cualquier proyecto del ecosistema, el agente detecta los skills disponibles.
+Los skills están en la carpeta `.agents/skills/` y contienen instrucciones predefinidas para agentes IA (como Antigravity / Gemini). Al abrir cualquier proyecto del ecosistema o sesión de pair-programming con el agente, este detecta los skills disponibles para ayudarte a orquestar cambios arquitectónicos sin romper la paridad.
 
 ---
-
-*Mantenido por: Pueblac · Última actualización: 25-06-2026*
+*Mantenido por: Pueblac · Última actualización: 26-06-2026*

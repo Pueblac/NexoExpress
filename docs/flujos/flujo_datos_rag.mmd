@@ -1,0 +1,22 @@
+sequenceDiagram
+    participant App as Aplicación Cliente
+    participant DB as Firestore
+    participant CF as Cloud Function (Triggers)
+    participant LLM as Vertex AI (Embeddings)
+
+    %% Fase de Ingesta Asíncrona
+    Note over App, LLM: Fase de Ingesta (Automática)
+    App->>DB: Guarda documento en sintesis/
+    DB-->>CF: Trigger onWrite()
+    CF->>LLM: Pide Embedding del texto
+    LLM-->>CF: Retorna Vector de Alta Dimensión
+    CF->>DB: Actualiza doc con campo 'embedding'
+
+    %% Fase de Consulta en Tiempo Real
+    Note over App, LLM: Fase de Consulta (Usuario pregunta al Copiloto)
+    App->>LLM: "Dime qué acordamos de esto" (Genera vector query)
+    LLM-->>App: Vector Query
+    App->>DB: Consulta K-Nearest Neighbors (Vector Search)
+    DB-->>App: Retorna Top 3 documentos relevantes
+    App->>LLM: Envía Prompt + Contexto (Top 3 docs)
+    LLM-->>App: Respuesta con Inteligencia Contextual

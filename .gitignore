@@ -1,0 +1,20 @@
+# Entornos Virtuales (Dependencias instaladas)
+.venv/
+venv/
+env/
+
+# Caché de Python
+__pycache__/
+*.pyc
+*.pyo
+
+# IDEs y Editores
+.vscode/
+.idea/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Nota: NO se ignoran los archivos .md, .mmd, .png ni .docx
+# porque este es el repositorio central de documentación.

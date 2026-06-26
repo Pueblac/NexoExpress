@@ -1,7 +1,7 @@
 # Esquema Firestore — Contrato de Datos del Ecosistema Express
 
 > **Mantenido por:** NexoExpress (Coordinador del Ecosistema)
-> **Última modificación:** 24-06-2026
+> **Última modificación:** 26-06-2026
 > **Regla:** Ningún proyecto puede crear una colección no documentada aquí.
 
 ---
@@ -9,7 +9,7 @@
 ## Colecciones Activas
 
 ### `users/{uid}`
-**Quién escribe:** ActaExpressWeb, ActaExpress Android
+**Quién escribe:** ActaExpressWeb, ActaExpress Android, BitácoraExpress
 **Quién lee:** Todos los proyectos
 
 ```json
@@ -23,9 +23,16 @@
   "rolloverCredits": 0,
   "nextRefillDate": "timestamp",
   "createdAt": "timestamp",
-  "meetingsUsed": 0
+  "meetingsUsed": 0,
+  "preferences": {
+    "trackingActivo": true,
+    "horariosLaborales": [
+      { "dia": "Lunes", "inicio": "09:00", "fin": "18:00" }
+    ]
+  }
 }
 ```
+> **Nota de Privacidad:** `preferences` permite al cliente de BitácoraExpress pausar la recolección automáticamente fuera del horario laboral, asegurando que los sitios privados del usuario no se suban a la base de datos.
 
 ---
 
@@ -54,18 +61,19 @@
 }
 ```
 > ⚠️ `folderId` — pendiente de implementar (Fase 2)
-> ⚠️ `plataforma` — campo nuevo, permite saber el origen del acta
+> ✅ `plataforma` — campo implementado en Web.
 
 ---
 
-### `sintesis/{actaId}` ← PENDIENTE (Fase 1)
-**Quién escribe:** ActaExpressWeb, ActaExpress Android
+### `sintesis/{actaId}` 
+**Quién escribe:** ActaExpressWeb (✅ Implementado), ActaExpress Android (⏳ Pendiente)
 **Quién lee:** Sistema contextual (Fase 3)
 **Razón de separación:** Documentos grandes. No inflar la colección `actas/` que se lee frecuentemente.
 
 ```json
 {
   "actaId": "string (referencia)",
+  "ownerId": "uid",
   "transcripcion": "string (texto completo hablado)",
   "analisis_profundo": "string (análisis temático, tensiones, puntos no explícitos)",
   "preguntas_sin_resolver": ["string"],
@@ -77,8 +85,8 @@
 
 ---
 
-### `folders/{folderId}` ← PENDIENTE (Fase 2)
-**Quién escribe:** ActaExpressWeb, ActaExpress Android
+### `folders/{folderId}` 
+**Quién escribe:** ActaExpressWeb, ActaExpress Android (⏳ Fase 2)
 **Quién lee:** Todos
 
 ```json
@@ -93,10 +101,10 @@
 
 ---
 
-### `be_actividades/{actividadId}` ← BitácoraExpress (PENDIENTE migración)
+### `be_actividades/{actividadId}`
 **Quién escribe:** BitácoraExpress
-**Quién lee:** BitácoraExpress, sistema contextual (Fase 3)
-**Estado actual:** SQLite local. Pendiente migración a Firestore.
+**Quién lee:** BitácoraExpress
+**Estado actual:** ⚠️ SQLite local. Pendiente migración a Firestore.
 
 ```json
 {
@@ -109,28 +117,35 @@
   "timestamp": "timestamp"
 }
 ```
+> **Nota Arquitectónica:** El sistema RAG futuro **NO** debe leer esta colección debido al volumen masivo de registros. Solo debe leer `be_bitacoras/`.
 
 ---
 
-### `be_proyectos/{proyectoId}` ← BitácoraExpress (PENDIENTE migración)
+### `be_proyectos/{proyectoId}`
 **Quién escribe:** BitácoraExpress
 **Quién lee:** BitácoraExpress
+**Estado actual:** ⚠️ SQLite local. Pendiente migración a Firestore.
 
 ```json
 {
   "ownerId": "uid",
   "name": "string",
   "status": "active | archived",
+  "fechaInicio": "YYYY-MM-DD | null",
+  "fechaFin": "YYYY-MM-DD | null",
+  "tags": ["string"],
   "folderPath": "string | null",
   "createdAt": "timestamp"
 }
 ```
+> **Nota de Contexto (Herencia):** Los campos `fechaInicio` y `fechaFin` permiten delimitar el contexto (ej. "ENA 2026" vs "ENA 2027"). Al cerrar un proyecto, su síntesis se empaqueta y puede ser heredada por el siguiente.
 
 ---
 
-### `be_bitacoras/{fecha}` ← BitácoraExpress (PENDIENTE)
-**Quién escribe:** BitácoraExpress (generada por Gemini al final del día)
+### `be_bitacoras/{fecha}`
+**Quién escribe:** BitácoraExpress (generada por IA al final del día)
 **Quién lee:** Sistema contextual (Fase 3)
+**Estado actual:** ⚠️ Pendiente migración.
 
 ```json
 {
@@ -145,12 +160,10 @@
 
 ---
 
-## Colecciones Futuras (Fase 3)
+## 🧠 Viabilidad Técnica: Sistema de Inteligencia Contextual (Fase 3)
 
-| Colección | Propósito |
-|---|---|
-| `contextos/{uid}` | Índice de ámbitos para el sistema de inteligencia contextual |
-| `docs_subidos/{docId}` | Documentos subidos manualmente (PPTs, actas externas, etc.) |
+1. **Aislamiento de Cerebro (Privacidad):** Las actas y bitácoras son estrictamente personales (`ownerId`). Compartir un acta hacia afuera (PDF, Drive) es una acción de exportación explícita, no una mezcla de bases de datos internas. El RAG es un "Cerebro Aislado" por usuario.
+2. **Capa Vectorial (RAG):** El sistema contextual usará Firestore Vector Search (añadiendo embeddings a `sintesis` y `be_bitacoras`) en lugar de leer texto crudo, lo cual disminuye costos e incrementa velocidad.
 
 ---
 
@@ -158,5 +171,4 @@
 
 - Todo documento debe tener `ownerId` = `uid` del usuario autenticado.
 - Las reglas deben verificar `request.auth.uid == resource.data.ownerId`.
-- Colecciones de BitácoraExpress (`be_*`) son privadas — solo el propietario puede leer/escribir.
-- `actas/` puede ser compartida en el futuro (campo `sharedWith: [uid]`), diseñar pensando en eso.
+- El esquema asume **aislamiento total por usuario**. No existen lecturas compartidas a nivel de base de datos para preservar la privacidad de las actas y bitácoras.

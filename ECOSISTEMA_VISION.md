@@ -1,216 +1,85 @@
-# Ecosistema ActaExpress — Visión y Arquitectura Global
+# Ecosistema Express — Visión y Arquitectura Global
 
-> **Mantenido en:** `Coordinador_ActaExpress` (workspace auditor)
-> **Última actualización:** 24/06/2026
-> **Propósito de este workspace:** Auditar paridad de funcionalidades entre proyectos, definir la arquitectura compartida y trazar el roadmap del ecosistema completo.
-
----
-
-## 🗺️ El Ecosistema Completo
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                        ECOSISTEMA ACTAEXPRESS                           │
-│                                                                         │
-│  ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐  │
-│  │  ActaExpress     │    │  ActaExpressWeb   │    │ BurócrataExpress │  │
-│  │  (Android)       │    │  (Web / Chrome)   │    │  (Desktop)       │  │
-│  │                  │    │                  │    │                  │  │
-│  │ • Graba mic      │    │ • Graba mic      │    │ • Cada 10 seg    │  │
-│  │   del celular    │    │ • Graba pestaña  │    │   envía titular  │  │
-│  │ • Gemini 2.5     │    │   (YouTube/Teams)│    │   de lo que hago │  │
-│  │ • Acta→Firestore │    │ • Gemini 2.5    │    │ • Agrupa por     │  │
-│  │ • Capacitor      │    │ • Acta→Firestore │    │   tareas/día    │  │
-│  │                  │    │ • Export DOCX/TXT│    │ • Sube docs al   │  │
-│  └────────┬─────────┘    └────────┬─────────┘    │   final del día  │  │
-│           │                       │              └────────┬─────────┘  │
-│           └───────────────────────┴──────────────────────┘             │
-│                                   │                                     │
-│                    ┌──────────────▼──────────────┐                     │
-│                    │      FIREBASE (compartido)   │                     │
-│                    │                             │                     │
-│                    │  • Firestore: actas/        │                     │
-│                    │  • Firestore: sintesis/     │  ← nuevo            │
-│                    │  • Firestore: bitacoras/    │  ← BurócrataExpress │
-│                    │  • Auth: Google Sign-In     │                     │
-│                    │  • Storage: audios (opt.)   │                     │
-│                    └──────────────┬──────────────┘                     │
-│                                   │                                     │
-│                    ┌──────────────▼──────────────┐                     │
-│                    │   SISTEMA DE INTELIGENCIA   │  ← FASE FUTURA      │
-│                    │   CONTEXTUAL (NotebookLM    │                     │
-│                    │   propio)                   │                     │
-│                    └─────────────────────────────┘                     │
-└─────────────────────────────────────────────────────────────────────────┘
-```
+> **Mantenido en:** `NexoExpress` (Coordinador del Ecosistema)
+> **Última actualización:** 26/06/2026
 
 ---
 
-## 📱 Las Tres Aplicaciones Actuales
+## 🗺️ La Arquitectura de 3 Capas
+
+A medida que el ecosistema evoluciona, se hace evidente que necesitamos separar las responsabilidades. El ecosistema se divide conceptualmente en tres grandes capas:
+
+### Capa 1: Recolección de Información (Los "Sensores")
+Aplicaciones cuyo único propósito es capturar información sin fricción y guardarla estructurada en Firestore.
+- **ActaExpressWeb:** Captura de reuniones formales en PC.
+- **ActaExpress Android:** Captura de reuniones formales en terreno.
+- **BitácoraExpress:** Captura del trabajo diario, esfuerzo y herramientas en background, respetando la privacidad (horarios configurables, detección pausada).
+
+### Capa 2: Análisis de Información (El "Cerebro")
+Servicios que procesan, vectorizan y conectan la información recolectada. (Proyectos separados de las apps de recolección).
+- **Motor RAG / Inteligencia Contextual:** Transforma las actas (colección `sintesis`) y los resúmenes diarios (`be_bitacoras`) en vectores para responder consultas.
+- **Gestión del Conocimiento Histórico:** Entiende el ciclo de vida de los proyectos. Si un proyecto como "ENA 2026" termina, su aprendizaje se sintetiza y se pasa a "ENA 2027", evitando que la IA se contradiga con decisiones obsoletas del pasado.
+
+### Capa 3: Reportería (El "Espejo Analítico")
+- Dashboards y métricas semanales que analizan el esfuerzo vs. resultados. Esta capa no busca razonamiento profundo de IA, sino cruce de datos numéricos y reportes ejecutivos consolidados a partir de `be_proyectos` y `be_actividades`.
+
+---
+
+## 📱 Las Tres Herramientas de Recolección (Capa 1)
 
 ### 1. ActaExpress (Android)
-- **Estado:** MVP core funcionando en dispositivo real (~Fase 4)
-- **Entrada:** Micrófono del celular (capacitor-voice-recorder)
-- **Procesamiento:** Gemini 2.5 Flash (llamada directa desde cliente)
-- **Salida:** Acta estructurada en Firestore
-- **Pendiente:** Síntesis extendida, carpetas/proyectos, copiloto en tiempo real
+- **Estado:** MVP core funcionando en dispositivo real (~60%)
+- **Entrada:** Micrófono del celular
+- **Procesamiento:** Gemini 2.5 Flash
+- **Salida:** Acta en Firestore (`actas/` con `plataforma: "android"`)
 
 ### 2. ActaExpressWeb
-- **Estado:** ~78% MVP (más avanzada que Android)
+- **Estado:** Principal prototipo del ecosistema (~82%)
 - **Entrada:** Micrófono del sistema O captura de pestaña (YouTube, Teams)
-- **Procesamiento:** Gemini 2.5 Flash vía API Server (Express en puerto 8080)
-- **Salida:** Acta en Firestore + Export DOCX/TXT
-- **Pendiente:** Export PDF, compartir acta, deploy
+- **Procesamiento:** Gemini 2.5 Flash vía API Server
+- **Salida:** Acta + `sintesis/` + Export DOCX/TXT
 
-### 3. BurócrataExpress
-- **Estado:** Definido en concepto, desarrollo pendiente
-- **Entrada:** Texto automático cada 10 segundos (lo que hago en el PC)
-- **Procesamiento:** Agrupación por tareas/contexto del día
-- **Salida:** Bitácora diaria en Firestore
-- **Extra:** Al final del día, el usuario sube documentos adicionales (actas, PPTs, etc.)
+### 3. BitácoraExpress (Desktop - Python)
+- **Estado:** Activo en Linux/Windows (~48%), migrando SQLite a Firestore
+- **Entrada:** Watcher en background captura título de la ventana activa, filtrado por configuración de privacidad del usuario (horarios laborales, modo off).
+- **Procesamiento:** FastAPI backend agrupa tiempos por proyecto; Gemini resume el día.
+- **Salida:** `be_actividades/` y `be_bitacoras/` en Firestore
 
 ---
 
-## ❓ Respuestas a las preguntas clave
+## ❓ Decisiones Clave de Diseño y Privacidad
 
-### 4. ¿Es posible guardar una síntesis más larga además del acta?
+### 1. Aislamiento Total (Cerebro Aislado)
+Las actas y bitácoras son estrictamente personales en la base de datos. Si deseas compartir un acta, la exportas (PDF, DOCX) y la envías por Drive o correo. La base de datos y el motor RAG nunca mezclarán información de múltiples usuarios, garantizando la privacidad absoluta de tu contexto.
 
-**Sí, y es muy recomendable.** La propuesta: una colección separada `sintesis/`:
+### 2. Privacidad y el Límite Personal/Laboral
+Para evitar que BitácoraExpress capture información confidencial fuera del trabajo, la herramienta integrará configuraciones de **horario laboral** y un botón de **pausa manual**. El usuario acepta que, dentro del horario activo, se registrarán las cabeceras, confiando en el modelo de "Cerebro Aislado" donde solo él tiene acceso a sus datos.
 
-```json
-sintesis/{actaId}
-{
-  "actaId": "referencia al acta",
-  "transcripcion": "texto completo de lo hablado",
-  "analisis_profundo": "análisis temático, tensiones, no dichos",
-  "contexto_previo": "qué pasó en reuniones anteriores del tema",
-  "preguntas_sin_resolver": ["¿Cuándo entrega Pedro?", "..."],
-  "temas_clave": ["string"],
-  "createdAt": "timestamp"
-}
-```
-
-**¿Por qué colección separada?** Para no inflar `actas/` que se lee frecuentemente, y consultar la síntesis solo cuando se necesita profundizar.
-
-### 5. ¿Por qué es importante tener más información?
-
-La información extendida sirve para:
-- **Modificar actas** con fundamento (no solo el resumen)
-- **Ampliar un tema** específico sin re-escuchar el audio
-- **Alimentar el sistema de inteligencia contextual** (fase futura)
-- **Detectar contradicciones** entre reuniones del mismo proyecto
-
-### 6. BurócrataExpress — ¿Cómo encaja?
-
-Es el **tercer canal de captura de contexto**, el más granular. Mientras las actas capturan reuniones formales:
-
-```
-BurócrataExpress captura → trabajo informal, decisiones pequeñas,
-                            navegación web, código escrito, contexto
-                            cotidiano que nunca queda en un acta
-```
-
-Flujo de datos:
-```
-Cada 10 seg → texto → buffer acumulado
-     ↓
-Cada N minutos → IA agrupa en "tarea actual"
-     ↓
-bitacoras/{uid}/{fecha} en Firestore
-     ↓ (fin del día)
-El usuario sube docs adicionales → enriquece el contexto del día
-```
+### 3. El Ciclo de Vida del Contexto (Proyectos)
+El contexto no es infinito. Se agrupa en **Proyectos** (`be_proyectos`) con inicio y fin (ej. anualmente). Esto evita la "contaminación" histórica de decisiones y permite trasladar aprendizajes ordenados de una iteración a otra sin confundir a la IA.
 
 ---
 
-## 🧠 El Sistema de Inteligencia Contextual (Fase Futura)
+## 🗓️ Roadmap Global por Fases
 
-Esta es la pieza que une todo. Funciona como un **NotebookLM propio** pero con tus datos.
+### Fase 1 — Paridad básica y Estabilización (Actual)
+✅ **[ActaExpressWeb]**: Implementar colección `sintesis/` y `plataforma: "web"`.
+⚠️ **[BitácoraExpress]**: Finalizar migración local (SQLite) a Firebase (`be_proyectos/`, `be_actividades/`).
+✅ **[NexoExpress & BitácoraExpress]**: Push a GitHub de los repos locales completado con éxito.
+⏳ **[ActaExpressWeb]**: Enriquecer el prompt para incluir la transcripción completa (mejora la síntesis).
+⏳ **[ActaExpress Android]**: Añadir campo `plataforma: "android"` y lograr paridad de exportación y síntesis.
 
-### Arquitectura conceptual
+### Fase 2 — Organización e Integración (Capa 1)
+⏳ **Privacidad Frontend**: Agregar interfaz de configuración de horarios y botón de pausa a BitácoraExpress.
+⏳ **Carpetas/Proyectos**: Implementar la organización y ciclo de vida en ambas apps ActaExpress.
+⏳ **Asignación de Actas**: Vincular un acta a un `be_proyectos/{id}`.
 
-```
-FUENTES DE CONTEXTO:
-  actas/          → reuniones formales (ActaExpress Web + Android)
-  sintesis/       → análisis profundo de cada reunión
-  bitacoras/      → trabajo cotidiano (BurócrataExpress)
-  docs_subidos/   → PPTs, textos, etc. subidos manualmente
-         │
-         ▼
-  ÍNDICE DE ÁMBITOS:
-  { laboral: [...actaIds, ...bitacoraIds],
-    cotidiano: [...],
-    "proyecto-X": [...] }
-         │
-         ▼
-  MOTOR DE PROFUNDIZACIÓN:
-  • El usuario elige ámbito
-  • Se cargan los documentos relevantes como contexto
-  • Gemini 2.5 Flash (1M tokens) procesa todo en una sola llamada
-  • El usuario puede preguntar, explorar, tomar decisiones
-         │
-         ▼
-  ASISTENTE EN TIEMPO REAL (durante reuniones):
-  • Carga el contexto del ámbito activo
-  • Escucha la reunión en curso (streaming)
-  • Sugiere preguntas relevantes
-  • Detecta compromisos no cumplidos del pasado
-  • Genera respuestas posibles a preguntas que te hagan
-```
-
-### ¿Qué preguntas puede responder en tiempo real?
-- *"¿Qué puedo preguntar ahora dado este contexto?"*
-- *"¿Qué respuesta tengo a este problema según lo que ya sé?"*
-- *"¿Qué ideas puedo aportar en este momento?"*
-- *"¿Esto contradice algún acuerdo previo?"*
+### Fase 3 — Inteligencia (Capa 2) y Reportería (Capa 3)
+⏳ **Capa Vectorial**: Implementar Firestore Vector Search para `sintesis` y `be_bitacoras`.
+⏳ **Motor de profundización**: RAG aislado para conversar con tu propio contexto.
+⏳ **Capa de Reportería Semanal**: Dashboard de analítica del esfuerzo (separado de la IA profunda).
 
 ---
 
-## 📊 Paridad de funcionalidades (tabla de auditoría)
-
-| Funcionalidad | ActaExpressWeb | ActaExpress Android | Prioridad |
-|---|---|---|---|
-| Grabación de audio | ✅ mic + pestaña | ✅ mic celular | — |
-| Procesamiento Gemini | ✅ | ✅ | — |
-| Acta estructurada → Firestore | ✅ | ✅ | — |
-| Export DOCX/TXT | ✅ | ❌ | 🔴 Alta |
-| Export PDF | ⏳ pendiente | ❌ | 🟡 Media |
-| Síntesis extendida guardada | ❌ | ❌ | 🔴 Alta (nuevo) |
-| Transcripción completa guardada | ❌ | ❌ | 🟡 Media (nuevo) |
-| Carpetas/Proyectos | ❌ | ❌ | 🟡 Media |
-| Chat con historial | ❌ | ❌ | 🟢 Futura |
-| Copiloto tiempo real | ❌ | ❌ | 🟢 Futura |
-
----
-
-## 🗓️ Roadmap por fases
-
-### Fase 1 — Paridad básica (próximas semanas)
-1. **Síntesis extendida**: agregar colección `sintesis/` y guardarla al procesar acta en ambas apps
-2. **Export en Android**: implementar share/export equivalente a la versión web
-3. **Unificar modelo de datos Firestore**: mismo esquema en ambas apps
-
-### Fase 2 — Organización y profundización
-1. **Carpetas/Proyectos** en ambas apps (ya en ROADMAP_FUTURO.md de Android)
-2. **BurócrataExpress** MVP básico (web app)
-3. **Chat con historial** dentro de cada carpeta (NotebookLM básico)
-
-### Fase 3 — Inteligencia contextual
-1. **Índice de ámbitos** (laboral / cotidiano / proyecto)
-2. **Motor de profundización** con Gemini como núcleo
-3. **Asistente en tiempo real** durante reuniones (el más complejo)
-
----
-
-## 🔧 Decisiones de arquitectura abiertas
-
-| Decisión | Opciones | Recomendación |
-|---|---|---|
-| ¿Dónde vive el motor de inteligencia contextual? | Cloud Function / servidor propio / cliente | Cloud Function (escalable, sin CORS) |
-| ¿Síntesis en colección separada o campo en `actas`? | Campo adicional / colección `sintesis/` | Colección separada |
-| ¿BurócrataExpress es web o desktop? | Web app / Electron / extensión Chrome | Web app primero, luego extensión Chrome |
-| ¿Cómo se define el "ámbito"? | Tags manuales / clasificación IA / carpetas | Carpetas + IA para sugerencias |
-
----
-
-> **Regla del coordinador:** La versión Web es el prototipo. Toda feature nueva se construye primero en Web y luego se porta a Android. Este documento se actualiza al iniciar cada sesión de trabajo importante.
+> **Última revisión:** 26-06-2026
+> **Regla de NexoExpress:** La versión Web es el prototipo. Toda feature se construye primero en Web. El schema unificado en `schemas/` es la única fuente de verdad.

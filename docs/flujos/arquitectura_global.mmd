@@ -1,0 +1,26 @@
+graph TD
+    subgraph Capa 1: Recolección
+        A[ActaExpress Web]
+        B[ActaExpress Android]
+        C[BitácoraExpress Local]
+    end
+
+    subgraph Firebase Cloud
+        DB[(Firestore: actas, sintesis, bitacoras)]
+        Auth[Google Auth]
+        CF_TTL[Cloud Function TTL]
+    end
+
+    subgraph Capa 2 y 3: Inteligencia y Reportería
+        RAG[Motor RAG Vectorial]
+        Dash[Espejo Analítico / Dashboards]
+    end
+
+    A -->|Escribe actas/sintesis| DB
+    B -->|Escribe actas| DB
+    C -->|Escribe be_actividades| DB
+    Auth -.->|Valida ownerId| DB
+    
+    DB -->|Búsqueda Semántica K-NN| RAG
+    DB -->|Agrupación de Series de Tiempo| Dash
+    CF_TTL -.->|Purga datos expirados| DB
