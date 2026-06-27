@@ -1,28 +1,36 @@
-# Informe de Arquitectura — Suite Express (Cloud & Local)
+# Informe Arquitectónico y Cloud — Ecosistema Express
 
-## 1. Visión Global
-El Ecosistema Express ha madurado hacia una arquitectura de 3 capas claramente delimitadas, donde Firestore actúa como la única fuente de verdad y puente de comunicación:
-- **Capa 1 (Recolección):** ActaExpressWeb, ActaExpress Android, BitácoraExpress. Su foco es la baja fricción en la captura y el respeto a la privacidad mediante filtros locales (horarios laborales).
-- **Capa 2 (Inteligencia / RAG):** El "Cerebro Aislado" que asimila las síntesis formales y los resúmenes de bitácora mediante búsquedas semánticas.
-- **Capa 3 (Reportería):** Visualización analítica del esfuerzo y uso de tiempo, sin necesidad de inferencia profunda.
+**Fecha:** 27-06-2026
+**Analista:** Arquitecto de Ecosistema y Software
+**Proyectos Analizados:** ActaExpressWeb, BitácoraExpress, NexoExpress
 
-## 2. Hallazgos y Desafíos Técnicos (Cloud)
+---
 
-### A. Escalabilidad y Costos (RAG vs Firestore)
-El modelo conceptual inicial sugería que la IA leería múltiples documentos completos (como toda la colección `sintesis`) al vuelo. **Riesgo:** Hacer esto para cada prompt destrozará los límites de la capa gratuita de Firestore (50k lecturas/día) y añadirá latencia inaceptable al Asistente.
-**Mitigación Obligatoria:** Implementar **Firestore Vector Search**. El cliente solo pedirá los *Top-K* documentos más similares a la pregunta.
+## 1. Visión End-to-End del Ciclo de Vida de los Datos
+El ecosistema actualmente captura información desde la máquina local (BitácoraExpress) y aplicaciones front-end (ActaExpress). 
+El flujo crítico es: **Captura Local -> API Local / Cliente Web -> Google Cloud Firestore -> Modelos LLM (Gemini) -> Base de Conocimiento (Vector Search)**.
 
-### B. Latencia de Ingesta (El Pipeline de Embeddings)
-El cliente frontend/local no debe calcular embeddings matemáticos. Se recomienda delegar esto a Cloud Functions: cuando se crea una síntesis, un trigger `onDocumentCreated` llama a Vertex AI y guarda el vector. Esto desahoga al cliente pero introduce una latencia asíncrona de 1-2 segundos. El cliente debe estar preparado para no mostrar resultados del asistente si el vector aún no existe.
+## 2. Hallazgos y Desafíos Estructurales
 
-### C. Ciclo de Vida y "Amnesia Controlada"
-Si un proyecto "ENA 2026" termina, y la IA lee esos datos en "ENA 2028", se generarán contradicciones ("Alucinación de Vigencia"). 
-**Propuesta Arquitectónica:** Cuando un proyecto de `be_proyectos` marque `status: archived` y pase su `fechaFin`, se debe invocar a Gemini para generar un "Documento de Traspaso" súper-sintetizado. Los vectores de "ENA 2026" se excluyen de la búsqueda diaria (se filtran en la query), y solo se vectoriza el Documento de Traspaso.
+### 2.1. Escalabilidad y Costos de Lectura (Firestore)
+- **Riesgo:** BitácoraExpress inserta cientos de micro-registros diarios en la colección `be_actividades` (saltos de ventana rápidos). Si el futuro motor RAG o la IA leen directamente esta colección para consultar contexto histórico, los costos operativos (Facturación por Document Reads en GCP) crecerán drásticamente de forma insostenible.
+- **Solución Evaluada:** La arquitectura dictada en el esquema actual estipula que la IA **solo** debe leer `be_bitacoras/` (un documento resumen por día) en lugar de la data cruda. Este límite arquitectónico es vital y está diseñado correctamente.
 
-### D. Seguridad e Inmutabilidad
-Las reglas de Firestore garantizan aislamiento por `ownerId`. No obstante, `be_actividades` es una colección volátil y propensa a inflar la base de datos velozmente. Debe diseñarse una Cloud Function de limpieza (TTL) que purgue `be_actividades` de más de 30 días, ya que el contexto útil reside permanentemente en `be_bitacoras/`.
+### 2.2. Aislamiento, Seguridad y Admin SDK
+- **Riesgo:** Actualmente, las aplicaciones locales (como BitácoraExpress) se comunican con Firestore usando credenciales de **Firebase Admin SDK**. Esto significa que el backend local tiene acceso de superusuario a la base de datos, saltándose las *Firestore Security Rules*.
+- **Solución a Futuro:** Para uso exclusivamente personal (MVP) en un PC seguro, esto es aceptable. Sin embargo, si la suite Express se distribuye a otros usuarios, se debe migrar al SDK Cliente (Firebase Auth) para que los tokens de sesión restrinjan estrictamente la lectura a `request.auth.uid == resource.data.ownerId`.
 
-## 3. Propuesta de Flujos a Diagramar
-Solicito al `diseñador_flujos` que diagrame lo siguiente:
-1. **Arquitectura Global:** La separación entre las 3 Capas y el bus de Firebase.
-2. **Flujo de Datos RAG:** La secuencia asíncrona desde que se guarda un acta hasta que el cliente hace una búsqueda semántica.
+### 2.3. Cuello de Botella: Vectorización y Triggers (Fase 3)
+- **Desafío:** La promesa del ecosistema es un "Cerebro Aislado" (RAG). Para ello, cada acta y bitácora debe ser transformada a vectores numéricos (Embeddings).
+- **Riesgo Operacional:** Si la vectorización se hace sincrónicamente (esperando a que Gemini devuelva el vector antes de que el usuario vea el "Guardado con éxito"), la latencia frustrará al usuario.
+- **Recomendación:** Usar **Firebase Cloud Functions** (Background Triggers). Cuando un documento se escribe en Firestore, un evento `onDocumentCreated` debe disparar asíncronamente el llamado a Vertex AI para calcular el embedding, sin bloquear la interfaz del usuario.
+
+## 3. Propuestas de Mejora Concretas (Arquitectura)
+
+1. **Garbage Collection (Recolección de Basura):** Los registros crudos en `be_actividades` pierden su valor principal una vez que el Agente IA genera el resumen diario en `be_bitacoras`. Propongo diseñar una política de expiración (TTL en Firestore o un Cron Job de GCP) que purgue las actividades huérfanas de más de 30 días para ahorrar cuota de almacenamiento gratuito.
+2. **Consolidación de Evidencias de Texto:** Actualmente, las evidencias largas en texto se guardan crudas. Si se almacenan muchas actas pesadas directamente en el documento de Firestore, podríamos golpear el límite de 1MB por documento. Se debe vigilar este límite en `ActaExpressWeb`.
+
+## 4. Requerimientos para `@/disenador_flujos`
+Basado en este análisis de arquitectura Cloud, se solicita al Diseñador de Flujos que genere **dos diagramas Mermaid**:
+1. **Flujo de Vectorización Asíncrona:** Un diagrama que ilustre cómo un Acta/Bitácora llega a Firestore -> dispara una Cloud Function -> consulta a Vertex AI (Text Embeddings) -> y guarda el vector de vuelta en Firestore.
+2. **Ciclo de Vida de la Data Local a Cloud:** Mostrando el filtro de privacidad local (horarios), el viaje al backend, la consolidación, y la purga a los 30 días (Garbage Collection).
