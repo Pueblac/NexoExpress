@@ -11,7 +11,7 @@
 |---|---|---|---|
 | ActaExpressWeb | 🟢 Activo | ~82% | Enriquecer prompt Gemini con transcripción |
 | ActaExpress Android | 🟡 En pausa | ~60% | Paridad con Web (campo `plataforma`) |
-| BitácoraExpress | 🟢 Activo en Linux | ~48% | Completar migración a Firebase (Python local) |
+| BitácoraExpress | 🟢 Activo en Linux | 100% (MVP) | MVP Completado, mantenimiento |
 | NexoExpress | 🟢 Activo | 100% | Orquestación, RAG Docs y Mantenimiento |
 
 ---
@@ -20,20 +20,18 @@
 
 - **Integración con GitHub exitosa:** Repositorios conectados y subidos correctamente usando PAT.
 - **Configuración de Firebase en Backend:** El SDK de Admin de Firebase ya está configurado en BitácoraExpress (`keys/`).
+- **BitácoraExpress MVP Completado:** Interfaz de conciliación con evidencia, agrupación masiva de saltos de ventana, borrado y creación de proyectos virtuales, todo conectado a Firebase.
+- **Frontend Modularizado:** Refactorización arquitectónica de BitácoraExpress para separar CSS y JS de la vista HTML (`index.html`).
 - **Pipeline Documental Automatizado:** Script en Python que renderiza flujos de Mermaid a PNG y los empaqueta en `.docx` con timestamp.
-- **Definición de 3 Capas:** El ecosistema separa formalmente la Recolección (Apps), el Análisis (RAG Vectorial) y la Reportería.
-- **Privacidad y Vectorización:** Se decidió no usar texto crudo para RAG por costos (se usará Vector Search) y se delegó la privacidad al cliente (horarios laborales) para que Firestore sea un "Cerebro Aislado".
-- **Skills creados:** `arquitecto_ecosistema` y `disenador_flujos` añadidos a los 4 originales.
+- **Privacidad y Vectorización:** Se decidió delegar la privacidad al cliente (horarios laborales) para que Firestore sea un "Cerebro Aislado".
 
 ---
 
 ## 🚀 Próximos 5 Pasos Globales (priorizados)
 
-1. **[BitácoraExpress]** Migrar escritura SQLite → Firebase Firestore (`be_proyectos/`, `be_actividades/`) usando el `GOOGLE_APPLICATION_CREDENTIALS`.
-2. **[ActaExpressWeb]** Enriquecer el prompt para incluir transcripción completa en la respuesta de Gemini, mejorando la `sintesis/`.
-3. **[BitácoraExpress]** Implementar frontend o configuración para establecer horario laboral y botón de pausa.
-4. **[ActaExpress Android]** Añadir campo `plataforma: "android"` al guardar actas y lograr paridad de exportación.
-5. **[NexoExpress]** Investigar costos de Cloud Functions para la futura vectorización con Vertex AI.
+1. **[ActaExpressWeb]** Enriquecer el prompt para incluir transcripción completa en la respuesta de Gemini, mejorando la `sintesis/`.
+2. **[ActaExpress Android]** Añadir campo `plataforma: "android"` al guardar actas y lograr paridad de exportación.
+3. **[NexoExpress]** Investigar costos de Cloud Functions para la futura vectorización con Vertex AI.
 
 ---
 
