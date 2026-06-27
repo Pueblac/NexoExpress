@@ -104,17 +104,19 @@
 ### `be_actividades/{actividadId}`
 **Quién escribe:** BitácoraExpress
 **Quién lee:** BitácoraExpress
-**Estado actual:** ⚠️ SQLite local. Pendiente migración a Firestore.
+**Estado actual:** 🟢 Migrado a Firestore (Activo).
 
 ```json
 {
   "ownerId": "uid",
-  "proyectoId": "string | null",
-  "ventanaTitulo": "string",
-  "duracionSegundos": 120,
-  "evidenciaUrl": "string | null",
-  "sistemaOperativo": "windows | linux | darwin",
-  "timestamp": "timestamp"
+  "project_id": "string | null (referencia a be_proyectos o null si es huérfana)",
+  "title": "string (título de la ventana)",
+  "duration": 120,
+  "time": "ISO 8601 string",
+  "evidence_type": "file | text | null",
+  "evidence_url": "string | null (ruta local o cloud al archivo)",
+  "evidence_text": "string | null (texto plano pegado por el usuario)",
+  "sistemaOperativo": "windows | linux | darwin"
 }
 ```
 > **Nota Arquitectónica:** El sistema RAG futuro **NO** debe leer esta colección debido al volumen masivo de registros. Solo debe leer `be_bitacoras/`.
@@ -124,7 +126,7 @@
 ### `be_proyectos/{proyectoId}`
 **Quién escribe:** BitácoraExpress
 **Quién lee:** BitácoraExpress
-**Estado actual:** ⚠️ SQLite local. Pendiente migración a Firestore.
+**Estado actual:** 🟢 Migrado a Firestore (Activo). Soporta proyectos virtuales sin carpeta.
 
 ```json
 {
@@ -135,7 +137,7 @@
   "fechaFin": "YYYY-MM-DD | null",
   "tags": ["string"],
   "folderPath": "string | null",
-  "createdAt": "timestamp"
+  "createdAt": "ISO 8601 string"
 }
 ```
 > **Nota de Contexto (Herencia):** Los campos `fechaInicio` y `fechaFin` permiten delimitar el contexto (ej. "ENA 2026" vs "ENA 2027"). Al cerrar un proyecto, su síntesis se empaqueta y puede ser heredada por el siguiente.
