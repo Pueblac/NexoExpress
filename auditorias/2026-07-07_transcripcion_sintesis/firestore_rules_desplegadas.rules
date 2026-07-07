@@ -1,0 +1,24 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Regla para la colección de usuarios
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Regla para la colección de actas
+    match /actas/{actaId} {
+      // Permite crear solo si el acta es tuya
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.ownerId;
+      // Permite leer, modificar o borrar solo si ya eres el dueño
+      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.ownerId;
+    }
+    
+    // Regla para la colección de síntesis (espeja la de actas; ver schemas/firestore_schema.md)
+    match /sintesis/{actaId} {
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.ownerId;
+      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.ownerId;
+    }
+  }
+}

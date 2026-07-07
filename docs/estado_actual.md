@@ -1,7 +1,21 @@
 # Estado Actual — NexoExpress (Coordinador del Ecosistema)
 
 **Estado Global del Ecosistema:** 🟢 VERDE
-**Última Actualización:** 26-06-2026
+**Última Actualización:** 07-07-2026
+
+---
+
+## ✅ Checklist de Micro-Tareas Vigente
+
+**Meta (CERRADA 07-07-2026):** [ActaExpressWeb] Enriquecer el prompt de Gemini para incluir transcripción completa y poblar `sintesis/` con contenido real.
+**Expediente:** `auditorias/2026-07-07_transcripcion_sintesis/` — ciclo dual-IA completo: diseño APROBADO CON CAMBIOS (r1), código APROBADO CON OBSERVACIONES + BUG D1 corregido (r1), fix APROBADO (r2). Commiteado y pusheado con aprobación del Director.
+
+- [x] **MT-01** — Diseño del enriquecimiento + prompt de revisión de DISEÑO para Gemini 3.1 Pro High, archivado en el expediente. — **DoD cumplido (07-07-2026):** existe `auditorias/2026-07-07_transcripcion_sintesis/prompt_diseno_ronda1.md` y fue entregado al Director.
+- [x] **MT-02** — Implementar el diseño aprobado en ronda 1 (ver `respuesta_diseno_ronda1.md`, dictamen §3): dos llamadas (acta síncrona intacta + síntesis en background text/plain 65536 tokens reutilizando el `fileUri`), sin reintento MAX_TOKENS, purga anti-derrame, truncado 800k, flag `generarSintesis` (default false), logging de `usageMetadata`. — **DoD cumplido (07-07-2026):** E2E real con audio sintetizado → `sintesis/HwewR3jTMUdopfVzqCVN` con transcripción de 494 chars y `actas/{id}` con solo sus 13 campos; evidencia literal en `evidencia_mt02.md`. **Colaterales resueltos:** reglas Firestore no cubrían `sintesis/` (desplegado fix con aprobación del Director) y bug 400 en `firestoreSet` (updateMask con comas) corregido.
+- [x] **MT-03** — Prompt de auditoría de CÓDIGO (claims, trazas, trampas, dudas, adjuntos exactos) archivado en el expediente. — **DoD cumplido (07-07-2026):** existe `prompt_auditoria_ronda1.md` y fue entregado al Director.
+- [ ] **MT-04** — Frontend Web: enviar `generarSintesis: true` desde la UI (toggle u opción al grabar, decisión de UX del Director). — **DoD:** request real del frontend con el flag y síntesis generada end-to-end. *(No bloqueante para MT-02/MT-03.)*
+
+**Cursor:** ciclo cerrado. Próxima meta a descomponer al abrir sesión: MT-04 (frontend envía `generarSintesis: true`; UX del toggle a decidir por el Director) o la que el Director priorice de los Próximos Pasos.
 
 ---
 
@@ -18,6 +32,9 @@
 
 ## 📌 Hitos Recientes del Ecosistema
 
+- **Transcripción + análisis profundo funcionando (07-07):** ActaExpressWeb puebla `sintesis/` en background con flag `generarSintesis`; verificado E2E contra Firestore real. Primer ciclo dual-IA completo (expediente `2026-07-07_transcripcion_sintesis`): cazó 3 defectos reales (reglas Firestore sin `sintesis/`, 400 en `firestoreSet`, truncado chars vs bytes).
+- **Reglas Firestore actualizadas (07-07):** bloque owner-based para `sintesis/` desplegado (ruleset `3dc59963`). Regla operativa nueva: colección en el schema ⇒ verificar reglas desplegadas antes de estrenarla.
+- **Entorno GCP verificado (07-07):** config gcloud `actaexpress`; billing OFF (suficiente por ahora; Blaze exige desvincular otro proyecto — cupo 5/5); Gemini API en `gen-lang-client-0046942155` tier gratuito (decisión de gobernanza pendiente).
 - **Integración con GitHub exitosa:** Repositorios conectados y subidos correctamente usando PAT.
 - **Configuración de Firebase en Backend:** El SDK de Admin de Firebase ya está configurado en BitácoraExpress (`keys/`).
 - **BitácoraExpress MVP Completado:** Interfaz de conciliación con evidencia, agrupación masiva de saltos de ventana, borrado y creación de proyectos virtuales, todo conectado a Firebase.
@@ -29,9 +46,11 @@
 
 ## 🚀 Próximos 5 Pasos Globales (priorizados)
 
-1. **[ActaExpressWeb]** Enriquecer el prompt para incluir transcripción completa en la respuesta de Gemini, mejorando la `sintesis/`.
+1. **[ActaExpressWeb] MT-04:** frontend envía `generarSintesis: true` (toggle de UX a decidir por el Director).
 2. **[ActaExpress Android]** Añadir campo `plataforma: "android"` al guardar actas y lograr paridad de exportación.
-3. **[NexoExpress]** Investigar costos de Cloud Functions para la futura vectorización con Vertex AI.
+3. **[NexoExpress]** Costos de Cloud Functions/Vertex AI para vectorización + decisión de billing (cupo 5/5, hay que desvincular un proyecto).
+4. **[Gobernanza]** Tier de Gemini API: gratuito (datos usables por Google) vs pagado — afecta privacidad del audio de reuniones.
+5. **[ActaExpressWeb]** Observación: actas de reuniones en inglés salen en español pese al prompt (ciclo propio si se prioriza).
 
 ---
 
