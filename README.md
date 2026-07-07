@@ -23,18 +23,24 @@ En el futuro, un Motor de Profundización (RAG) consumirá toda esta informació
 
 ```text
 NexoExpress/
-├── .agents/skills/          ← Agentes IA reutilizables
-│   ├── auditor_paridad/     ← Audita brechas entre proyectos
-│   ├── documentador_sesion/ ← Genera bitácoras de sesión
-│   ├── arquitecto_firebase/ ← Define el schema Firestore
-│   └── roadmap_manager/     ← Gestiona el roadmap global
+├── .agents/skills/            ← Agentes IA reutilizables
+│   ├── auditor_externo/       ← Ciclo dual-IA: prompts de diseño/código para Gemini + validación anti-bluff
+│   ├── auditor_paridad/       ← Audita brechas entre proyectos
+│   ├── depurador_agentes/     ← Detecta bucles/alucinación en agentes IA y prescribe la intervención
+│   ├── documentador_sesion/   ← Genera bitácoras de sesión
+│   ├── innovador/             ← Propone mejoras fuera del plan (con evidencia; nunca implementa)
+│   ├── arquitecto_firebase/   ← Define el schema Firestore
+│   └── roadmap_manager/       ← Gestiona el roadmap global (descompone en micro-tareas)
 ├── docs/
-│   ├── estado_actual.md     ← Estado vivo y pendientes del ecosistema
-│   ├── ECOSISTEMA_VISION.md ← Visión a futuro y arquitectura completa
-│   └── bitacora_*.md        ← Bitácoras generadas en cada sesión
+│   ├── METODOLOGIA_DUAL_IA.md    ← Ciclo "diseño primero" Claude↔Gemini + micro-tareas (LEER PRIMERO)
+│   ├── PROMPT_ARRANQUE_SESION.md ← Plantilla del primer mensaje de cada sesión
+│   ├── estado_actual.md          ← Estado vivo, pendientes y checklist de micro-tareas
+│   ├── ECOSISTEMA_VISION.md      ← Visión a futuro y arquitectura completa
+│   └── bitacora_*.md             ← Bitácoras generadas en cada sesión
+├── auditorias/                 ← Expedientes dual-IA ({fecha}_{tema}/: prompts, respuestas, validación)
 ├── schemas/
-│   └── firestore_schema.md  ← Contrato de datos Firebase (fuente de verdad)
-└── scratch/                 ← Scripts temporales y pruebas (ej. setups GitHub)
+│   └── firestore_schema.md     ← Contrato de datos Firebase (fuente de verdad)
+└── scratch/                    ← Scripts temporales y pruebas (ej. setups GitHub)
 ```
 
 ## 🔑 Reglas del Ecosistema
@@ -43,6 +49,8 @@ NexoExpress/
 2. **Schema centralizado**: ningún proyecto crea colecciones Firestore sin documentarlas primero en `schemas/firestore_schema.md`.
 3. **Bitácora diaria**: cada sesión de desarrollo en el ecosistema genera su propia `docs/bitacora_DD_MM_YYYY.md` para mantener la trazabilidad.
 4. **Prefijos y Trazabilidad**: BitacoraExpress usa `be_` en todas sus colecciones para evitar colisiones. Toda acta debe incluir el campo `plataforma` ("web" o "android").
+5. **Ciclo dual-IA "diseño primero"** (ver `docs/METODOLOGIA_DUAL_IA.md`): todo cambio no trivial pasa por revisión de diseño de Gemini ANTES de implementarse y auditoría de código DESPUÉS, con validación anti-bluff de cada respuesta. Nada se commitea sin aprobación del Director.
+6. **Micro-tareas**: toda meta se descompone en unidades de ≤30–45 min con DoD explícito antes de empezar; una sesión cierra 1–3 micro-ciclos completos.
 
 ## 🏗️ Firebase / Firestore Centralizado
 
