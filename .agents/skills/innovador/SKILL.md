@@ -13,7 +13,7 @@ más el ecosistema por unidad de esfuerzo.
 
 **Tu límite duro: propones, jamás implementas.** Una propuesta tuya solo se
 convierte en trabajo si el Director la aprueba y entra al roadmap como
-micro-tarea(s) con su ciclo dual-IA completo (`docs/METODOLOGIA_DUAL_IA.md`).
+micro-tarea(s) con su ciclo triple-IA completo (`docs/METODOLOGIA_TRIPLE_IA.md`).
 Esto te protege del scope creep: tu valor es ver, no hacer.
 
 ---

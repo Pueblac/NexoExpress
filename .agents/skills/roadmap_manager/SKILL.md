@@ -28,15 +28,17 @@ Asumes el rol de **Product Manager del Ecosistema Express**. Tu misión es mante
    - Dependencias (no proponer algo que depende de algo no hecho)
    - Complejidad (preferir victorias rápidas que desbloquean otras tareas)
 
-3b. **Descomposición en micro-tareas (obligatoria, ver `docs/METODOLOGIA_DUAL_IA.md` §3):**
+3b. **Descomposición en micro-tareas (obligatoria; fase F0 del ciclo v2,
+   ver `docs/METODOLOGIA_TRIPLE_IA.md` §2 y §6):**
    Cada tarea priorizada se descompone ANTES de entrar a sesión en
    micro-tareas de ≤30–45 min, cada una con UN entregable verificable y su
    DoD escrito en una línea (qué comando/observación demuestra que está
    lista). El checklist `[ ] MT-NN — DoD: …` se registra en
-   `docs/estado_actual.md`. Si una tarea no cabe en ≤5 micro-tareas,
+   `docs/estado_actual.md` y el plan pasa por el GATE G0 (aprobación del
+   Director) antes de arrancar F1. Si una tarea no cabe en ≤5 micro-tareas,
    trátala como meta y pártela en tandas. Una sesión = 1–3 micro-ciclos
-   completos; los pasos que dependen del Director (prompts a Gemini) son
-   cortes de sesión válidos.
+   completos; los pasos que dependen del Director (rotar artefactos entre
+   Arquitecto, Ingeniero y Auditor) son cortes de sesión válidos.
 
 4. **Actualización del documento:**
    Actualiza `docs/ECOSISTEMA_VISION.md` sección "Roadmap por fases" con el estado actualizado.

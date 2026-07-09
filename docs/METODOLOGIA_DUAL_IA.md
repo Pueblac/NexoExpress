@@ -1,5 +1,12 @@
 # Metodología Dual-IA — Ecosistema Express
 
+> **⚠️ HISTÓRICO — SUPERSEDIDA.** Desde el 09-07-2026 rige
+> `METODOLOGIA_TRIPLE_IA.md` (v2, ciclo triple-IA aprobado en el expediente
+> `auditorias/2026-07-08_metodologia_v2/`). Este documento se conserva como
+> referencia y **fallback operativo** (v2 §7: degradación autorizada por el
+> Director o indisponibilidad de Sonnet). NO usarlo para arrancar sesiones
+> nuevas.
+
 > **Origen:** extrapolada del proyecto OPCG (jul-2026), donde este flujo cazó
 > bugs reales que ninguna de las dos IAs habría detectado sola (un bypass por
 > mutación referencial, un test falso-positivo y un claim impreciso del propio
