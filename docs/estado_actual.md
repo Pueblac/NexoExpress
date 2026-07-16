@@ -8,6 +8,21 @@
 
 ## ✅ Checklist de Micro-Tareas Vigente
 
+**Meta (F0 registrado 13-07-2026 — PENDIENTE GATE G0):** [ActaExpressWeb] **Robustez del pipeline** (hallazgos H1+H2+H5 del piloto): que una reunión real larga o un audio defectuoso NUNCA produzcan acta confabulada, síntesis truncada ni fallo por timeout. Backend + un ajuste de UX; sin cambios de schema ni reglas. Prioridad #1 fijada por el Director (orden: robustez → captura confiable → resiliencia → billing/Vertex en paralelo).
+**Expediente (se abre en F1):** `auditorias/2026-07-14_robustez_pipeline/`
+
+- [ ] **MT-R1** — Guard server-side de audio casi mudo: rechazo temprano (antes de subir a Gemini) cuando el bitrate efectivo `audioSizeBytes/segundo` caiga bajo un umbral (~2 KB/s, configurable), con mensaje accionable ("No se detectó señal de audio; revisa tu micrófono"). Estrategia fina (422 vs aviso) se decide en F1. — **DoD:** audio sintético silencioso → rechazo con mensaje; audio con voz → 201; prueba A/B (guard neutralizado → el mudo pasa y el test falla).
+- [ ] **MT-R2** — Endurecer `ACTA_PROMPT` y `SINTESIS_PROMPT`: declarar ininteligibilidad explícitamente, PROHIBIDO inferir contenido no audible; sincronizar la heurística `looksEmpty` con el nuevo wording. — **DoD:** E2E con audio borderline (ruido sin voz que pase el guard) → acta "sin contenido audible", cero confabulación.
+- [ ] **MT-R3** — Acotar `thinkingBudget` en la llamada de síntesis (y evaluar el de la llamada de acta). — **DoD:** E2E real con log `usageMetadata`: `thoughtsTokenCount` ≈ 0, síntesis íntegra, latencia medida y comparada (~4 min → objetivo <1 min en el peor caso).
+- [ ] **MT-R4** — Timeout proporcional en `waitForFileActive` (fórmula en función de `msDuration`, piso el actual 40s). — **DoD:** prueba A/B unitaria de la fórmula (1 min vs 60 min) + log del timeout aplicado por request.
+- [ ] **MT-R5** — [Frontend] UX de expectativa: durante `isPending`, mensaje "esto puede tardar unos minutos — no cierres esta pestaña"; con síntesis activada, recordatorio de que el análisis sigue en segundo plano. — **DoD:** render real verificado con screenshot/observación.
+
+**Cursor:** F0 hecho (descomposición + DoD + roadmap actualizado en `ECOSISTEMA_VISION.md`). **Esperando GATE G0 del Director** → F1 (diseño + prompt de revisión para Gemini en el expediente nuevo). *(Fuera de tanda, registrado para ciclo propio: visor de síntesis en la UI.)*
+
+---
+
+## 📁 Meta anterior (CERRADA 13-07-2026)
+
 **Meta (PILOTO v2 — CERRADA 13-07-2026):** [ActaExpressWeb] MT-04: toggle "Análisis profundo" → `generarSintesis: true`. **Primer ciclo de código completo bajo la metodología v2**: F0→F7 con 2 rondas de diseño + 1 de código; auditoría final de Gemini **APROBADO** ("listo para merge"), anti-bluff VÁLIDA; persistencia confirmada; commits `0e35253` (ActaExpressWeb linux) y `05d0539` (NexoExpress).
 **Expediente:** `auditorias/2026-07-09_mt04_toggle_sintesis/` (15 archivos)
 **Hallazgo de F0:** `openapi.yaml` ya declara `generarSintesis` (línea 218, ciclo anterior), pero los clientes generados (`lib/api-client-react`, `lib/api-zod`) NO lo incluyen — la regeneración es prerrequisito del toggle.
@@ -73,13 +88,13 @@
 
 ---
 
-## 🚀 Próximos 5 Pasos Globales (priorizados)
+## 🚀 Próximos 5 Pasos Globales (orden fijado por el Director, 13-07-2026)
 
-1. **[ActaExpressWeb] MT-04:** frontend envía `generarSintesis: true` (toggle de UX a decidir por el Director).
-2. **[ActaExpress Android]** Añadir campo `plataforma: "android"` al guardar actas y lograr paridad de exportación.
-3. **[NexoExpress]** Costos de Cloud Functions/Vertex AI para vectorización + decisión de billing (cupo 5/5, hay que desvincular un proyecto).
-4. **[Gobernanza]** Tier de Gemini API: gratuito (datos usables por Google) vs pagado — afecta privacidad del audio de reuniones.
-5. **[ActaExpressWeb]** Observación: actas de reuniones en inglés salen en español pese al prompt (ciclo propio si se prioriza).
+1. **[ActaExpressWeb] Robustez del pipeline (H1+H2+H5)** — ciclo EN CURSO (F0 → gate G0).
+2. **[ActaExpressWeb] Captura confiable (H3+H4):** selector "Reunión virtual / presencial–sonido ambiente" + detector de micrófono muerto.
+3. **[ActaExpressWeb] Resiliencia de grabación (H6):** autoguardado IndexedDB + recuperación.
+4. **[Gobernanza — en paralelo]** Billing/Vertex + tier pagado de Gemini (privacidad del audio; cupo Blaze 5/5, hay que desvincular un proyecto).
+5. **[Backlog]** Visor de síntesis en la UI (ciclo propio); Android campo `plataforma` y paridad; actas en inglés salen en español (fusionable con H1/fidelidad).
 
 ---
 

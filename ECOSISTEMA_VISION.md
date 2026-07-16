@@ -64,10 +64,18 @@ El contexto no es infinito. Se agrupa en **Proyectos** (`be_proyectos`) con inic
 
 ### Fase 1 — Paridad básica y Estabilización (Actual)
 ✅ **[ActaExpressWeb]**: Implementar colección `sintesis/` y `plataforma: "web"`.
+✅ **[ActaExpressWeb]**: Transcripción completa + análisis profundo en background (ciclo `2026-07-07`, E2E verificado).
+✅ **[ActaExpressWeb]**: Toggle "Análisis profundo" en frontend — flag `generarSintesis` end-to-end (ciclo `2026-07-09_mt04`, piloto de la metodología v2, auditado y APROBADO).
 ⚠️ **[BitácoraExpress]**: Finalizar migración local (SQLite) a Firebase (`be_proyectos/`, `be_actividades/`).
 ✅ **[NexoExpress & BitácoraExpress]**: Push a GitHub de los repos locales completado con éxito.
-⏳ **[ActaExpressWeb]**: Enriquecer el prompt para incluir la transcripción completa (mejora la síntesis).
 ⏳ **[ActaExpress Android]**: Añadir campo `plataforma: "android"` y lograr paridad de exportación y síntesis.
+
+**Estabilización del pipeline (hallazgos H1–H6 del piloto v2 — orden fijado por el Director, 13-07-2026):**
+1. ⏳ **Robustez del pipeline** (H1 guard anti-audio-mudo + prompts anti-alucinación; H2 `thinkingBudget`; H5 timeout proporcional + UX de espera) — ciclo EN CURSO (F0).
+2. ⏳ **Captura confiable** (H3 selector "Reunión virtual / presencial–sonido ambiente"; H4 detector de micrófono muerto).
+3. ⏳ **Resiliencia de grabación** (H6 autoguardado IndexedDB + recuperación).
+4. ⏳ **Billing/Vertex + privacidad del tier de Gemini** (gobernanza; corre en paralelo — interés explícito del Director en tier pagado).
+   *Fuera de tanda, registrado:* visor de síntesis en la UI (endpoint GET + regen + vista; ciclo propio).
 
 ### Fase 2 — Organización e Integración (Capa 1)
 ⏳ **Privacidad Frontend**: Agregar interfaz de configuración de horarios y botón de pausa a BitácoraExpress.
@@ -81,5 +89,5 @@ El contexto no es infinito. Se agrupa en **Proyectos** (`be_proyectos`) con inic
 
 ---
 
-> **Última revisión:** 26-06-2026
+> **Última revisión:** 13-07-2026 (roadmap_manager — retro del piloto v2)
 > **Regla de NexoExpress:** La versión Web es el prototipo. Toda feature se construye primero en Web. El schema unificado en `schemas/` es la única fuente de verdad.
