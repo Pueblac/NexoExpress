@@ -8,6 +8,23 @@
 
 ## ✅ Checklist de Micro-Tareas Vigente
 
+**Meta (F0 APROBADO EN G0 el 17-07-2026):** [ActaExpressWeb] **Captura confiable** (hallazgos H3+H4): el usuario elige EXPLÍCITAMENTE el tipo de reunión (sin diálogos sorpresa ni degradación silenciosa de la fuente de audio) y se entera de un micrófono muerto EN LOS PRIMEROS SEGUNDOS de la grabación, no al final. 100% frontend; sin cambios de schema, openapi ni reglas; el guard 422 del server queda como última defensa. Prioridad #1 (orden del Director 13-07; H4 re-pedido el 17-07 en F5.2).
+**Expediente (se abre en F1):** `auditorias/2026-07-17_captura_confiable/`
+
+- [ ] **MT-C1** — Selector de tipo de reunión en `home.tsx`: "Reunión virtual" (audio de pestaña + micrófono) / "Reunión presencial — sonido ambiente" (micrófono directo, sin diálogo de compartir). Persistido por uid (patrón del toggle de síntesis), deshabilitado durante grabación/procesamiento. — **DoD:** selector visible con las 2 opciones; la elección sobrevive un reload (clave localStorage por uid); typecheck verde.
+- [ ] **MT-C2** — `startRecording(modo)` en `useAudioRecorder.ts`: modo presencial → `getUserMedia` directo (CERO diálogo de compartir); modo virtual → pestaña+mic como hoy, pero **sin fallback silencioso**: si el usuario cancela el diálogo o la pestaña no entrega audio, la grabación NO arranca y se muestra error accionable (no degradar a solo-mic sin avisar). `captureMode` reportado coherente con lo realmente capturado. — **DoD:** A/B manual de los 4 caminos (presencial OK, virtual OK, virtual cancelado, virtual sin audio de pestaña); typecheck verde.
+- [ ] **MT-C3** — Hook de nivel de micrófono (H4): `AnalyserNode` sobre el stream del mic durante la grabación; expone `micSilent`/`micLevel` con umbral y ventana de calibración (~3–5 s) para no dar falsos positivos al arrancar. Sin dependencias nuevas. — **DoD:** A/B ejecutable del cálculo de nivel (señal sintética vs silencio) o instrumentación manual verificada; typecheck verde.
+- [ ] **MT-C4** — Aviso H4 en UI: banner persistente "⚠️ Tu micrófono parece estar apagado o en silencio" visible desde los primeros segundos cuando `micSilent`, en AMBOS modos; desaparece solo al detectar señal. — **DoD E2E con el Director:** mic muteado → aviso visible en ≤5 s desde el inicio de la grabación; desmutear → el aviso se va; grabación normal → jamás aparece.
+- [ ] **MT-C5** — Estado de procesamiento más prominente (observación del Director en F5.2): jerarquía visual del "Procesando con IA..." + mensaje de espera (cuadro destacado / indicador de pensando). — **DoD:** render real aprobado por el Director.
+
+**Decisiones de producto del GATE G0 (17-07):** (a) modo por defecto = **presencial** (recomendación del Arquitecto adoptada: no interrumpe con diálogos y es el caso probado E2E); (b) **MT-C5 INCLUIDA** en la tanda (5/5); (c) el aviso H4 **solo avisa, nunca corta** la grabación.
+
+**Cursor:** G0 concedido → **F1 en curso: diseño + prompt de revisión a Gemini** (`prompt_diseno_ronda1.md`) → F2 veredicto + anti-bluff → G1 → F3 (5 specs).
+
+---
+
+## 📁 Meta anterior (CERRADA 17-07-2026)
+
 **Meta (CERRADA 17-07-2026 — commit `c382c4c` en ActaExpressWeb linux, pusheado):** [ActaExpressWeb] **Robustez del pipeline** (hallazgos H1+H2+H5 del piloto): que una reunión real larga o un audio defectuoso NUNCA produzcan acta confabulada, síntesis truncada ni fallo por timeout. **Tercer ciclo v2 completo (segundo de código): F0→F7 en 1 ronda de diseño + 1 de auditoría, ambas con anti-bluff; rotación asistida consolidada.**
 **Expediente:** `auditorias/2026-07-14_robustez_pipeline/` (15 archivos)
 
