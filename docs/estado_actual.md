@@ -1,23 +1,23 @@
 # Estado Actual — NexoExpress (Coordinador del Ecosistema)
 
 **Estado Global del Ecosistema:** 🟢 VERDE
-**Última Actualización:** 09-07-2026
+**Última Actualización:** 17-07-2026
 **Metodología vigente:** v2 Triple-IA (`docs/METODOLOGIA_TRIPLE_IA.md`, adoptada 09-07-2026)
 
 ---
 
 ## ✅ Checklist de Micro-Tareas Vigente
 
-**Meta (F0 registrado 13-07-2026 — PENDIENTE GATE G0):** [ActaExpressWeb] **Robustez del pipeline** (hallazgos H1+H2+H5 del piloto): que una reunión real larga o un audio defectuoso NUNCA produzcan acta confabulada, síntesis truncada ni fallo por timeout. Backend + un ajuste de UX; sin cambios de schema ni reglas. Prioridad #1 fijada por el Director (orden: robustez → captura confiable → resiliencia → billing/Vertex en paralelo).
-**Expediente (se abre en F1):** `auditorias/2026-07-14_robustez_pipeline/`
+**Meta (CERRADA 17-07-2026 — commit `c382c4c` en ActaExpressWeb linux, pusheado):** [ActaExpressWeb] **Robustez del pipeline** (hallazgos H1+H2+H5 del piloto): que una reunión real larga o un audio defectuoso NUNCA produzcan acta confabulada, síntesis truncada ni fallo por timeout. **Tercer ciclo v2 completo (segundo de código): F0→F7 en 1 ronda de diseño + 1 de auditoría, ambas con anti-bluff; rotación asistida consolidada.**
+**Expediente:** `auditorias/2026-07-14_robustez_pipeline/` (15 archivos)
 
-- [x] **MT-R1** — Guard 422 de audio casi mudo (`audioGuard.ts` + handler; umbral **300 B/s** por dictamen, env-configurable, piso 5s). — **DoD código cumplido (17-07):** A/B de 5 casos re-ejecutado por el Arquitecto (incluye el falso positivo de 479 B/s → false y el A/B neutralizado); typecheck verde. *E2E (toast 422 con mic muteado): pendiente con el Director.*
+- [x] **MT-R1** — Guard 422 de audio casi mudo (`audioGuard.ts` + handler; umbral **300 B/s** por dictamen, env-configurable, piso 5s). — **DoD CUMPLIDO AL 100% (17-07):** A/B de 5 casos re-ejecutado por el Arquitecto + typecheck verde + **E2E real: mic muteado 31,9s → 254 B/s → 422 en 292 ms, cero llamadas a Gemini, toast correcto, sin acta.**
 - [x] **MT-R2** — Centinelas anti-confabulación en ambos prompts (texto Q3 literal) + `looksEmpty` reconciliada (título exacto + keyword "no se detectó" — cierra OBS-1, hueco demostrado por A/B viejo=false/nuevo=true). — **DoD código cumplido (17-07).**
-- [x] **MT-R3** — `thinkingConfig: { thinkingBudget: 4096 }` SOLO en la síntesis (acta intacta, verificado). — **DoD código cumplido (17-07).** *E2E (log thoughtsTokenCount ≤ 4096): pendiente con el Director.*
+- [x] **MT-R3** — `thinkingConfig: { thinkingBudget: 4096 }` SOLO en la síntesis (acta intacta, verificado). — **DoD CUMPLIDO AL 100% (17-07):** **E2E real: síntesis con `thoughtsTokenCount: 1145` ≤ 4096 (baseline pre-fix: 62.912), `finishReason: STOP`, acta fiel al guión.**
 - [x] **MT-R4** — `calcularMaxWaitMs` (clamp 40s → +msDuration/10 → techo 600s) + `waitForFileActive(fileName, msDuration)`. — **DoD cumplido (17-07):** A/B de 5 valores re-ejecutado (30min→220s, 1h→400s, 2h→techo) + neutralizado.
-- [x] **MT-R5** — Mensaje "Esto puede tardar unos minutos — no cierres esta pestaña" bajo el estado, solo con `isPending` (`data-testid="text-espera"`). — **DoD código cumplido (17-07).** *Render real: pendiente con el Director.*
+- [x] **MT-R5** — Mensaje "Esto puede tardar unos minutos — no cierres esta pestaña" bajo el estado, solo con `isPending` (`data-testid="text-espera"`). — **DoD CUMPLIDO AL 100% (17-07):** **render real confirmado por captura del Director durante el procesamiento; desmonta al resolver.** *Mejora UX registrada fuera de tanda: mensaje más prominente + indicador visual de "pensando".*
 
-**Cursor:** G1 concedido → F3 (5 specs) → **F4 completada en rotación asistida (17-07): las 5 MTs implementadas por subagentes Sonnet, cero desviaciones, cero dudas** → **F5 parte 1 (código) VERIFICADA por el Arquitecto** (`verificacion_f5.md`: A/B de ambos helpers re-ejecutados, greps, typecheck verde, contraste informes-vs-realidad sin discrepancias). Working tree de ActaExpressWeb con la tanda SIN commit. **Siguiente: F5 parte 2 con el Director** (grabar con mic muteado → toast 422; grabación normal ON → mensaje de espera + `thoughtsTokenCount ≤ 4096` en el log) → F6 (auditoría con diff íntegro) → F7. Riesgo residual registrado: timeout HTTP de proxy al desplegar. *(Fuera de tanda: visor de síntesis en la UI.)*
+**Cursor:** **CICLO CERRADO (17-07):** F5 completa (código + E2E real), F6 auditoría de Gemini **APROBADO** con anti-bluff VÁLIDA, **G2 concedido** → commit `c382c4c` pusheado en ActaExpressWeb (linux) + expediente y bitácora cerrados. **Siguiente: F0 del ciclo "Captura confiable" (H3 selector virtual/presencial + H4 detector de micrófono muerto)** — H4 re-pedido por el Director en F5.2 (el 422 llega al final; el aviso debe llegar AL INICIO de la grabación). Backlog alimentado por este ciclo: UX del mensaje de espera más prominente; validar `msDuration` server-side (OBS-A); visor de síntesis; riesgo residual de proxy al desplegar.
 
 ---
 
@@ -66,7 +66,7 @@
 
 | Proyecto | Estado | % MVP | Prioridad ahora |
 |---|---|---|---|
-| ActaExpressWeb | 🟢 Activo | ~82% | Enriquecer prompt Gemini con transcripción |
+| ActaExpressWeb | 🟢 Activo | ~85% | Captura confiable (H3+H4) |
 | ActaExpress Android | 🟡 En pausa | ~60% | Paridad con Web (campo `plataforma`) |
 | BitácoraExpress | 🟢 Activo en Linux | 100% (MVP) | MVP Completado, mantenimiento |
 | NexoExpress | 🟢 Activo | 100% | Orquestación, RAG Docs y Mantenimiento |
@@ -75,6 +75,7 @@
 
 ## 📌 Hitos Recientes del Ecosistema
 
+- **Robustez del pipeline cerrada (17-07):** guard 422 pre-gasto (300 B/s), centinelas anti-confabulación en ambos prompts + `looksEmpty` reconciliada, thinkingBudget 4096 en síntesis (thoughts reales: 1145 vs 62.912), timeout File API proporcional y mensaje de espera. Ciclo v2 completo con E2E real y auditoría APROBADO (`c382c4c` en ActaExpressWeb linux; expediente `2026-07-14_robustez_pipeline`, 15 archivos).
 - **Metodología v2 Triple-IA adoptada (09-07):** ciclo F0–F7 con Fable Arquitecto / Sonnet Ingeniero / Gemini Auditor; auto-auditada por Gemini (APROBADO CON CAMBIOS r1, 5 cambios incorporados) y commiteada (`b23dff7`). v1 queda como fallback. Piloto: MT-04.
 - **Transcripción + análisis profundo funcionando (07-07):** ActaExpressWeb puebla `sintesis/` en background con flag `generarSintesis`; verificado E2E contra Firestore real. Primer ciclo dual-IA completo (expediente `2026-07-07_transcripcion_sintesis`): cazó 3 defectos reales (reglas Firestore sin `sintesis/`, 400 en `firestoreSet`, truncado chars vs bytes).
 - **Reglas Firestore actualizadas (07-07):** bloque owner-based para `sintesis/` desplegado (ruleset `3dc59963`). Regla operativa nueva: colección en el schema ⇒ verificar reglas desplegadas antes de estrenarla.
@@ -88,13 +89,13 @@
 
 ---
 
-## 🚀 Próximos 5 Pasos Globales (orden fijado por el Director, 13-07-2026)
+## 🚀 Próximos 5 Pasos Globales (orden fijado por el Director, 13-07-2026; actualizado 17-07 tras cerrar Robustez)
 
-1. **[ActaExpressWeb] Robustez del pipeline (H1+H2+H5)** — ciclo EN CURSO (F0 → gate G0).
-2. **[ActaExpressWeb] Captura confiable (H3+H4):** selector "Reunión virtual / presencial–sonido ambiente" + detector de micrófono muerto.
-3. **[ActaExpressWeb] Resiliencia de grabación (H6):** autoguardado IndexedDB + recuperación.
-4. **[Gobernanza — en paralelo]** Billing/Vertex + tier pagado de Gemini (privacidad del audio; cupo Blaze 5/5, hay que desvincular un proyecto).
-5. **[Backlog]** Visor de síntesis en la UI (ciclo propio); Android campo `plataforma` y paridad; actas en inglés salen en español (fusionable con H1/fidelidad).
+1. **[ActaExpressWeb] Captura confiable (H3+H4):** selector "Reunión virtual / presencial–sonido ambiente" + detector de micrófono muerto (aviso AL INICIO — re-pedido por el Director en F5.2). Siguiente ciclo: abrir con F0.
+2. **[ActaExpressWeb] Resiliencia de grabación (H6):** autoguardado IndexedDB + recuperación.
+3. **[Gobernanza — en paralelo]** Billing/Vertex + tier pagado de Gemini (privacidad del audio; cupo Blaze 5/5, hay que desvincular un proyecto).
+4. **[Backlog]** Visor de síntesis en la UI (ciclo propio); Android campo `plataforma` y paridad; actas en inglés salen en español; UX del mensaje de espera; validar `msDuration` server-side (OBS-A F6); timeout de proxy al desplegar.
+5. **[Metodología]** Diseño del "Modo A" partiendo de `docs/arquitectura_mas_cloud.md` (cuando el Director lo priorice).
 
 ---
 

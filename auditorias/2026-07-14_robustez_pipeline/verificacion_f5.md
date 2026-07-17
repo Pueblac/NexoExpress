@@ -13,12 +13,25 @@
 
 **Veredicto F5 parte 1 (código): las 5 MTs FIELES al diseño aprobado (r1 + cambios del dictamen + OBS-1).**
 
-## Pendiente F5 parte 2 — E2E real con el Director
+## F5 parte 2 — E2E real EJECUTADO con el Director (17-07-2026, ~10:21–10:52)
 
-| Prueba | Qué valida | Resultado esperado |
-|---|---|---|
-| Grabar ~30s con micrófono MUTEADO a propósito | MT-R1 guard | Toast de error INMEDIATO "No se detectó señal de audio…" — sin acta creada, sin tokens gastados (log: `audio casi mudo rechazado`) |
-| Grabación normal con toggle ON | MT-R3 + MT-R5 + regresión | Mensaje "Esto puede tardar unos minutos…" visible durante el procesamiento; acta y síntesis fieles; log `sintesis: respuesta` con `thoughtsTokenCount ≤ 4096` |
-| (Se mantiene del diseño) | MT-R2 centinelas | Caso borderline difícil de fabricar manualmente — cobertura por prompt + guard; se observará en uso real |
+Servidor reiniciado con `./dev.sh` antes de las pruebas (código nuevo cargado, build fresco 10:50:33). Evidencia: capturas de UI del Director + log literal del terminal del API server (pegado en la sesión del Arquitecto, contrastado por él).
 
-Tras la parte 2 → F6 (prompt de auditoría de la tanda con diff íntegro) → F7 (gate G2).
+### Prueba (a) — mic MUTEADO ~30s → guard MT-R1: ✅ PASA
+
+- Toast rojo en UI: "HTTP 422 Unprocessable Entity: No se detectó señal de audio en la grabación (micrófono apagado o en silencio). Revisa tu micrófono e inténtalo de nuevo." Sin acta nueva en la lista.
+- Log literal: `WARN processAudio: audio casi mudo rechazado (guard MT-R1)` con `audioSizeBytes: 8106, msDuration: 31939, bytesPerSec: 254, minBps: 300` → `statusCode: 422, responseTime: 292`.
+- Contraste del Arquitecto: 254 B/s clava el perfil de silencio real del diseño (~253 B/s, CTX-1); rechazo en 292 ms **sin upload a File API ni inferencia** (0 tokens gastados) — objetivo de H1 cumplido.
+- Observación de producto del Director durante la prueba: el aviso debería llegar AL INICIO de la grabación, no al procesar (evitar grabar 1h en vano). Ya cubierto por el hallazgo **H4** (detector de micrófono en cliente vía AnalyserNode), ciclo siguiente "Captura confiable" — NO se toma en esta tanda.
+
+### Prueba (b) — grabación real 56s, mic integrado, toggle ON, guión como ground truth: ✅ PASA (MT-R5 confirmada aparte)
+
+- **MT-R3:** log literal `sintesis: respuesta de Gemini recibida` con `thoughtsTokenCount: 1145` ≤ 4096 (antes del fix: 62.912; −98%). `finishReason: "STOP"` en acta y síntesis (sin MAX_TOKENS). Acta: 472 thoughts.
+- **Fidelidad (regresión H1):** acta `rFqr24fvZjqoYB96cYur` "Reunión de Sincronización del Proyecto Nexo Express" contrastada por el Arquitecto contra el guión leído: resumen, 3 puntos, 1 acuerdo y 2 pendientes con responsable/fecha correctos (Carlos/hoy en la tarde; equipo de diseño/mañana a primera hora). Cero invenciones; 4 participantes = entidades mencionadas en el audio.
+- **Síntesis:** `sintesis: guardada en Firestore` con `transcripcionChars: 1111` — coherente con el guión (~1.100 chars en 56s). (Visor de UI: fuera de tanda.)
+- **Regresión MT-R1:** 880,2 KB / 55,96 s ≈ 15.731 B/s ≫ 300 — sin falso positivo con voz real.
+- **Regresión MT-R4:** presupuesto `calcularMaxWaitMs(55958)` ≈ 45,6 s; archivo ACTIVE en ~1 s. Sin timeout.
+- **MT-R5 (mensaje de espera): ✅ CONFIRMADA** — captura del Director durante el procesamiento: "Esto puede tardar unos minutos — no cierres esta pestaña." visible bajo "Procesando con IA...", círculo con spinner; desaparece al resolverse la mutación.
+- Observación de UX del Director (fuera de tanda, registrada): el mensaje se ve pequeño — mejorar jerarquía visual del estado de procesamiento (cuadro más prominente / indicador de "pensando"). Candidata a MT trivial post-ciclo o a integrarse en el ciclo "Captura confiable".
+
+**Veredicto F5 COMPLETA (17-07-2026): las 5 MTs verificadas — parte 1 (código: A/B, greps, typecheck) + parte 2 (E2E real: MT-R1, MT-R3, MT-R5 observadas; regresiones de fidelidad, guard y timeout limpias). Cero desviaciones.** → F6 (prompt de auditoría de la tanda con diff íntegro) → F7 (gate G2).

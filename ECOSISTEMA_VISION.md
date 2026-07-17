@@ -34,7 +34,7 @@ Servicios que procesan, vectorizan y conectan la información recolectada. (Proy
 - **Salida:** Acta en Firestore (`actas/` con `plataforma: "android"`)
 
 ### 2. ActaExpressWeb
-- **Estado:** Principal prototipo del ecosistema (~82%)
+- **Estado:** Principal prototipo del ecosistema (~85%)
 - **Entrada:** Micrófono del sistema O captura de pestaña (YouTube, Teams)
 - **Procesamiento:** Gemini 2.5 Flash vía API Server
 - **Salida:** Acta + `sintesis/` + Export DOCX/TXT
@@ -71,7 +71,7 @@ El contexto no es infinito. Se agrupa en **Proyectos** (`be_proyectos`) con inic
 ⏳ **[ActaExpress Android]**: Añadir campo `plataforma: "android"` y lograr paridad de exportación y síntesis.
 
 **Estabilización del pipeline (hallazgos H1–H6 del piloto v2 — orden fijado por el Director, 13-07-2026):**
-1. ⏳ **Robustez del pipeline** (H1 guard anti-audio-mudo + prompts anti-alucinación; H2 `thinkingBudget`; H5 timeout proporcional + UX de espera) — ciclo EN CURSO (F0).
+1. ✅ **Robustez del pipeline** (H1 guard anti-audio-mudo + prompts anti-alucinación; H2 `thinkingBudget` 4096; H5 timeout proporcional + UX de espera) — **ciclo CERRADO 17-07-2026**: F0→F7 completo, auditoría de Gemini APROBADO (r1), E2E real verificado (422 a 254 B/s; thoughts 1145 vs 62.912 previo), commit `c382c4c` en ActaExpressWeb linux. Expediente `2026-07-14_robustez_pipeline/`.
 2. ⏳ **Captura confiable** (H3 selector "Reunión virtual / presencial–sonido ambiente"; H4 detector de micrófono muerto).
 3. ⏳ **Resiliencia de grabación** (H6 autoguardado IndexedDB + recuperación).
 4. ⏳ **Billing/Vertex + privacidad del tier de Gemini** (gobernanza; corre en paralelo — interés explícito del Director en tier pagado).
@@ -89,5 +89,5 @@ El contexto no es infinito. Se agrupa en **Proyectos** (`be_proyectos`) con inic
 
 ---
 
-> **Última revisión:** 13-07-2026 (roadmap_manager — retro del piloto v2)
+> **Última revisión:** 17-07-2026 (cierre del ciclo "Robustez del pipeline"; siguiente: "Captura confiable" H3+H4)
 > **Regla de NexoExpress:** La versión Web es el prototipo. Toda feature se construye primero en Web. El schema unificado en `schemas/` es la única fuente de verdad.
