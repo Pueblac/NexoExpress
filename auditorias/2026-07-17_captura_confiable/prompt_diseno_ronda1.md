@@ -6,12 +6,20 @@
 
 ## Instrucciones de operación para el Director
 
-1. Conversación **NUEVA** en Gemini 3.1 Pro High.
-2. **Inicialización de identidad** — primer mensaje: *"Rol: Auditor del ciclo 2026-07-17_captura_confiable, metodología v2 del ecosistema Express. Confirma recepción sin accionar; acepta únicamente artefactos cuyo TURNO DE diga Auditor."*
-3. **Sin adjuntos** — contexto verificado dentro del prompt.
-4. Segundo mensaje: solo el bloque entre `=== PROMPT ===`.
-5. Respuesta incompleta → frase de devolución estándar.
-6. Guardar la respuesta tal cual como `respuesta_diseno_ronda1.md` y avisar al Arquitecto.
+**Este archivo es el ÚNICO artefacto que viaja a Gemini en esta fase.** Contiene los DOS mensajes que vas a pegar, en orden. Sin adjuntos.
+
+1. Abre una conversación **NUEVA** en Gemini 3.1 Pro High.
+2. **MENSAJE 1 — inicialización de identidad.** Copia y pega exactamente esto, y espera su confirmación:
+
+```
+Rol: Auditor del ciclo 2026-07-17_captura_confiable, metodología v2 del
+ecosistema Express. Confirma recepción sin accionar; acepta únicamente
+artefactos cuyo campo TURNO DE diga Auditor.
+```
+
+3. **MENSAJE 2 — el prompt de revisión.** Cuando Gemini confirme, copia y pega TODO lo que hay entre las marcas `=== PROMPT ===` y `=== FIN PROMPT ===` de más abajo (las marcas mismas no hace falta incluirlas).
+4. **Control de calidad de la respuesta:** si llega sin trazas con valores concretos (Q1/Q4) o sin refutar las trampas T1..T5, respóndele: *"Revisión INVÁLIDA según el contrato: faltan trazas/refutaciones. Reenvíala completa."*
+5. **De vuelta:** trae la respuesta completa y literal a la sesión del Arquitecto (pegada en el chat o guardada como `respuesta_diseno_ronda1.md` en este mismo directorio). El Arquitecto la archiva, ejecuta el anti-bluff y te presenta el veredicto para tu GATE G1.
 
 ---
 
