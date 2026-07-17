@@ -17,7 +17,7 @@
 - [ ] **MT-R4** — Timeout proporcional en `waitForFileActive` (fórmula en función de `msDuration`, piso el actual 40s). — **DoD:** prueba A/B unitaria de la fórmula (1 min vs 60 min) + log del timeout aplicado por request.
 - [ ] **MT-R5** — [Frontend] UX de expectativa: durante `isPending`, mensaje "esto puede tardar unos minutos — no cierres esta pestaña"; con síntesis activada, recordatorio de que el análisis sigue en segundo plano. — **DoD:** render real verificado con screenshot/observación.
 
-**Cursor:** F0 hecho (descomposición + DoD + roadmap actualizado en `ECOSISTEMA_VISION.md`). **Esperando GATE G0 del Director** → F1 (diseño + prompt de revisión para Gemini en el expediente nuevo). *(Fuera de tanda, registrado para ciclo propio: visor de síntesis en la UI.)*
+**Cursor:** diseño r1 respondido y validado (14-07): **APROBADO CON CAMBIOS** — umbral 300 B/s (el 500 propuesto tenía falso positivo demostrado con aritmética verificada), `thinkingBudget: 4096` (no 0: protege el ANALISIS_PROFUNDO), texto Q3 literal en ambos prompts. Anti-bluff: VÁLIDA con **OBS-1** (refutación de T2 incorrecta — el resumen centinela no matchea ninguna keyword real de `looksEmpty`; reconciliación incorporada a la spec: keyword `"no se detectó"` + match exacto de título). Riesgo residual registrado: timeout HTTP de proxy con audios largos (aplica al desplegar). **Esperando GATE G1 del Director** → F3 (specs MT-R1..R5 para el Ingeniero, rotación asistida). *(Fuera de tanda: visor de síntesis en la UI.)*
 
 ---
 
