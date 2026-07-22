@@ -19,7 +19,7 @@
 
 **Decisiones de producto del GATE G0 (17-07):** (a) modo por defecto = **presencial** (recomendación del Arquitecto adoptada: no interrumpe con diálogos y es el caso probado E2E); (b) **MT-C5 INCLUIDA** en la tanda (5/5); (c) el aviso H4 **solo avisa, nunca corta** la grabación.
 
-**Cursor:** G0 concedido → **F1 en curso: diseño + prompt de revisión a Gemini** (`prompt_diseno_ronda1.md`) → F2 veredicto + anti-bluff → G1 → F3 (5 specs).
+**Cursor:** G0 → F1 (diseño) → **F2 COMPLETA (22-07): Gemini APROBADO CON CAMBIOS** (6 cambios) + **anti-bluff VÁLIDA** (`respuesta_diseno_ronda1.md`): OBS-1 cambio 5 ya implementado (`home.tsx:184` ya tiene `disabled=isPending`, no-op); OBS-2 contradicción cambios 1↔2 → reconciliación propuesta: ventana POR MODO (presencial 5 s con NS off cumple DoD ≤5 s; virtual 10 s + banner pasivo). Cambios 2/3/4/6 adoptados tal cual. **Siguiente: GATE G1 del Director** (adoptar + resolver ventana de OBS-2) → F3 (5 specs) → F4 rotación asistida.
 
 ---
 
