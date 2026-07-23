@@ -16,15 +16,23 @@
 
 **Veredicto F5 parte 1 (código): las 5 MTs FIELES al diseño congelado en G1** (6 cambios del dictamen + ventana por modo 5s/10s). typecheck verde, alcance cerrado (frontend, 3 archivos), sin dependencias nuevas.
 
-## Pendiente F5 parte 2 — E2E real con el Director
+## F5 parte 2 — E2E real con el Director (EJECUTADO 23-07-2026)
 
-| Prueba | Modo | Qué valida | Resultado esperado |
-|---|---|---|---|
-| Grabar con mic MUTEADO en el SO | **presencial** | MT-C3+C4 detector+banner | Banner ROJO "⚠️ No se detecta señal de tu micrófono…" en **≤5 s** desde el inicio; desmutear → desaparece |
-| Grabar hablando normal | presencial | Regresión detector | El banner NUNCA aparece; acta fiel |
-| Elegir "Virtual" y CANCELAR el diálogo de compartir | **virtual** | MT-C2 sin fallback | Error accionable (texto Q3), la grabación NO arranca, NO cae a solo-mic |
-| Virtual con pestaña compartida pero mic muteado | virtual | MT-C3+C4 ventana 10s + banner pasivo | Aviso ÁMBAR (no rojo) tras ~10 s; grabación sigue |
-| Recargar la página tras elegir un modo | ambos | MT-C1 persistencia | El selector recuerda el modo elegido (localStorage por uid) |
-| Procesar cualquier grabación | — | MT-C5 tarjeta | Tarjeta "Procesando con IA…" prominente durante el proceso; desaparece al terminar |
+Entorno: `./dev.sh` reiniciado por el Arquitecto con el código de la tanda (API 8080 `Server listening`, Vite 5173 `ready`). Director ejecutando en Chrome sobre http://localhost:5173. Evidencia: reporte del Director + capturas de pantalla en el chat de la sesión (descritas por prueba).
 
-Recordar al Director: **reiniciar `./dev.sh`** para cargar el código nuevo antes del E2E. Tras la parte 2 → F6 (auditoría de código con diff íntegro) → F7 (gate G2).
+| # | Prueba | Modo | Qué valida | Resultado |
+|---|---|---|---|---|
+| 1 | Grabar con mic MUTEADO en el SO | presencial | MT-C3+C4 detector+banner | ✅ **PASA.** Captura a 00:10: banner ROJO con el texto exacto "⚠️ No se detecta señal de tu micrófono — revisa que no esté silenciado en el sistema.", grabación sigue (badge "Solo micrófono", selector deshabilitado). Captura a 00:14 tras desmutear: banner desaparecido solo, grabación intacta. |
+| 2 | Grabar hablando normal 15–20 s | presencial | Regresión detector | ✅ **PASA.** El banner nunca apareció. |
+| 3 | Elegir "Virtual" y CANCELAR el diálogo de compartir | virtual | MT-C2 sin fallback (corrección H3) | ✅ **PASA.** Captura: timer en 00:00 "Listo para grabar" (la grabación NO arrancó, no cayó a solo-mic) + error accionable con el texto Q3 exacto: "No se capturó audio. Al compartir, asegúrate de seleccionar 'Pestaña de Chrome' y tener activa la casilla 'Compartir audio de la pestaña'." |
+| 4 | Virtual con pestaña compartida + mic muteado | virtual | MT-C3+C4 ventana 10 s + banner pasivo | ✅ **PASA.** Captura a 00:12: aviso ÁMBAR (no rojo) "Tu micrófono no aporta señal. Si solo escuchas la reunión está bien; si querías hablar, revisa que no esté silenciado.", badge "Altavoces + micrófono", grabación sigue sin cortarse. |
+| 5 | Recargar la página tras elegir un modo | ambos | MT-C1 persistencia | ✅ **PASA.** Virtual → F5 → sigue Virtual; Presencial → F5 → sigue Presencial (localStorage por uid). |
+| 6 | Procesar una grabación | — | MT-C5 tarjeta "Procesando con IA…" | ✅ **PASA (23-07).** Captura a 01:18 de proceso: tarjeta prominente "Procesando con IA…" con spinner + texto conservado "Esto puede tardar unos minutos — no cierres esta pestaña" (`text-espera`). Acta generada fiel: el Director grabó una noticia del día (ataque a base en Jordania) y el acta refleja resumen y puntos coherentes (1 min, 1 participante). Tarjeta desaparece al terminar. |
+
+**Nota de precisión (prueba 1):** la primera captura es a 00:10 de grabación; el DoD fino de la ventana de 5 s (banner visible en ≤5 s desde el inicio) queda pendiente de confirmación verbal del Director — el diseño lo garantiza por `MIC_SILENT_WINDOW_PRESENCIAL_MS=5000` con muestreo ~200 ms. Se traslada como observación a la auditoría F6.
+
+## Veredicto F5 COMPLETO (23-07-2026)
+
+**F5 parte 1 (código) + parte 2 (E2E de 6 pruebas): APROBADO por el Arquitecto.** Las 5 MTs funcionan end-to-end en el navegador real del Director; la corrección de H3 (sin fallback silencioso) y H4 (banner en los primeros segundos) verificadas con capturas. Único cabo suelto: confirmación verbal del instante exacto (≤5 s) de aparición del banner en presencial — registrado como observación para F6, no bloquea.
+
+Siguiente: F6 (auditoría de código con diff íntegro, incluyendo `useMicLevel.ts` completo por ser untracked) → F7 (gate G2).

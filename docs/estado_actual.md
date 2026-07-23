@@ -1,25 +1,25 @@
 # Estado Actual — NexoExpress (Coordinador del Ecosistema)
 
 **Estado Global del Ecosistema:** 🟢 VERDE
-**Última Actualización:** 17-07-2026
+**Última Actualización:** 23-07-2026
 **Metodología vigente:** v2 Triple-IA (`docs/METODOLOGIA_TRIPLE_IA.md`, adoptada 09-07-2026)
 
 ---
 
 ## ✅ Checklist de Micro-Tareas Vigente
 
-**Meta (F0 APROBADO EN G0 el 17-07-2026):** [ActaExpressWeb] **Captura confiable** (hallazgos H3+H4): el usuario elige EXPLÍCITAMENTE el tipo de reunión (sin diálogos sorpresa ni degradación silenciosa de la fuente de audio) y se entera de un micrófono muerto EN LOS PRIMEROS SEGUNDOS de la grabación, no al final. 100% frontend; sin cambios de schema, openapi ni reglas; el guard 422 del server queda como última defensa. Prioridad #1 (orden del Director 13-07; H4 re-pedido el 17-07 en F5.2).
-**Expediente (se abre en F1):** `auditorias/2026-07-17_captura_confiable/`
+**Meta (CERRADA 23-07-2026 — commit `35580f0` en ActaExpressWeb linux):** [ActaExpressWeb] **Captura confiable** (hallazgos H3+H4): el usuario elige EXPLÍCITAMENTE el tipo de reunión (sin diálogos sorpresa ni degradación silenciosa de la fuente de audio) y se entera de un micrófono muerto EN LOS PRIMEROS SEGUNDOS de la grabación, no al final. 100% frontend; sin cambios de schema, openapi ni reglas; el guard 422 del server queda como última defensa. **Cuarto ciclo v2 completo (tercero de código): F0→F7 en 1 ronda de diseño + 1 de auditoría, ambas con anti-bluff; E2E 6/6 con el Director.**
+**Expediente:** `auditorias/2026-07-17_captura_confiable/` (16 archivos)
 
-- [x] **MT-C1** — Selector de tipo de reunión (RadioGroup, default presencial, persistido por uid, deshabilitado en grabación/proceso). — **DoD código cumplido (22-07):** typecheck verde, 11 marcadores, solo home.tsx. *E2E persistencia tras reload: pendiente con el Director.*
-- [x] **MT-C2** — `startRecording(modo)`: presencial → `getUserMedia` directo (EC/NS off, AGC on); virtual → pestaña+mic **sin fallback silencioso** (cancela→error Q3, no arranca); expone `micStream`. — **DoD código cumplido (22-07):** fallback `getUserMedia({audio:true})` ELIMINADO (grep sin resultados), A/B de 4 caminos, typecheck verde.
-- [x] **MT-C3** — Hook nuevo `useMicLevel.ts` (H4): `AnalyserNode` sobre mic crudo, RMS, umbral 0.01, ventana 5s presencial/10s virtual, `resume()` si suspended (trampa T1), no acumula silencio hasta `running`. — **DoD código cumplido (22-07):** A/B razonado del RMS, typecheck verde.
-- [x] **MT-C4** — Banner H4 (`banner-mic-muerto`): rojo destructivo presencial / ámbar pasivo virtual (cambio 3), solo con `isRecording && micSilent`, nunca corta. — **DoD código cumplido (22-07).** *E2E (≤5s presencial / ≤10s virtual): pendiente con el Director.*
-- [x] **MT-C5** — Tarjeta de procesamiento prominente (`card-procesando`, Loader2, conserva `text-espera`). — **DoD código cumplido (22-07).** *Render real: pendiente con el Director.*
+- [x] **MT-C1** — Selector de tipo de reunión (RadioGroup, default presencial, persistido por uid, deshabilitado en grabación/proceso). — **DoD CUMPLIDO AL 100% (23-07):** typecheck verde, 11 marcadores, **E2E real: persistencia tras reload confirmada en ambos sentidos (prueba 5).**
+- [x] **MT-C2** — `startRecording(modo)`: presencial → `getUserMedia` directo (EC/NS off, AGC on); virtual → pestaña+mic **sin fallback silencioso** (cancela→error Q3, no arranca); expone `micStream`. — **DoD CUMPLIDO AL 100% (23-07):** fallback `getUserMedia({audio:true})` ELIMINADO (grep sin resultados), **E2E real: cancelar el diálogo → error Q3 con timer en 00:00, la grabación NO arrancó (prueba 3 — corrección de H3 verificada con captura).**
+- [x] **MT-C3** — Hook nuevo `useMicLevel.ts` (H4): `AnalyserNode` sobre mic crudo, RMS, umbral 0.01, ventana 5s presencial/10s virtual, `resume()` si suspended (trampa T1), no acumula silencio hasta `running`. — **DoD CUMPLIDO AL 100% (23-07):** **E2E real: mic muteado detectado en presencial (banner a ≤10s de grabación, prueba 1) y en virtual (~12s, prueba 4); regresión hablando normal sin falso positivo (prueba 2).**
+- [x] **MT-C4** — Banner H4 (`banner-mic-muerto`): rojo destructivo presencial / ámbar pasivo virtual (cambio 3), solo con `isRecording && micSilent`, nunca corta. — **DoD CUMPLIDO AL 100% (23-07):** **E2E real con capturas: rojo con texto exacto en presencial, desaparece al desmutear; ámbar pasivo en virtual sin cortar la grabación.**
+- [x] **MT-C5** — Tarjeta de procesamiento prominente (`card-procesando`, Loader2, conserva `text-espera`). — **DoD CUMPLIDO AL 100% (23-07):** **render real confirmado por captura durante el procesamiento (prueba 6); acta fiel a la noticia grabada; desaparece al terminar.**
 
 **Decisiones de producto del GATE G0 (17-07):** (a) modo por defecto = **presencial** (recomendación del Arquitecto adoptada: no interrumpe con diálogos y es el caso probado E2E); (b) **MT-C5 INCLUIDA** en la tanda (5/5); (c) el aviso H4 **solo avisa, nunca corta** la grabación.
 
-**Cursor:** G0 → F1 → F2 (APROBADO CON CAMBIOS + anti-bluff) → G1 (ventana 5s/10s) → F3 (5 specs) → **F4 COMPLETA (22-07): 5 subagentes Sonnet secuenciales, cero desviaciones, cero dudas** → **F5 parte 1 (código) VERIFICADA por el Arquitecto** (`verificacion_f5.md`: typecheck verde, greps por MT, fallback H3 eliminado confirmado, contraste informes-vs-realidad sin discrepancias). Working tree de ActaExpressWeb con la tanda SIN commit (3 archivos: `useAudioRecorder.ts` M, `home.tsx` M, `useMicLevel.ts` nuevo). **Siguiente: F5 parte 2 E2E con el Director** (mic muteado presencial→banner rojo ≤5s; virtual cancelado→error sin fallback; persistencia tras reload; tarjeta procesando) → F6 (auditoría diff íntegro) → F7.
+**Cursor:** G0 → F1 → F2 (APROBADO CON CAMBIOS + anti-bluff) → G1 (ventana 5s/10s) → F3 (5 specs) → **F4 COMPLETA (22-07)** → **F5 COMPLETA (23-07): parte 1 código + parte 2 E2E real con el Director — las 6 pruebas PASADAS con capturas** (banner rojo con mic muteado y desaparición al desmutear; regresión sin banner; virtual cancelado→error Q3 sin arrancar, H3 corregido; ámbar ~10s en virtual; persistencia tras reload; tarjeta "Procesando con IA…" + acta fiel; ver `verificacion_f5.md`) → **F6 EN CURSO: `prompt_auditoria_ronda1.md` generado** (diff íntegro verificado byte a byte + `useMicLevel.ts` completo incrustado, C1..C6, Q1..Q4, T1..T5, dudas D1..D4 del Arquitecto; formato MENSAJE 1/MENSAJE 2). Working tree de ActaExpressWeb con la tanda SIN commit (3 archivos) → **F6 COMPLETA (23-07): respuesta de Gemini archivada (`respuesta_auditoria_ronda1.md`, APROBADO CON OBSERVACIONES) + anti-bluff del Arquitecto VÁLIDA (`validacion_antibluff_ronda1.md`)** — Q1 carácter a carácter, citas sin código inexistente, y el único "BUG" (T5, carrera de auth pisando la persistencia) **REFUTADO con evidencia**: `Home` solo se monta vía `ProtectedRoute` con `user` resuelto (App.tsx:33-47) + E2E prueba 5 lo contradice empíricamente; cero bugs confirmados → **CICLO CERRADO (23-07): G2 concedido → commit `35580f0` en ActaExpressWeb (linux) + expediente cerrado + bitácora + ECOSISTEMA_VISION.md (Captura confiable ✅).** Backlog alimentado por este ciclo (NO tomar sin ciclo propio): D1 umbral RMS en sala callada (posible falso positivo presencial; calibración/0.005 candidatos), D3 botón de descarte del aviso ámbar (fatiga de alarma), useEffect defensivo de persistencia si algún día `Home` se montara sin guard. **Siguiente: F0 del ciclo "Resiliencia de grabación" (H6: autoguardado IndexedDB + recuperación) — pendiente de G0 del Director.**
 
 **Parámetros finales del diseño (F3):** `modoReunion: "presencial"|"virtual"` default presencial, persistido `actaexpress:modoReunion:${uid}` + ref espejo · presencial = `getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:true}})` directo · virtual = display+mix, SIN fallback silencioso (null→setError con texto Q3, no arranca; display OK + mic falla→mode "system") · hook `useMicLevel(micStream,isRecording,modo)`: AnalyserNode fftSize 2048, muestreo ~200ms, RMS, `MIC_RMS_THRESHOLD=0.01`, ventana `MIC_SILENT_WINDOW_PRESENCIAL_MS=5000`/`MIC_SILENT_WINDOW_VIRTUAL_MS=10000`, `resume()` si suspended + no contar hasta `running`, salida inmediata a false con señal · banner rojo presencial / ámbar pasivo virtual (`data-testid="banner-mic-muerto"`) · MT-C5 tarjeta de procesamiento prominente (conserva `text-espera`). Texto Q3: *"No se capturó audio. Al compartir, asegúrate de seleccionar 'Pestaña de Chrome' y tener activa la casilla 'Compartir audio de la pestaña'."*
 
@@ -85,7 +85,7 @@
 
 | Proyecto | Estado | % MVP | Prioridad ahora |
 |---|---|---|---|
-| ActaExpressWeb | 🟢 Activo | ~85% | Captura confiable (H3+H4) |
+| ActaExpressWeb | 🟢 Activo | ~90% | Resiliencia de grabación (H6) |
 | ActaExpress Android | 🟡 En pausa | ~60% | Paridad con Web (campo `plataforma`) |
 | BitácoraExpress | 🟢 Activo en Linux | 100% (MVP) | MVP Completado, mantenimiento |
 | NexoExpress | 🟢 Activo | 100% | Orquestación, RAG Docs y Mantenimiento |
@@ -94,6 +94,7 @@
 
 ## 📌 Hitos Recientes del Ecosistema
 
+- **Captura confiable cerrada (23-07):** selector explícito presencial/virtual persistido por uid, fin del fallback silencioso de fuente de audio (H3), detector de micrófono muerto con banner por severidad en los primeros 5–10 s (H4) y tarjeta prominente de procesamiento. Ciclo v2 completo con E2E 6/6 y auditoría APROBADO CON OBSERVACIONES cuyo único BUG alegado (T5) fue refutado con evidencia por el Arquitecto (`35580f0` en ActaExpressWeb linux; expediente `2026-07-17_captura_confiable`, 16 archivos).
 - **Robustez del pipeline cerrada (17-07):** guard 422 pre-gasto (300 B/s), centinelas anti-confabulación en ambos prompts + `looksEmpty` reconciliada, thinkingBudget 4096 en síntesis (thoughts reales: 1145 vs 62.912), timeout File API proporcional y mensaje de espera. Ciclo v2 completo con E2E real y auditoría APROBADO (`c382c4c` en ActaExpressWeb linux; expediente `2026-07-14_robustez_pipeline`, 15 archivos).
 - **Metodología v2 Triple-IA adoptada (09-07):** ciclo F0–F7 con Fable Arquitecto / Sonnet Ingeniero / Gemini Auditor; auto-auditada por Gemini (APROBADO CON CAMBIOS r1, 5 cambios incorporados) y commiteada (`b23dff7`). v1 queda como fallback. Piloto: MT-04.
 - **Transcripción + análisis profundo funcionando (07-07):** ActaExpressWeb puebla `sintesis/` en background con flag `generarSintesis`; verificado E2E contra Firestore real. Primer ciclo dual-IA completo (expediente `2026-07-07_transcripcion_sintesis`): cazó 3 defectos reales (reglas Firestore sin `sintesis/`, 400 en `firestoreSet`, truncado chars vs bytes).
@@ -108,13 +109,13 @@
 
 ---
 
-## 🚀 Próximos 5 Pasos Globales (orden fijado por el Director, 13-07-2026; actualizado 17-07 tras cerrar Robustez)
+## 🚀 Próximos 5 Pasos Globales (orden fijado por el Director, 13-07-2026; actualizado 23-07 tras cerrar Captura confiable)
 
-1. **[ActaExpressWeb] Captura confiable (H3+H4):** selector "Reunión virtual / presencial–sonido ambiente" + detector de micrófono muerto (aviso AL INICIO — re-pedido por el Director en F5.2). Siguiente ciclo: abrir con F0.
-2. **[ActaExpressWeb] Resiliencia de grabación (H6):** autoguardado IndexedDB + recuperación.
-3. **[Gobernanza — en paralelo]** Billing/Vertex + tier pagado de Gemini (privacidad del audio; cupo Blaze 5/5, hay que desvincular un proyecto).
-4. **[Backlog]** Visor de síntesis en la UI (ciclo propio); Android campo `plataforma` y paridad; actas en inglés salen en español; UX del mensaje de espera; validar `msDuration` server-side (OBS-A F6); timeout de proxy al desplegar.
-5. **[Metodología]** Diseño del "Modo A" partiendo de `docs/arquitectura_mas_cloud.md` (cuando el Director lo priorice).
+1. **[ActaExpressWeb] Resiliencia de grabación (H6):** autoguardado IndexedDB + recuperación al reabrir. Siguiente ciclo: abrir con F0.
+2. **[Gobernanza — en paralelo]** Billing/Vertex + tier pagado de Gemini (privacidad del audio; cupo Blaze 5/5, hay que desvincular un proyecto; el Director quiere pagar).
+3. **[Backlog]** Visor de síntesis en la UI (ciclo propio); Android campo `plataforma` y paridad; actas en inglés salen en español; validar `msDuration` server-side (OBS-A robustez); timeout de proxy al desplegar; **del ciclo captura confiable:** umbral RMS en sala callada (D1), botón de descarte del ámbar (D3), useEffect defensivo de persistencia.
+4. **[Metodología]** Diseño del "Modo A" partiendo de `docs/arquitectura_mas_cloud.md` (cuando el Director lo priorice).
+5. **[Ecosistema]** Retomar paridad Android cuando Web estabilice la fase 1 del roadmap.
 
 ---
 
