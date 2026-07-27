@@ -1,12 +1,28 @@
 # Estado Actual — NexoExpress (Coordinador del Ecosistema)
 
 **Estado Global del Ecosistema:** 🟢 VERDE
-**Última Actualización:** 23-07-2026
+**Última Actualización:** 25-07-2026
 **Metodología vigente:** v2 Triple-IA (`docs/METODOLOGIA_TRIPLE_IA.md`, adoptada 09-07-2026)
 
 ---
 
 ## ✅ Checklist de Micro-Tareas Vigente
+
+**Meta (F0 APROBADO EN G0 el 25-07-2026):** [ActaExpressWeb] **Resiliencia de grabación** (hallazgo H6, Fase 1): que un crash o cierre de pestaña a mitad de una reunión larga NO pierda el audio ya grabado — persistencia de los chunks de 1 s (ya existentes, `start(1000)`) en IndexedDB al vuelo + oferta de recuperación al reabrir. 100% frontend; sin cambios de schema, openapi ni server; la grabación JAMÁS falla por culpa del vault (degradación al comportamiento actual). Sin streaming/transcripción incremental (descartado el 13-07; Live API = Fase 3).
+**Expediente:** `auditorias/2026-07-25_resiliencia_grabacion/`
+
+**Decisiones de producto del GATE G0 (25-07):** (a) recuperación **OFRECIDA** (tarjeta Recuperar/Descartar), nunca automática; (b) máximo **1** sesión huérfana conservada (la última); (c) H6 confirmado como ciclo — billing/Vertex pospuesto.
+
+- [ ] **MT-H6a** — Módulo `recordingVault.ts`: wrapper IndexedDB (`sessions` con metadata uid/modo/mimeType/startedAt/lastChunkAt/chunkCount + `chunks` por `[sessionId, seq]`; API createSession/appendChunk/listSessions/readChunks/deleteSession/purgeAllExcept). — DoD: typecheck verde + A/B razonado del ciclo de vida.
+- [ ] **MT-H6b** — Escritura al vuelo en `useAudioRecorder`: `createSession` al arrancar, `appendChunk` fire-and-forget en `ondataavailable` (errores silenciados → vault off, grabación intacta), heartbeat `lastChunkAt`. — DoD: grabar → matar pestaña → chunks visibles en IndexedDB (DevTools); flujo normal sin cambios.
+- [ ] **MT-H6c** — Recuperación en `home.tsx`: al montar, huérfanas del uid por heartbeat stale → tarjeta "Grabación interrumpida (~X min) — Recuperar / Descartar"; recuperar = Blob(chunks)→base64→`processAudio.mutate` (pipeline existente); borrado solo en acta OK o descarte. — DoD E2E: matar pestaña a mitad de grabación → reabrir → recuperar → acta generada.
+- [ ] **MT-H6d** — Robustez del vault: límite 1 huérfana (purga), QuotaExceeded/IndexedDB ausente → degradación silenciosa sin cortar grabación, protección multi-pestaña (no ofrecer sesiones vivas). — DoD: A/B de los 3 caminos.
+
+**Cursor:** G0 (25-07) → F1 → F2 (APROBADO CON CAMBIOS ×5 + anti-bluff VÁLIDA) → **G1 CONCEDIDO (25-07)** → F3 (4 specs congeladas) → **F4 COMPLETA (25-07): 4 subagentes Sonnet secuenciales, cero desviaciones, cero dudas, checklist adversarial de MT-H6d 8/8** (incidencia: pausa por modo Plan a mitad de MT-H6b, reanudada con aprobación del Director sin impacto) → **F5 parte 1 (código) VERIFICADA por el Arquitecto** (`verificacion_f5.md`: typecheck verde re-ejecutado, greps por MT, lectura de los bloques críticos — purga que ignora vivas, re-check T2×T5, ruta imperativa anti-T4 — contraste informes-vs-realidad sin discrepancias). **E2E ronda 1 (27-07): núcleo VALIDADO** (recuperación tras cierre real → acta fiel; Descartar OK) **+ 1 BUG corregido en F3′ (MT-H6e:** la tarjeta no aparecía sin remontar Home; ahora re-chequeo cada 10 s, aparición sola en ~30-40 s**)** + 2 hallazgos nuevos al backlog (bug preexistente del basurero; feature "Continuar reunión"). **Checkpoint commiteado y pusheado por orden del Director (27-07): `2871a74` en ActaExpressWeb linux (MT-H6a..e, 381 inserciones) — CICLO ABIERTO: falta E2E ronda 2** (repetir las 6 pruebas esperando ~40 s la tarjeta) **→ F6 (auditoría diff íntegro, sobre `git show 2871a74`) → F7 (cierre)**.
+
+---
+
+## 📁 Meta anterior (CERRADA 23-07-2026)
 
 **Meta (CERRADA 23-07-2026 — commit `35580f0` en ActaExpressWeb linux):** [ActaExpressWeb] **Captura confiable** (hallazgos H3+H4): el usuario elige EXPLÍCITAMENTE el tipo de reunión (sin diálogos sorpresa ni degradación silenciosa de la fuente de audio) y se entera de un micrófono muerto EN LOS PRIMEROS SEGUNDOS de la grabación, no al final. 100% frontend; sin cambios de schema, openapi ni reglas; el guard 422 del server queda como última defensa. **Cuarto ciclo v2 completo (tercero de código): F0→F7 en 1 ronda de diseño + 1 de auditoría, ambas con anti-bluff; E2E 6/6 con el Director.**
 **Expediente:** `auditorias/2026-07-17_captura_confiable/` (16 archivos)
@@ -111,9 +127,9 @@
 
 ## 🚀 Próximos 5 Pasos Globales (orden fijado por el Director, 13-07-2026; actualizado 23-07 tras cerrar Captura confiable)
 
-1. **[ActaExpressWeb] Resiliencia de grabación (H6):** autoguardado IndexedDB + recuperación al reabrir. Siguiente ciclo: abrir con F0.
+1. **[ActaExpressWeb] Resiliencia de grabación (H6):** autoguardado IndexedDB + recuperación al reabrir. **EN CURSO — G0 aprobado 25-07, cursor en F2 (revisión de diseño con Gemini).**
 2. **[Gobernanza — en paralelo]** Billing/Vertex + tier pagado de Gemini (privacidad del audio; cupo Blaze 5/5, hay que desvincular un proyecto; el Director quiere pagar).
-3. **[Backlog]** Visor de síntesis en la UI (ciclo propio); Android campo `plataforma` y paridad; actas en inglés salen en español; validar `msDuration` server-side (OBS-A robustez); timeout de proxy al desplegar; **del ciclo captura confiable:** umbral RMS en sala callada (D1), botón de descarte del ámbar (D3), useEffect defensivo de persistencia.
+3. **[Backlog]** Visor de síntesis en la UI (ciclo propio); Android campo `plataforma` y paridad; actas en inglés salen en español; validar `msDuration` server-side (OBS-A robustez); timeout de proxy al desplegar; **del ciclo captura confiable:** umbral RMS en sala callada (D1), botón de descarte del ámbar (D3), useEffect defensivo de persistencia; **del E2E de resiliencia (27-07):** bug PREEXISTENTE del botón borrar de la lista de actas (navega en vez de borrar — `stopPropagation` sin `preventDefault` dentro del `<Link>`, home.tsx:495) y **"Continuar reunión"** desde un acta (anexar audio tras un corte — dirección de producto del Director, ciclo propio).
 4. **[Metodología]** Diseño del "Modo A" partiendo de `docs/arquitectura_mas_cloud.md` (cuando el Director lo priorice).
 5. **[Ecosistema]** Retomar paridad Android cuando Web estabilice la fase 1 del roadmap.
 

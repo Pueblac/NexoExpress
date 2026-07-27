@@ -1,0 +1,36 @@
+# Respuesta del Auditor (Gemini 3.1 Pro High) — revisión de DISEÑO ronda 1, ciclo resiliencia de grabación (H6)
+
+> Archivada TAL CUAL fue entregada por el Director el 25-07-2026 (transporte manual,
+> chat nuevo con inicialización de identidad). El pegado en chat degradó el formato
+> de la tabla de claims (columnas con tabulación); contenido sin edición.
+> Validación anti-bluff del Arquitecto en `validacion_antibluff_diseno_ronda1.md`.
+
+---
+
+Auditoría de Diseño: Resiliencia de Grabación (H6)
+1. Verificación de Claims
+Claim	Análisis	Veredicto
+C1	El diseño D-B especifica appendChunk como fire-and-forget con errores silenciados, manteniendo la escritura en memoria (chunksRef.current en :215-217) intacta. Si IndexedDB falla o se bloquea, la promesa rechazada no frena el main thread ni el evento ondataavailable, recayendo al 100% en el comportamiento actual en memoria.	SÓLIDO
+C2	D-C postula el borrado en onSuccess. Dado que el auto-procesamiento tras onstop depende de un useEffect asíncrono y llamadas de red (:141-155), un crash en cualquier punto durante el envío o la espera a Gemini dejaría la sesión intacta en IndexedDB. Si se borrara prematuramente en onstop, se perdería la cobertura frente a fallos post-grabación.	SÓLIDO
+C3	D-D asume un latido constante bajo lastChunkAt. Aunque MediaRecorder corre en la plataforma subyacente, la recepción de sus eventos y promesas IDB dependen del hilo principal de JS. Un umbral estricto de 10s es vulnerable a background tab throttling severo, micro-suspensiones de CPU o recolecciones de basura pesadas, lo que marcaría una sesión viva como huérfana, disparando comportamientos de purga en pestañas concurrentes.	DÉBIL (Alternativa: Aumentar sustancialmente el umbral STALE_MS a un valor tolerante a latencias de plataforma, ej. 30 segundos).
+C4	El flujo de MediaRecorder emite un bloque inicial con el header EBML, seguido de clusters. La concatenación plana de estos blobs desde IDB reconstruye un live stream válido de WebM (sin metadatos de Cues ni duración final). Este formato crudo es aceptado nativamente por herramientas decodificadoras convencionales y el pipeline de Gemini File API, sin requerir reempaquetado.	SÓLIDO
+C5	El enfoque de D-E recicla directamente la mutación processAudio.mutate preexistente y emula un audio WebM estándar (D-A guarda el mimeType original). Todo el Vault opera localmente en IndexedDB sin añadir endpoints, alterar esquemas remotos ni interferir con la ruta principal si ocurre un error local (que es silenciado).	SÓLIDO
+2. Preguntas de Diseño
+Q1: Recomendación: Se debe usar la diferencia de timestamps (lastChunkAt - startedAt). Justificación: El cálculo de chunkCount * 1000 asume erróneamente un intervalo isócrono absoluto de MediaRecorder. Bajo presión de CPU o variaciones del codificador, el tamaño y tiempo de los chunks variará, causando que chunkCount diverja significativamente de la duración real y falle la validación estricta del guard 422 del backend en grabaciones largas.
+Q2: Recomendación: Se debe purgar la cuota (límite 1 huérfana) tanto al montar Home como al crear una sesión nueva; respecto a las huérfanas de otro uid, la política es nunca borrarlas. Justificación: Purgar en ambos flujos asegura que el almacenamiento esté limpio tras flujos interrumpidos y antes de añadir nueva carga. Sin embargo, IndexedDB es compartido por origen. Purgar datos ajenos destruye la recuperación del usuario B sin su consentimiento. El límite y purga deben operar en un silo filtrado exclusivamente para el uid autenticado.
+Q3: Recomendación: La sesión debe ser descartada automáticamente ante un error de negocio terminal (como el HTTP 422 por audio mudo), y conservarse únicamente ante errores transitorios de infraestructura (Network Error, HTTP 5xx). Justificación: El rechazo 422 es determinista: el backend nunca aceptará ese audio. Dejar la sesión en IndexedDB crearía un bucle infinito en UX (la tarjeta vuelve a aparecer, el envío vuelve a fallar), forzando al usuario a borrarla manualmente y generando fricción sin valor.
+Q4: Recomendación: El umbral de latencia STALE_MS debe fijarse en 30 000 ms (30 segundos). Justificación: 10 segundos carece de margen de seguridad frente a contenciones del SO o tab sleep parcial por gestión térmica o batería. Si el usuario sufre un crash real, la reapertura tarda varios segundos (lo cual igual superará los 30s de latido), pero un valor de 30s protege a la concurrencia de pestañas frente a falsos positivos transitorios del runtime de JS.
+3. Demostración Anti-Aprobación-Automática (Trampas)
+T1: El audio sobrevive y ES recuperable. La lógica de borrado reside exclusivamente en el onSuccess del acta generada (D-C). Si el navegador crashea tras onstop y antes del acta, el bloque de éxito de la red nunca se alcanza, dejando el audio intacto en IDB para que Home lo detecte al reabrir.
+T2: No puede ofrecer recuperarla ni purgarla porque el filtro de orfandad (D-D) detectará que lastChunkAt de A es reciente (delta < STALE_MS). Para B, la sesión de A no clasifica como huérfana, y si ambas graban a la vez, tienen diferentes UUID (D-A), conviviendo pacíficamente sin colisionar.
+T3: El usuario no verá absolutamente nada distinto. Un fallo de cuota rechazará la promesa de appendChunk. Al estar diseñada como fire-and-forget y tener los errores silenciados (D-B), el error muere localmente. La RAM (chunksRef.current) se sigue poblando y el cierre fluye intacto, perdiéndose únicamente la red de seguridad de IndexedDB pero completando el trabajo exitosamente.
+T4: No hay disparo doble porque la ruta de recuperación es estanca. El auto-proceso en el useEffect requiere que cambie el estado reactivo global de useAudioRecorder (audioBase64 y duration). D-E llama explícitamente a processAudio.mutate inyectando las variables decodificadas de IDB de forma imperativa, sin ensuciar los ref o dependencias reactivas del useEffect vivo de la vista principal.
+T5: La suspensión marca a la sesión como "stale" matemáticamente (lastChunkAt a 1 h), pero no sucede nada destructivo. El componente Home no se vuelve a montar si la pestaña permaneció abierta, por lo que listSessions (D-D) nunca se evalúa. Al despertar, el MediaRecorder inyecta un nuevo chunk, actualizando lastChunkAt con el nuevo tiempo y devolviéndola al estatus "viva".
+4. Cambios Obligatorios
+Cálculo de duración: Reemplazar el producto escalar chunkCount * 1000 por la resta de tiempo transcurrido exacto (lastChunkAt - startedAt) en el payload inyectado a processAudio.mutate (D-E).
+Ciclo de purgas segmentado: Modificar la consulta de orfandad y los barridos de purga (listSessions, purgeAllExcept) para que apliquen exclusivamente a registros coincidentes con el uid autenticado.
+Purgas agresivas: Asegurar que el comando de purgado de límite (mantener 1) se ejecute obligatoriamente al montar Home y al momento de invocar createSession.
+Descarte por error terminal: Incorporar una cláusula en el catch/onError del pipeline de processAudio (durante recuperación y en flujo normal) que dispare deleteSession si el servidor emite una respuesta determinista (HTTP 422).
+Calibración de ventana STALE: Incrementar el valor absoluto de la constante STALE_MS de 10 000 ms a 30 000 ms para tolerar throttling concurrente y pausas pesadas del Garbage Collector.
+5. Veredicto Global
+APROBADO CON CAMBIOS
