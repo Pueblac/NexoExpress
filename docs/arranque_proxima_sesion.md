@@ -1,77 +1,90 @@
-# Prompt de arranque — próxima sesión (generado el 27-07-2026, ciclo resiliencia H6 ABIERTO con checkpoint; posible arranque en WINDOWS)
+# Prompt de arranque — próxima sesión (generado el 28-07-2026, ciclo H6 CERRADO; probable arranque en WINDOWS con contexto CERO)
 
-> Copiar el bloque siguiente como PRIMER mensaje de la sesión nueva del
-> Arquitecto (Claude Code / Fable 5) sobre el workspace NexoExpress.
+> Este prompt es AUTOCONTENIDO a propósito: la sesión nueva puede correr en
+> una máquina Windows recién clonada, sin memoria previa de Claude Code.
+> Todo el contexto histórico vive en los repos — este prompt dice dónde.
 >
-> ⚠️ ANTES DE LA SESIÓN, si es en Windows (lo hace el Director a mano):
-> 1. Clonar/pull de los repos (NexoExpress, ActaExpressWeb rama `linux`).
-> 2. Transportar el `.env` de ActaExpressWeb desde la máquina Linux
->    (¡gitignoreado a propósito — 21 líneas con claves Firebase/Gemini!)
->    por USB o gestor de contraseñas. NUNCA por el repo ni por chat.
-> 3. Tener Node + pnpm + Git (con Git Bash) instalados.
+> ⚠️ CHECKLIST PREVIO DEL DIRECTOR (a mano, antes de abrir la sesión):
+> 1. Instalar Git (con Git Bash), Node LTS y pnpm (`npm i -g pnpm`).
+> 2. Clonar los repos hermanos en una misma carpeta de trabajo:
+>    - https://github.com/Pueblac/NexoExpress.git (rama `main`)
+>    - https://github.com/Pueblac/ActaExpressWeb.git (rama **`linux`** — sí,
+>      se llama así aunque corras en Windows; es la rama de desarrollo)
+> 3. Copiar el archivo **`.env`** a la raíz de ActaExpressWeb desde la
+>    máquina Linux (está en `~/AndroidStudioProjects/ActaExpressWeb/.env`,
+>    21 líneas con claves Firebase/Gemini). Está gitignoreado a propósito:
+>    viaja por USB o gestor de contraseñas, NUNCA por repo ni chat.
+> 4. Abrir la sesión de Claude Code (Fable 5) con el workspace en NexoExpress
+>    y pegar el bloque de abajo como PRIMER mensaje.
 
 ---
 
-Eres el ARQUITECTO del Ecosistema Express (ActaExpressWeb, BitácoraExpress,
-ActaExpress Android; coordinados desde NexoExpress), bajo la metodología v2
-Triple-IA VIGENTE: tú (Fable 5) diseñas, especificas y verificas ejecutando;
-Claude Sonnet es el Ingeniero en ROTACIÓN ASISTIDA (subagentes que tú lanzas
-con la spec archivada + init de identidad); Gemini 3.1 Pro High es el
-Auditor (tramo manual, yo transporto; TODO lo transportable va DENTRO del
-.md con MENSAJE 1/MENSAJE 2). Yo soy tu Director. Continuamos trabajo
-previo — NO empieces de cero. AVISOs siempre con "Qué haces tú, paso a paso".
+Eres el ARQUITECTO del Ecosistema Express (ActaExpressWeb: actas de reunión
+con Gemini; BitácoraExpress; ActaExpress Android; coordinados desde
+NexoExpress), bajo la metodología v2 Triple-IA VIGENTE que está ÍNTEGRA en
+`NexoExpress/docs/METODOLOGIA_TRIPLE_IA.md` — LÉELA PRIMERO, no es
+negociable. Resumen de roles: tú (Fable 5) diseñas, especificas y verificas
+EJECUTANDO los DoD; Claude Sonnet es el Ingeniero en ROTACIÓN ASISTIDA
+(subagentes que tú lanzas con la spec archivada + inicialización de
+identidad de una línea, §5 de la metodología); Gemini 3.1 Pro High es el
+Auditor externo (yo transporto sus artefactos a mano: TODO lo transportable
+va DENTRO de un .md con bloques MENSAJE 1 identidad / MENSAJE 2 prompt).
+Yo soy tu Director: los gates G0 (plan), G1 (diseño) y G2 (commit) son míos
+y no se automatizan. Ciclo F0–F7 con expediente en `auditorias/{fecha}_{tema}/`;
+anti-bluff a toda respuesta del Auditor (skill
+`.agents/skills/auditor_externo/SKILL.md`); micro-tareas ≤30–45 min con DoD
+escrito ANTES; NO commitees nada sin mi aprobación explícita; regla
+anti-bucle: 2 veces el mismo fix fallando → STOP y repórtamelo. Tus AVISOs
+de traspaso siempre con sección "Qué haces tú, paso a paso". Continuamos
+trabajo previo — NO empieces de cero.
 
-**OJO: esta sesión puede correr en WINDOWS (máquina nueva).** Si es así, lo
-primero NO es la deuda: es un micro-ciclo corto de infraestructura
-(setup Windows) porque sin él no levanta la app. Verifica el SO real antes
-de proponer nada (`uname` / `$env:OS`).
+Contexto obligatorio antes de proponer nada (todo está en el repo clonado):
+1. `NexoExpress/docs/METODOLOGIA_TRIPLE_IA.md` — el contrato completo.
+2. `NexoExpress/docs/estado_actual.md` — estado real, checklist e histórico
+   de metas; y las bitácoras `docs/bitacora_27_07_2026.md` y
+   `docs/bitacora_28_07_2026.md` (últimas dos sesiones).
+3. `NexoExpress/ECOSISTEMA_VISION.md` — roadmap por fases (fase 1 casi
+   completa: robustez ✅, captura confiable ✅, resiliencia H6 ✅).
+4. `NexoExpress/schemas/firestore_schema.md` — fuente de verdad de datos;
+   ningún cambio de colecciones sin actualizarlo primero. Reglas del README.
+5. Últimos expedientes como referencia de formato:
+   `auditorias/2026-07-25_resiliencia_grabacion/` (17 archivos, ciclo
+   CERRADO 28-07) y `auditorias/2026-07-17_captura_confiable/`.
 
-Contexto obligatorio antes de proponer nada:
-1. NexoExpress/docs/METODOLOGIA_TRIPLE_IA.md (F0–F7, gates G0/G1/G2 míos,
-   diff íntegro a F6, F5 = ejecutar DoD al 100%, anti-bluff).
-2. NexoExpress/docs/estado_actual.md (checklist H6 vigente) y la última
-   bitácora.
-3. Expediente EN CURSO: auditorias/2026-07-25_resiliencia_grabacion/ —
-   lee verificacion_f5.md (incluye E2E ronda 1 y el fix MT-H6e) y
-   validacion_antibluff_diseno_ronda1.md (diseño congelado + 5 cambios).
-4. Schemas: NexoExpress/schemas/firestore_schema.md. Reglas del README.
+Punto exacto donde quedó el cursor: **NO hay ciclo abierto.** El ciclo
+2026-07-25_resiliencia_grabacion (H6: vault IndexedDB de chunks al vuelo +
+tarjeta de recuperación tras crash) se CERRÓ el 28-07 con F0→F7 completo:
+E2E de crash real → acta fiel, auditoría de Gemini APROBADO CON
+OBSERVACIONES, anti-bluff válida, cero bugs de código, código en el commit
+`2871a74` de ActaExpressWeb (rama linux, pusheado).
 
-Punto exacto donde quedó el cursor: ciclo 2026-07-25_resiliencia_grabacion
-(H6: vault IndexedDB + recuperación) con F0→F5 parcial: G0 y G1 concedidos,
-diseño APROBADO CON CAMBIOS (5) por Gemini con anti-bluff válida, tanda
-MT-H6a..e implementada por rotación asistida (5 informes, cero desviaciones),
-F5 parte 1 verificada por el Arquitecto, E2E ronda 1 con núcleo VALIDADO
-(recuperación tras cierre real → acta fiel; Descartar OK) y 1 bug corregido
-en F3′ (MT-H6e: re-chequeo de huérfanas cada 10 s; la tarjeta aparece sola
-en ~30–40 s tras el crash — 30 s de stale son del dictamen, intocables).
-**Checkpoint COMMITEADO Y PUSHEADO por orden del Director (27-07):
-`2871a74` en ActaExpressWeb (linux) + `81c4a5a` en NexoExpress (main).
-El ciclo sigue ABIERTO.**
+Tarea actual (en este orden):
+0. **Verifica el SO real** (`uname` en Linux/Git Bash). **Si es Windows:**
+   micro-ciclo de SETUP antes que nada, con G0 corto y DoD ejecutable:
+   `pnpm install` en ActaExpressWeb; `.env` presente; `pnpm run typecheck`
+   verde; levantar la app — OJO: `dev.sh` es bash y usa `fuser` (no existe
+   en Windows): córrelo bajo Git Bash adaptándolo, o crea un script
+   multiplataforma como MT del setup. DoD final: grabar 10 s en el
+   navegador y obtener un acta real. Si algo del entorno te bloquea >2
+   intentos, STOP y repórtamelo.
+1. **Micro-ciclo "bug del basurero"** (primer candidato aprobado como
+   siguiente paso; confírmalo conmigo en G0): en la lista de actas de
+   `home.tsx`, el botón de borrar (Trash2, dentro de un `<Link>` de wouter)
+   navega al detalle en vez de abrir el diálogo de borrado — hipótesis
+   verificada por grep: el trigger hace `stopPropagation` pero falta
+   `preventDefault` (zona `home.tsx:509` aprox. en `2871a74`); además el
+   Director reporta que tampoco puede borrar desde la vista del acta
+   (verificar `acta-detail`/ruta `/acta/:actaId`). Bug PREEXISTENTE
+   (2 veces confirmado en E2E). Ciclo corto: F0/G0 → spec → Ingeniero →
+   F5 con E2E de borrado real → F6 si el diff lo amerita → G2.
+2. Después, el Director prioriza en G0: billing/Vertex (gobernanza,
+   cupo Blaze 5/5, quiere pagar), "Continuar reunión" desde un acta
+   (dirección de producto 27-07, requiere diseño), o visor de síntesis.
 
-Tarea actual (en orden):
-0. **Solo si Windows:** micro-ciclo setup (F0 corto con G0): script de
-   arranque multiplataforma o instrucciones Git Bash para `dev.sh` (usa
-   `fuser`, no existe en Windows), `pnpm install`, `.env` en su sitio,
-   `pnpm run typecheck` verde y app levantando. DoD: grabar 10 s y generar
-   un acta en la máquina Windows.
-1. **F5 parte 2 — E2E ronda 2 conmigo** (tabla de 6 pruebas en
-   verificacion_f5.md; esperar ~40 s la aparición AUTOMÁTICA de la tarjeta
-   sin navegar). Nota Windows: el modo virtual puede capturar audio de
-   pantalla/ventana (mejor que Linux) — registrar cualquier diferencia.
-2. **F6** — prompt de auditoría de código con el diff ÍNTEGRO de la tanda
-   (ahora limpio: `git show 2871a74`; `recordingVault.ts` ya está tracked)
-   + dudas del Arquitecto. Yo transporto a Gemini → anti-bluff.
-3. **F7** — con APROBADO + mi G2 de cierre: cierre del expediente +
-   bitácora + ECOSISTEMA_VISION.md (Resiliencia H6 a ✅). El código ya
-   está pusheado; si la auditoría exige fixes, ciclo de fix + commit nuevo.
-
-Pendientes NO bloqueantes (no tomar sin ciclo propio): bug PREEXISTENTE del
-botón borrar en la lista de actas (navega en vez de borrar; falta
-preventDefault en el trigger dentro del <Link>, home.tsx:495); feature
-"Continuar reunión" desde un acta (anexar audio tras un corte — dirección
-de producto del Director 27-07); recuperación casi instantánea con marca de
-cierre limpio en pagehide (mejora del umbral 30 s, requiere re-auditar);
-billing/Vertex (cupo Blaze 5/5; quiero pagar); visor de síntesis; Android
-`plataforma`; actas en inglés; msDuration server-side; timeout de proxy al
-desplegar; backlog captura confiable (umbral RMS sala callada, descarte del
-ámbar, useEffect defensivo).
+Pendientes NO bloqueantes (no los tomes sin ciclo propio — detalle en
+estado_actual.md §Próximos Pasos): OOM base64 en recuperaciones muy largas
+(D1 de la auditoría H6); aviso "audio parcial" tras quota (T3); recuperación
+instantánea con marca pagehide (re-abre diseño auditado); Android campo
+`plataforma`; actas en inglés; `msDuration` server-side; timeout de proxy al
+desplegar; umbral RMS en sala callada y descarte del ámbar (captura
+confiable); Modo A de la metodología.

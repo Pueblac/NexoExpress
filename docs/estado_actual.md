@@ -1,24 +1,25 @@
 # Estado Actual — NexoExpress (Coordinador del Ecosistema)
 
 **Estado Global del Ecosistema:** 🟢 VERDE
-**Última Actualización:** 25-07-2026
+**Última Actualización:** 28-07-2026
 **Metodología vigente:** v2 Triple-IA (`docs/METODOLOGIA_TRIPLE_IA.md`, adoptada 09-07-2026)
 
 ---
 
 ## ✅ Checklist de Micro-Tareas Vigente
 
-**Meta (F0 APROBADO EN G0 el 25-07-2026):** [ActaExpressWeb] **Resiliencia de grabación** (hallazgo H6, Fase 1): que un crash o cierre de pestaña a mitad de una reunión larga NO pierda el audio ya grabado — persistencia de los chunks de 1 s (ya existentes, `start(1000)`) en IndexedDB al vuelo + oferta de recuperación al reabrir. 100% frontend; sin cambios de schema, openapi ni server; la grabación JAMÁS falla por culpa del vault (degradación al comportamiento actual). Sin streaming/transcripción incremental (descartado el 13-07; Live API = Fase 3).
-**Expediente:** `auditorias/2026-07-25_resiliencia_grabacion/`
+**Meta (CERRADA 28-07-2026 — código en `2871a74`, ActaExpressWeb linux, pusheado):** [ActaExpressWeb] **Resiliencia de grabación** (hallazgo H6, Fase 1): que un crash o cierre de pestaña a mitad de una reunión larga NO pierda el audio ya grabado — persistencia de los chunks de 1 s en IndexedDB al vuelo + oferta de recuperación al reabrir. 100% frontend; la grabación JAMÁS falla por culpa del vault. **Quinto ciclo v2 completo (cuarto de código): F0→F7 con 1 ronda de diseño + 1 de auditoría, ambas con anti-bluff; primer F3′ disparado por E2E (MT-H6e) y primer checkpoint commiteado a mitad de ciclo por orden del Director.**
+**Expediente:** `auditorias/2026-07-25_resiliencia_grabacion/` (17 archivos)
 
 **Decisiones de producto del GATE G0 (25-07):** (a) recuperación **OFRECIDA** (tarjeta Recuperar/Descartar), nunca automática; (b) máximo **1** sesión huérfana conservada (la última); (c) H6 confirmado como ciclo — billing/Vertex pospuesto.
 
-- [ ] **MT-H6a** — Módulo `recordingVault.ts`: wrapper IndexedDB (`sessions` con metadata uid/modo/mimeType/startedAt/lastChunkAt/chunkCount + `chunks` por `[sessionId, seq]`; API createSession/appendChunk/listSessions/readChunks/deleteSession/purgeAllExcept). — DoD: typecheck verde + A/B razonado del ciclo de vida.
-- [ ] **MT-H6b** — Escritura al vuelo en `useAudioRecorder`: `createSession` al arrancar, `appendChunk` fire-and-forget en `ondataavailable` (errores silenciados → vault off, grabación intacta), heartbeat `lastChunkAt`. — DoD: grabar → matar pestaña → chunks visibles en IndexedDB (DevTools); flujo normal sin cambios.
-- [ ] **MT-H6c** — Recuperación en `home.tsx`: al montar, huérfanas del uid por heartbeat stale → tarjeta "Grabación interrumpida (~X min) — Recuperar / Descartar"; recuperar = Blob(chunks)→base64→`processAudio.mutate` (pipeline existente); borrado solo en acta OK o descarte. — DoD E2E: matar pestaña a mitad de grabación → reabrir → recuperar → acta generada.
-- [ ] **MT-H6d** — Robustez del vault: límite 1 huérfana (purga), QuotaExceeded/IndexedDB ausente → degradación silenciosa sin cortar grabación, protección multi-pestaña (no ofrecer sesiones vivas). — DoD: A/B de los 3 caminos.
+- [x] **MT-H6a** — Módulo `recordingVault.ts` (227 líneas): wrapper IndexedDB con heartbeat, silo por uid, `purgeStaleKeepNewest` que jamás toca sesiones vivas, transacciones atómicas. — **DoD CUMPLIDO AL 100% (28-07):** typecheck verde, A/B del ciclo de vida, E2E real.
+- [x] **MT-H6b** — Escritura al vuelo en `useAudioRecorder`: `createSession` con mimeType real + `appendChunk` fire-and-forget; fallo del vault degrada sin cortar; PROHIBIDO borrar desde el recorder (grep sin resultados). — **DoD CUMPLIDO AL 100% (28-07):** E2E: la recuperación de la prueba 1 demuestra la persistencia al vuelo.
+- [x] **MT-H6c** — Recuperación en `home.tsx`: tarjeta Recuperar/Descartar, re-check heartbeat (T2×T5), `msDuration` por timestamps, borrado solo en acta-OK/descarte/422 (conserva en red/5xx). — **DoD CUMPLIDO AL 100% (28-07):** E2E: **cierre real de pestaña grabando → tarjeta automática → acta FIEL al guion**; descarte definitivo; caso feliz sin rastro.
+- [x] **MT-H6d** — Endurecimiento adversarial: checklist 8/8 PASA, cero fixes necesarios (todas las llamadas al vault con catch, silo verificado, doble-borrado benigno). — **DoD cumplido (25-07).**
+- [x] **MT-H6e** — (F3′ tras E2E r1) Re-chequeo periódico de huérfanas cada 10 s con apagado al detectar. — **DoD CUMPLIDO AL 100% (28-07):** E2E r2: tarjeta aparece SOLA a ~20 s de reabrir sin navegar; multi-pestaña sin falso positivo.
 
-**Cursor:** G0 (25-07) → F1 → F2 (APROBADO CON CAMBIOS ×5 + anti-bluff VÁLIDA) → **G1 CONCEDIDO (25-07)** → F3 (4 specs congeladas) → **F4 COMPLETA (25-07): 4 subagentes Sonnet secuenciales, cero desviaciones, cero dudas, checklist adversarial de MT-H6d 8/8** (incidencia: pausa por modo Plan a mitad de MT-H6b, reanudada con aprobación del Director sin impacto) → **F5 parte 1 (código) VERIFICADA por el Arquitecto** (`verificacion_f5.md`: typecheck verde re-ejecutado, greps por MT, lectura de los bloques críticos — purga que ignora vivas, re-check T2×T5, ruta imperativa anti-T4 — contraste informes-vs-realidad sin discrepancias). **E2E ronda 1 (27-07): núcleo VALIDADO** (recuperación tras cierre real → acta fiel; Descartar OK) **+ 1 BUG corregido en F3′ (MT-H6e:** la tarjeta no aparecía sin remontar Home; ahora re-chequeo cada 10 s, aparición sola en ~30-40 s**)** + 2 hallazgos nuevos al backlog (bug preexistente del basurero; feature "Continuar reunión"). **Checkpoint commiteado y pusheado por orden del Director (27-07): `2871a74` en ActaExpressWeb linux (MT-H6a..e, 381 inserciones) — CICLO ABIERTO: falta E2E ronda 2** (repetir las 6 pruebas esperando ~40 s la tarjeta) **→ F6 (auditoría diff íntegro, sobre `git show 2871a74`) → F7 (cierre)**.
+**Cursor:** G0 (25-07) → F1 → F2 (APROBADO CON CAMBIOS ×5 + anti-bluff VÁLIDA) → **G1 CONCEDIDO (25-07)** → F3 (4 specs congeladas) → **F4 COMPLETA (25-07): 4 subagentes Sonnet secuenciales, cero desviaciones, cero dudas, checklist adversarial de MT-H6d 8/8** (incidencia: pausa por modo Plan a mitad de MT-H6b, reanudada con aprobación del Director sin impacto) → **F5 parte 1 (código) VERIFICADA por el Arquitecto** (`verificacion_f5.md`: typecheck verde re-ejecutado, greps por MT, lectura de los bloques críticos — purga que ignora vivas, re-check T2×T5, ruta imperativa anti-T4 — contraste informes-vs-realidad sin discrepancias). **E2E ronda 1 (27-07): núcleo VALIDADO** (recuperación tras cierre real → acta fiel; Descartar OK) **+ 1 BUG corregido en F3′ (MT-H6e:** la tarjeta no aparecía sin remontar Home; ahora re-chequeo cada 10 s, aparición sola en ~30-40 s**)** + 2 hallazgos nuevos al backlog (bug preexistente del basurero; feature "Continuar reunión"). **Checkpoint commiteado y pusheado por orden del Director (27-07): `2871a74` en ActaExpressWeb linux (MT-H6a..e, 381 inserciones).** **E2E ronda 2 (28-07): 4/4 PASA → F5 CERRADA** (tarjeta automática a ~20 s de reabrir, acta recuperada FIEL al guion, descarte definitivo, caso feliz limpio, multi-pestaña sin falso positivo; ver `verificacion_f5.md`). **F6 EN CURSO: `prompt_auditoria_ronda1.md` generado** (`git show 2871a74` incrustado byte a byte verificado, C1..C6, Q1..Q4, T1..T5, dudas D1..D4 del Arquitecto — memoria en recuperaciones largas, carrera poll-descarte, purgas concurrentes, timing; formato MENSAJE 1/2). **F6 COMPLETA (28-07): APROBADO CON OBSERVACIONES + anti-bluff VÁLIDA** — cero bugs de código (el único "BUG", C3, fue imprecisión del enunciado del claim, reconocida por el propio Auditor). **CICLO CERRADO (28-07): G2 de cierre concedido** → expediente cerrado (17 archivos) + bitácora + ECOSISTEMA_VISION.md (Resiliencia H6 ✅). Backlog alimentado: OOM base64 en recuperaciones muy largas (D1), aviso de "audio parcial" tras quota (T3), bucle de tarjeta si el descarte falla (D2, aceptado), recuperación casi instantánea con marca pagehide. **Siguiente: micro-ciclo del bug del basurero (primer candidato) o el ciclo que el Director priorice en G0; si la sesión es en WINDOWS, antes va el micro-ciclo de setup (ver `arranque_proxima_sesion.md`).**
 
 ---
 
@@ -101,7 +102,7 @@
 
 | Proyecto | Estado | % MVP | Prioridad ahora |
 |---|---|---|---|
-| ActaExpressWeb | 🟢 Activo | ~90% | Resiliencia de grabación (H6) |
+| ActaExpressWeb | 🟢 Activo | ~92% | Bug basurero (micro-ciclo) / próximo G0 |
 | ActaExpress Android | 🟡 En pausa | ~60% | Paridad con Web (campo `plataforma`) |
 | BitácoraExpress | 🟢 Activo en Linux | 100% (MVP) | MVP Completado, mantenimiento |
 | NexoExpress | 🟢 Activo | 100% | Orquestación, RAG Docs y Mantenimiento |
@@ -110,6 +111,7 @@
 
 ## 📌 Hitos Recientes del Ecosistema
 
+- **Resiliencia de grabación cerrada (28-07):** vault IndexedDB que persiste los chunks de 1 s al vuelo + tarjeta de recuperación tras crash/cierre de pestaña (heartbeat 30 s, poll 10 s, silo por uid, borrado solo en acta-OK/descarte/422). E2E en 2 rondas con cierre REAL de pestaña → acta fiel; auditoría APROBADO CON OBSERVACIONES con anti-bluff válida y cero bugs de código (`2871a74` en ActaExpressWeb linux; expediente `2026-07-25_resiliencia_grabacion`, 17 archivos). Primer F3′ disparado por E2E (MT-H6e).
 - **Captura confiable cerrada (23-07):** selector explícito presencial/virtual persistido por uid, fin del fallback silencioso de fuente de audio (H3), detector de micrófono muerto con banner por severidad en los primeros 5–10 s (H4) y tarjeta prominente de procesamiento. Ciclo v2 completo con E2E 6/6 y auditoría APROBADO CON OBSERVACIONES cuyo único BUG alegado (T5) fue refutado con evidencia por el Arquitecto (`35580f0` en ActaExpressWeb linux; expediente `2026-07-17_captura_confiable`, 16 archivos).
 - **Robustez del pipeline cerrada (17-07):** guard 422 pre-gasto (300 B/s), centinelas anti-confabulación en ambos prompts + `looksEmpty` reconciliada, thinkingBudget 4096 en síntesis (thoughts reales: 1145 vs 62.912), timeout File API proporcional y mensaje de espera. Ciclo v2 completo con E2E real y auditoría APROBADO (`c382c4c` en ActaExpressWeb linux; expediente `2026-07-14_robustez_pipeline`, 15 archivos).
 - **Metodología v2 Triple-IA adoptada (09-07):** ciclo F0–F7 con Fable Arquitecto / Sonnet Ingeniero / Gemini Auditor; auto-auditada por Gemini (APROBADO CON CAMBIOS r1, 5 cambios incorporados) y commiteada (`b23dff7`). v1 queda como fallback. Piloto: MT-04.
@@ -125,13 +127,13 @@
 
 ---
 
-## 🚀 Próximos 5 Pasos Globales (orden fijado por el Director, 13-07-2026; actualizado 23-07 tras cerrar Captura confiable)
+## 🚀 Próximos 5 Pasos Globales (actualizado 28-07 tras cerrar Resiliencia H6)
 
-1. **[ActaExpressWeb] Resiliencia de grabación (H6):** autoguardado IndexedDB + recuperación al reabrir. **EN CURSO — G0 aprobado 25-07, cursor en F2 (revisión de diseño con Gemini).**
-2. **[Gobernanza — en paralelo]** Billing/Vertex + tier pagado de Gemini (privacidad del audio; cupo Blaze 5/5, hay que desvincular un proyecto; el Director quiere pagar).
-3. **[Backlog]** Visor de síntesis en la UI (ciclo propio); Android campo `plataforma` y paridad; actas en inglés salen en español; validar `msDuration` server-side (OBS-A robustez); timeout de proxy al desplegar; **del ciclo captura confiable:** umbral RMS en sala callada (D1), botón de descarte del ámbar (D3), useEffect defensivo de persistencia; **del E2E de resiliencia (27-07):** bug PREEXISTENTE del botón borrar de la lista de actas (navega en vez de borrar — `stopPropagation` sin `preventDefault` dentro del `<Link>`, home.tsx:495) y **"Continuar reunión"** desde un acta (anexar audio tras un corte — dirección de producto del Director, ciclo propio).
-4. **[Metodología]** Diseño del "Modo A" partiendo de `docs/arquitectura_mas_cloud.md` (cuando el Director lo priorice).
-5. **[Ecosistema]** Retomar paridad Android cuando Web estabilice la fase 1 del roadmap.
+1. **[Si la sesión es en WINDOWS]** Micro-ciclo de setup del entorno (prerrequisito de todo lo demás; ver `arranque_proxima_sesion.md`: `.env` a mano, dev.sh es bash+fuser).
+2. **[ActaExpressWeb] Micro-ciclo bug del basurero (PREEXISTENTE, confirmado 2 veces en E2E):** el botón borrar de la lista navega al acta en vez de borrar (falta `preventDefault` en el trigger dentro del `<Link>`, zona de `home.tsx:509` aprox.) y tampoco se puede borrar desde la vista del acta. Fix chico con DoD E2E propio.
+3. **[Gobernanza — en paralelo]** Billing/Vertex + tier pagado de Gemini (privacidad del audio; cupo Blaze 5/5, hay que desvincular un proyecto; el Director quiere pagar).
+4. **[Backlog]** **"Continuar reunión"** desde un acta (anexar audio tras un corte — dirección de producto del Director, ciclo propio); visor de síntesis en la UI; Android campo `plataforma`; actas en inglés; `msDuration` server-side; timeout de proxy al desplegar; **de captura confiable:** umbral RMS sala callada, descarte del ámbar, useEffect defensivo; **de resiliencia H6:** OOM base64 en recuperaciones muy largas (D1), aviso "audio parcial" tras quota (T3), recuperación casi instantánea con marca pagehide (cambia el diseño auditado).
+5. **[Metodología]** Diseño del "Modo A" partiendo de `docs/arquitectura_mas_cloud.md` (cuando el Director lo priorice).
 
 ---
 

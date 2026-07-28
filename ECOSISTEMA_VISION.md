@@ -73,7 +73,7 @@ El contexto no es infinito. Se agrupa en **Proyectos** (`be_proyectos`) con inic
 **Estabilización del pipeline (hallazgos H1–H6 del piloto v2 — orden fijado por el Director, 13-07-2026):**
 1. ✅ **Robustez del pipeline** (H1 guard anti-audio-mudo + prompts anti-alucinación; H2 `thinkingBudget` 4096; H5 timeout proporcional + UX de espera) — **ciclo CERRADO 17-07-2026**: F0→F7 completo, auditoría de Gemini APROBADO (r1), E2E real verificado (422 a 254 B/s; thoughts 1145 vs 62.912 previo), commit `c382c4c` en ActaExpressWeb linux. Expediente `2026-07-14_robustez_pipeline/`.
 2. ✅ **Captura confiable** (H3 selector "Reunión virtual / presencial–sonido ambiente" sin fallback silencioso; H4 detector de micrófono muerto con banner en los primeros 5–10 s + tarjeta "Procesando con IA…") — **ciclo CERRADO 23-07-2026**: F0→F7 completo en rotación asistida (5 subagentes Sonnet, cero desviaciones), E2E 6/6 con el Director, auditoría de Gemini APROBADO CON OBSERVACIONES (r1) con anti-bluff VÁLIDA y el único BUG alegado (T5) refutado con evidencia, commit `35580f0` en ActaExpressWeb linux. Expediente `2026-07-17_captura_confiable/`.
-3. ⏳ **Resiliencia de grabación** (H6 autoguardado IndexedDB + recuperación).
+3. ✅ **Resiliencia de grabación** (H6: vault IndexedDB que persiste los chunks de 1 s al vuelo + tarjeta de recuperación tras crash/cierre de pestaña, heartbeat 30 s + poll 10 s, silo por uid) — **ciclo CERRADO 28-07-2026**: F0→F7 completo con E2E de crash REAL (cierre de pestaña grabando → acta fiel), auditoría de Gemini APROBADO CON OBSERVACIONES (r1) con anti-bluff válida y cero bugs de código, commit `2871a74` en ActaExpressWeb linux. Expediente `2026-07-25_resiliencia_grabacion/` (17 archivos). Primer F3′ disparado por E2E (MT-H6e, re-chequeo periódico).
 4. ⏳ **Billing/Vertex + privacidad del tier de Gemini** (gobernanza; corre en paralelo — interés explícito del Director en tier pagado).
    *Fuera de tanda, registrado:* visor de síntesis en la UI (endpoint GET + regen + vista; ciclo propio).
 
@@ -89,5 +89,5 @@ El contexto no es infinito. Se agrupa en **Proyectos** (`be_proyectos`) con inic
 
 ---
 
-> **Última revisión:** 23-07-2026 (cierre del ciclo "Captura confiable" H3+H4; siguiente: "Resiliencia de grabación" H6, pendiente de F0/G0)
+> **Última revisión:** 28-07-2026 (cierre del ciclo "Resiliencia de grabación" H6; siguiente: micro-ciclo bug del basurero o el G0 que el Director priorice; posible migración de entorno a Windows)
 > **Regla de NexoExpress:** La versión Web es el prototipo. Toda feature se construye primero en Web. El schema unificado en `schemas/` es la única fuente de verdad.

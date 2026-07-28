@@ -37,4 +37,18 @@ Recordar: **reiniciar `./dev.sh`** antes del E2E (lo hace el Arquitecto). Tras l
 - **Fix MT-H6e (F3′ → F4 → F5):** `spec_mtH6e.md` + `informe_mtH6e.md`. Re-chequeo periódico `ORPHAN_POLL_MS = 10000` hasta detectar huérfana, con apagado del poll al encontrarla y cleanup correcto. Verificado por el Arquitecto: typecheck exit 0 re-ejecutado, lectura del bloque (`home.tsx:49`, `:105-121`). Latencia máxima esperada de aparición: ~40 s tras el crash (30 s stale del dictamen + 10 s de poll) — el umbral de 30 s es intocable sin re-auditar (cambio 5).
 - **Hallazgos NUEVOS registrados (fuera de tanda, ciclo propio):** (a) **bug PREEXISTENTE** del botón borrar en la lista de actas: navega al acta en vez de (solo) borrar — el trigger `home.tsx:495` hace `stopPropagation` sin `preventDefault` dentro del `<Link>`; el diff de la tanda no toca esa zona; (b) **dirección de producto:** "Continuar reunión" desde un acta (anexar audio a un acta existente tras un corte) — candidata a ciclo propio, toca pipeline.
 
-**Pendiente: E2E ronda 2** — repetir las 6 pruebas de la tabla, esperando hasta ~40 s la aparición automática de la tarjeta (sin navegar).
+## E2E ronda 2 (28-07) — F5 CERRADA ✅
+
+**Ejecutado por el Director sobre el código del commit `2871a74` (con MT-H6e):**
+| # | Prueba | Resultado |
+|---|---|---|
+| 1 | Crash real (cerrar pestaña grabando ~1 min) → reabrir | ✅ **Tarjeta aparece SOLA a los ~20 s de reabrir** (~30-35 s desde el último chunk, consistente con STALE 30 s + poll 10 s) → Recuperar → **acta FIEL al guion leído** (programa de observación de ballenas: zonas de avistamiento, horarios, medidas de seguridad — todo capturado). Captura de pantalla de la tarjeta archivada en el chat. |
+| 2 | Descartar | ✅ Tarjeta aparece → Descartar → no reaparece tras recargar. |
+| 3 | Caso feliz | ✅ Grabar y parar normal → acta fiel al guion completo (incluye pendientes con asignación de tareas) → recargar → la tarjeta NUNCA aparece (limpieza en onSuccess verificada). |
+| 4 | Multi-pestaña (T2) | ✅ Pestaña A grabando → pestaña B abierta → B NO ofrece recuperar (ni pasados 40 s: heartbeat late). |
+| 5 | IndexedDB en DevTools | Cubierta por evidencia indirecta: la recuperación de la prueba 1 es imposible sin persistencia al vuelo. (El Director no ejecutó la inspección manual; innecesaria.) |
+| 6 | 422 con mic muteado (opcional) | No ejecutada — política 422 verificada por código en F5 parte 1 y cubierta por trampa en F6. |
+
+**Veredicto F5 COMPLETO (código + E2E 2 rondas): APROBADO por el Arquitecto.** Hallazgo colateral re-confirmado (fuera de tanda, backlog): bug preexistente del basurero (navega en vez de borrar, tampoco se puede borrar desde la vista del acta — ampliación del hallazgo: falta acción de borrado funcional también en la vista de detalle o el trigger no abre el diálogo).
+
+Siguiente: F6 (prompt de auditoría con `git show 2871a74` íntegro) → F7.
