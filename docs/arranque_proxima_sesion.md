@@ -69,11 +69,21 @@ con el candidato recomendado por el Arquitecto primero:
    `deviceId` a `getUserMedia`, persistencia por uid). 100% frontend; ciclo
    estándar F0→F7 CON ronda de diseño a Gemini (toca el corazón de la
    captura). En esa máquina Windows además se puede probar E2E el caso real.
-2. **Billing/Vertex + tier pagado** (gobernanza; en paralelo, mayormente
+2. **Generación de acta PERSISTENTE (dirección de producto del Director,
+   29-07; orden vs selector a decidir en este G0):** que el procesamiento
+   sobreviva al cierre del sitio y no bloquee. Etapa 1 (frontend): grabar
+   otra reunión mientras la anterior se genera, aviso no bloqueante.
+   Etapa 2 (ciclo estándar, server+openapi+schema): acta creada de
+   inmediato con `estado: "generando"` visible en la lista, completada en
+   background, y correlación de IDs con el vault H6 — OJO: el Arquitecto
+   detectó que hoy cerrar durante el procesamiento puede DUPLICAR el acta
+   (el server termina igual y el vault re-ofrece recuperar); ese hueco se
+   cierra en este ciclo. Sinergia con el timeout de proxy al desplegar.
+3. **Billing/Vertex + tier pagado** (gobernanza; en paralelo, mayormente
    manual del Director: cupo Blaze 5/5, hay que desvincular un proyecto).
-3. **"Continuar reunión"** desde un acta (anexar audio tras un corte —
+4. **"Continuar reunión"** desde un acta (anexar audio tras un corte —
    requiere diseño, posible cambio de schema → skill arquitecto_firebase).
-4. **Visor de síntesis** en la UI (el análisis profundo se genera y guarda
+5. **Visor de síntesis** en la UI (el análisis profundo se genera y guarda
    en Firestore pero no se muestra); y el resto del backlog en
    estado_actual.md §Próximos Pasos.
 
