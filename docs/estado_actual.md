@@ -8,6 +8,18 @@
 
 ## ✅ Checklist de Micro-Tareas Vigente
 
+**Meta (CERRADA 29-07-2026 — commit `74e3d32` en ActaExpressWeb linux, pusheado):** [ActaExpressWeb] **Bug del basurero** (preexistente, confirmado 2 veces en E2E): borrado funcional desde la lista Y desde la vista de detalle.
+**Expediente:** `auditorias/2026-07-29_bug_basurero/` (6 archivos: 3 specs incl. r2, 3 informes + verificación F5)
+
+- [x] **MT-B1 (r2)** — Basurero de la lista: diálogo **controlado por estado** (`deleteDialogActaId`), botón fuera del `AlertDialogTrigger`, cierre explícito en `handleDelete`. — **DoD CUMPLIDO AL 100% (29-07):** E2E con capturas: diálogo en primer plano SIN navegar, borrado permanente. *Lección del ciclo: la spec r1 (`preventDefault` en el Trigger) fue un BUG de diseño del Arquitecto cazado en F5 contra el código instalado de Radix (`composeEventHandlers` salta handlers internos si `defaultPrevented` — el botón habría quedado muerto); F3′ → r2.*
+- [x] **MT-B2** — Botón **Eliminar** en la vista de detalle (no existía): confirmación, borrado, invalidación de la lista, toast y retorno a `/`. — **DoD CUMPLIDO AL 100% (29-07):** E2E con captura: borrado permanente desde el detalle.
+
+**Cursor: CICLO CERRADO (29-07).** G0 (ambas MTs) → F3/F3′ → F4 (3 subagentes Sonnet) → F5 (código + E2E 5/5) → **F6 DIFERIDO por decisión del Director en G2** (diff pequeño de patrón ya auditado; la verificación contra Radix se hizo en F5) → G2 + commit `74e3d32`. **Siguiente: G0 del próximo ciclo — candidato recomendado por el Arquitecto: selector de micrófono (CTA en el banner H4).**
+
+---
+
+## 📁 Meta anterior (CERRADA 28-07-2026)
+
 **Meta (CERRADA 28-07-2026 — fix win32 en `3ca3b1d`, ActaExpressWeb linux, pusheado; G0 colapso v1 + G2 concedidos el mismo día):** [Ecosistema/ActaExpressWeb] **Homologación Windows** (micro-ciclo de setup, prerrequisito de TODO ciclo de código en esta máquina — arranque_proxima_sesion.md tarea 0, ampliada por el Director: homologar el entorno y PROBAR en Windows antes de tocar producto): rama `linux` checkouteada, dependencias instaladas, credenciales colocadas donde el código las lee, typecheck verde, app levantada con arranque multiplataforma y un E2E real (grabar ~10 s → acta fiel) como prueba final. **Modo propuesto: colapso v1 (el Arquitecto ejecuta — son tareas de entorno, no de producto) [pendiente de autorización en G0].** Contexto verificado: ActaExpressWeb local está en `main`; la rama de desarrollo `linux` existe en el remoto y `2871a74` ya está fetcheado; los `.env` transportados a mano están en `artifacts/acta-express/.env`, `artifacts/api-server/.env` y un archivo `env` en la raíz (ubicación por confirmar en MT-W2).
 
 - [x] **MT-W1 — Sincronizar código.** — **DoD CUMPLIDO (28-07):** rama `linux` checkouteada al día (`## linux...origin/linux`, punta `2871a74`); `pnpm install` EXIT 0. Prerrequisitos resueltos en el camino: Node 24.18.0 LTS **portable** en `%LOCALAPPDATA%\Programs\node-v24.18.0-win-x64` (winget canceló por UAC sin admin) + PATH de usuario; pnpm 11.17.0 vía corepack (**usar `pnpm.cmd`**: el GPO del trabajo bloquea scripts .ps1); `pnpm config set script-shell` → `sh.exe` de Git Bash (el `preinstall` de la raíz usa `sh -c`, Linux-ismo que revienta con cmd.exe).
@@ -116,7 +128,7 @@
 
 | Proyecto | Estado | % MVP | Prioridad ahora |
 |---|---|---|---|
-| ActaExpressWeb | 🟢 Activo | ~92% | Bug basurero (micro-ciclo) / próximo G0 |
+| ActaExpressWeb | 🟢 Activo | ~93% | Próximo G0 (candidato: selector de micrófono) |
 | ActaExpress Android | 🟡 En pausa | ~60% | Paridad con Web (campo `plataforma`) |
 | BitácoraExpress | 🟢 Activo en Linux | 100% (MVP) | MVP Completado, mantenimiento |
 | NexoExpress | 🟢 Activo | 100% | Orquestación, RAG Docs y Mantenimiento |
@@ -144,7 +156,7 @@
 ## 🚀 Próximos 5 Pasos Globales (actualizado 28-07 tras cerrar Resiliencia H6)
 
 1. ~~[Si la sesión es en WINDOWS] Micro-ciclo de setup del entorno~~ ✅ **CERRADO 28-07** (`3ca3b1d`): entorno Windows homologado y probado E2E; particularidades en bitácora 28-07 sesión 2.
-2. **[ActaExpressWeb] Micro-ciclo bug del basurero (PREEXISTENTE, confirmado 2 veces en E2E):** el botón borrar de la lista navega al acta en vez de borrar (falta `preventDefault` en el trigger dentro del `<Link>`, zona de `home.tsx:509` aprox.) y tampoco se puede borrar desde la vista del acta. Fix chico con DoD E2E propio.
+2. ~~[ActaExpressWeb] Micro-ciclo bug del basurero~~ ✅ **CERRADO 29-07** (`74e3d32`): borrado funcional en lista (diálogo controlado, sin navegación espuria) y detalle (botón nuevo); E2E 5/5. **El siguiente ciclo se decide en G0 — candidato recomendado: selector de micrófono (punto 4).**
 3. **[Gobernanza — en paralelo]** Billing/Vertex + tier pagado de Gemini (privacidad del audio; cupo Blaze 5/5, hay que desvincular un proyecto; el Director quiere pagar).
 4. **[Backlog]** **Selector de micrófono en la app** (dirección de producto del Director, 28-07, nacida del primer caso REAL cazado por el banner H4: Chrome en el PC Windows del trabajo tenía "Stereo Mix (Realtek)" como mic → silencio; en Linux nunca ocurrió): el usuario no puede ser enviado a `chrome://settings` — la app debe exponer los dispositivos con su nombre amigable (`enumerateDevices()` post-permiso, p. ej. "Micrófono auriculares") y pasar `deviceId` a `getUserMedia`. Matiz del Director: PREFIERE la elección automática — candidato de diseño: mantener el default y, solo cuando H4 detecte silencio, ofrecer el cambio de micrófono en el propio banner (CTA con lista de dispositivos), persistiendo la elección por uid. Requiere ciclo propio con G0. **"Continuar reunión"** desde un acta (anexar audio tras un corte — dirección de producto del Director, ciclo propio); visor de síntesis en la UI; Android campo `plataforma`; actas en inglés; `msDuration` server-side; timeout de proxy al desplegar; **de captura confiable:** umbral RMS sala callada, descarte del ámbar, useEffect defensivo; **de resiliencia H6:** OOM base64 en recuperaciones muy largas (D1), aviso "audio parcial" tras quota (T3), recuperación casi instantánea con marca pagehide (cambia el diseño auditado).
 5. **[Metodología]** Diseño del "Modo A" partiendo de `docs/arquitectura_mas_cloud.md` (cuando el Director lo priorice).
