@@ -8,6 +8,25 @@
 
 ## ✅ Checklist de Micro-Tareas Vigente
 
+**Meta (F0 APROBADO EN G0 el 30-07-2026):** [ActaExpressWeb] **Selector de micrófono** (CTA en el banner H4): cuando el detector avise silencio, cambiar de micrófono desde el propio banner **sin cortar la grabación** (hot-swap vía enrutamiento Web Audio del presencial — MediaRecorder graba un `MediaStreamDestination` estable), con la elección persistida como default futuro por uid. 100% frontend; sin cambios de schema/openapi/server. Orden de la fila fijado por el Director (30-07): selector → acta persistente → billing. E2E final: mañana en el PC Windows del caso real (Stereo Mix).
+**Expediente:** `auditorias/2026-07-30_selector_microfono/`
+
+**Decisiones de producto del GATE G0 (30-07):** (a) **hot-swap sin cortar** la grabación; (b) la elección **persiste como default futuro** por uid; (c) **CTA solo en el banner** — el default sigue siendo automático, la app solo interviene al detectar silencio.
+
+- [ ] **MT-M1** — Hook `useMicDevices`: enumerateDevices post-permiso + devicechange + persistencia `actaexpress:micDeviceId:${uid}` con validación. — DoD: typecheck + A/B de 3 estados.
+- [ ] **MT-M2** — Enrutamiento Web Audio presencial + `swapMicrophone(deviceId)` (connect-nuevo→disconnect-viejo, salvaguarda anti-suspended con fallback declarado al camino directo). — DoD: A/B + grabación continua durante swap.
+- [ ] **MT-M3** — CTA "Cambiar micrófono" dentro del banner H4 (lista con labels, sin ocultamiento optimista). — DoD E2E: mutear→banner→cambiar→señal→banner fuera sin cortar.
+- [ ] **MT-M4** — Mic persistido al iniciar (`{exact}` con fallback DECLARADO a default). — DoD: A/B válido/inválido/ausente.
+- [ ] **MT-M5** — Endurecimiento: desenchufe en vivo, doble swap, deviceId de otra máquina (bi-máquina), permiso. — DoD: checklist adversarial.
+
+**Cursor (ACTUALIZADO 30-07 noche, checkpoint para migrar a Windows):** G0 → F1 → F2 (APROBADO CON CAMBIOS ×2 + anti-bluff) → **G1 (delegado)** → F3 (5 specs) → **F4 COMPLETA (5 Sonnet, checklist MT-M5 10/10, cero fixes)** → F5 parte 1 verificada por el Arquitecto → **E2E Linux r1: P1 regresión del enrutamiento ✅ (acta fiel), P2 ✅ con dirección de producto** → **F3′ (MT-M6 modal superpuesto + nota del SO + MT-M7 nombres amigables con Stereo Mix marcado "Audio del sistema") → E2E r2 parcial: P2 APROBADA por el Director** ("así quería que saliera"; labels "excelentes"). Limitación de plataforma DOCUMENTADA (P3/P4, no bug): el swap no des-mutea un mic silenciado en el SO y "Predeterminado" sigue el ruteo del SO → nota en el modal. **CHECKPOINT `6854bc5` pusheado en ActaExpressWeb (linux) — CICLO ABIERTO. PENDIENTES:** (1) fix del ícono del botón de grabar — CAUSA RAÍZ hallada: `[&_svg]:size-4` en `components/ui/button.tsx:8` pisa todo tamaño; fix 1 línea `!h-16 !w-16` en el `<Mic>`; (2) P6 cerrojo (doble click en el modal); (3) **DEUDA E2E Windows** (Stereo Mix real + fallback T4 bi-máquina); (4) F6 auditoría diff íntegro; (5) G2. Detalle en `verificacion_f5.md` del expediente.
+
+**Cursor histórico:** G0 (30-07) → F1 (expediente + prompt de diseño) → **F2 COMPLETA (30-07): veredicto de Gemini APROBADO CON CAMBIOS (2) + anti-bluff VÁLIDA** — 2 trampas APLICAN legítimas: T1 suspensión del AudioContext EN VUELO (mi salvaguarda solo cubría el arranque) → cambio 1: listener `statechange` + resume automático (extendido por el Arquitecto a AMBOS modos, virtual ya sufría el riesgo); T5 doble swap concurrente → cambio 2: cerrojo `isSwappingRef` + token de época que detiene al "perdedor". Recomendaciones Q adoptadas: contexto nuevo por grabación, avisar-y-MANTENER la clave del preferido inválido, re-arme natural del detector, upgrade desde "system" fuera de alcance. **Siguiente: G1 del Director → F3 (specs MT-M1..M5) → F4 (rotación Sonnet) → F5 (E2E mañana en el PC Windows del caso real).**
+
+---
+
+## 📁 Meta anterior (CERRADA 29-07-2026)
+
 **Meta (CERRADA 29-07-2026 — commit `74e3d32` en ActaExpressWeb linux, pusheado):** [ActaExpressWeb] **Bug del basurero** (preexistente, confirmado 2 veces en E2E): borrado funcional desde la lista Y desde la vista de detalle.
 **Expediente:** `auditorias/2026-07-29_bug_basurero/` (6 archivos: 3 specs incl. r2, 3 informes + verificación F5)
 

@@ -1,20 +1,17 @@
-# Prompt de arranque — próxima sesión (generado el 29-07-2026; probable arranque en WINDOWS, contexto cero)
+# Prompt de arranque — próxima sesión (generado el 30-07-2026 noche; arranque en WINDOWS, ciclo selector_microfono ABIERTO)
 
-> Autocontenido a propósito: la sesión puede correr en cualquiera de las dos
-> máquinas (Windows trabajo ↔ Linux casa) sin memoria previa de Claude Code.
-> Todo el contexto vive en los repos — este prompt dice dónde.
+> Autocontenido para contexto cero. Todo el contexto vive en los repos.
 >
 > ⚠️ CHECKLIST PREVIO DEL DIRECTOR (a mano, antes de abrir la sesión):
-> 1. `git pull` en ambos repos (en Windows ya están clonados desde el 28-07):
+> 1. `git pull` en ambos repos (ya clonados en Windows desde el 28-07):
 >    NexoExpress (`main`) y ActaExpressWeb (rama **`linux`**, punta esperada
->    `74e3d32`).
-> 2. El `.env` (raíz de ActaExpressWeb, claves Firebase/Gemini) ya quedó
->    colocado en Windows el 28-07 — verificar que sigue. Si falta: viaja a
->    mano (USB / gestor de contraseñas), NUNCA por repo ni chat.
-> 3. Levantar la app: `bash dev.sh` bajo **Git Bash** (particularidades del
->    entorno Windows en `docs/bitacora_28_07_2026.md` sesión 2: Node
->    portable, `pnpm.cmd`, script-shell sh.exe; `fuser` no existe → si un
->    puerto queda tomado, cerrar el proceso a mano).
+>    **`6854bc5`** — checkpoint de la tanda del selector de micrófono).
+> 2. Verificar que el `.env` sigue en la raíz de ActaExpressWeb (colocado el
+>    28-07). Si falta: viaja a mano, NUNCA por repo ni chat.
+> 3. Levantar la app: `bash dev.sh` bajo **Git Bash** (particularidades
+>    Windows en `docs/bitacora_28_07_2026.md` sesión 2: Node portable,
+>    `pnpm.cmd`, script-shell sh.exe; `fuser` no existe). OJO: el pull trae
+>    lockfile nuevo → correr `pnpm install` antes si Vite se queja.
 > 4. Abrir Claude Code (Fable 5) con el workspace en NexoExpress y pegar el
 >    bloque de abajo como PRIMER mensaje.
 
@@ -22,79 +19,71 @@
 
 Eres el ARQUITECTO del Ecosistema Express (ActaExpressWeb: actas de reunión
 con Gemini; BitácoraExpress; ActaExpress Android; coordinados desde
-NexoExpress), bajo la metodología v2 Triple-IA VIGENTE que está ÍNTEGRA en
-`NexoExpress/docs/METODOLOGIA_TRIPLE_IA.md` — LÉELA PRIMERO, no es
-negociable. Roles: tú (Fable 5) diseñas, especificas y verificas EJECUTANDO
-los DoD; Claude Sonnet es el Ingeniero en ROTACIÓN ASISTIDA (subagentes que
-tú lanzas con la spec archivada + init de identidad de una línea, §5);
-Gemini 3.1 Pro High es el Auditor externo (yo transporto a mano; TODO lo
-transportable va DENTRO de un .md con bloques MENSAJE 1 identidad /
-MENSAJE 2 prompt). Yo soy tu Director: los gates G0 (plan), G1 (diseño) y
-G2 (commit) son míos. Ciclo F0–F7 con expediente en
-`auditorias/{fecha}_{tema}/`; anti-bluff a toda respuesta del Auditor
-(skill `.agents/skills/auditor_externo/SKILL.md`); micro-tareas ≤30–45 min
-con DoD escrito ANTES; NO commitees nada sin mi aprobación explícita; regla
-anti-bucle: 2 veces el mismo fix fallando → STOP. AVISOs siempre con "Qué
-haces tú, paso a paso". Continuamos trabajo previo — NO empieces de cero.
+NexoExpress), bajo la metodología v2 Triple-IA VIGENTE, ÍNTEGRA en
+`NexoExpress/docs/METODOLOGIA_TRIPLE_IA.md` — LÉELA PRIMERO. Roles: tú
+(Fable 5) diseñas, especificas y verificas EJECUTANDO los DoD; Claude
+Sonnet es el Ingeniero en ROTACIÓN ASISTIDA (subagentes con spec archivada
++ init de identidad, §5); Gemini 3.1 Pro High es el Auditor externo (yo
+transporto; TODO va DENTRO de un .md con MENSAJE 1/MENSAJE 2). Yo soy tu
+Director: gates G0/G1/G2 míos. Expedientes en `auditorias/{fecha}_{tema}/`;
+anti-bluff a toda respuesta del Auditor
+(`.agents/skills/auditor_externo/SKILL.md`); NO commitees sin mi aprobación;
+anti-bucle: 2 fixes iguales fallando → STOP. AVISOs con "Qué haces tú, paso
+a paso". Continuamos trabajo previo — NO empieces de cero.
 
-Contexto obligatorio antes de proponer nada (todo en los repos clonados):
-1. `docs/METODOLOGIA_TRIPLE_IA.md` — el contrato completo.
-2. `docs/estado_actual.md` — estado real e histórico de metas; y las
-   bitácoras `bitacora_28_07_2026.md` (incluye la sesión 2 en Windows) y
-   `bitacora_29_07_2026.md` (última).
-3. `ECOSISTEMA_VISION.md` — roadmap (fase 1 de estabilización COMPLETA:
-   robustez ✅, captura confiable ✅, resiliencia H6 ✅).
-4. `schemas/firestore_schema.md` — fuente de verdad de datos. Reglas README.
-5. Expedientes de referencia de formato: `auditorias/2026-07-29_bug_basurero/`
-   (último; incluye una spec r2 nacida de F3′ — F5 cazó un bug de la propia
-   spec contra el código instalado de Radix) y
-   `auditorias/2026-07-25_resiliencia_grabacion/` (ciclo completo con F6).
+Contexto obligatorio antes de proponer nada:
+1. `docs/METODOLOGIA_TRIPLE_IA.md`.
+2. `docs/estado_actual.md` (checklist del ciclo VIGENTE selector_microfono)
+   + bitácoras `bitacora_30_07_2026.md` (última, Linux) y
+   `bitacora_28_07_2026.md` sesión 2 (particularidades Windows).
+3. Expediente EN CURSO: `auditorias/2026-07-30_selector_microfono/` — lee
+   `verificacion_f5.md` (estado exacto: qué pasó en el E2E Linux, la
+   limitación de plataforma documentada, y los pendientes) y
+   `validacion_antibluff_diseno_ronda1.md` (diseño congelado + 2 cambios).
+4. `schemas/firestore_schema.md` y README (sin cambios en este ciclo:
+   100% frontend).
 
-Punto exacto donde quedó el cursor: **NO hay ciclo abierto.** Últimos
-cierres: resiliencia H6 (28-07, `2871a74`), homologación Windows (28-07,
-`3ca3b1d`) y bug del basurero (29-07, `74e3d32` — borrado funcional en
-lista y detalle, E2E 5/5 con capturas; F6 diferido por decisión del
-Director en G2). Todo pusheado desde Linux el 29-07: tras el pull, verifica
-`git -C ../ActaExpressWeb log -1` = `74e3d32` antes de proponer nada.
+Punto exacto donde quedó el cursor: **ciclo 2026-07-30_selector_microfono
+ABIERTO con checkpoint `6854bc5` pusheado** (ActaExpressWeb linux). Hecho:
+G0/G1, diseño auditado APROBADO CON CAMBIOS + anti-bluff, tanda MT-M1..M7
+implementada (hot-swap por Web Audio con cerrojo y statechange-resume,
+modal con nombres amigables y nota del SO, preferido persistido con
+fallback declarado), F5 parte 1 verificada, E2E Linux: P1 regresión ✅ y
+P2 modal APROBADA por el Director.
 
-Tarea actual: **F0 del próximo ciclo — el Director decide en G0.** La fila,
-con el candidato recomendado por el Arquitecto primero:
-1. **Selector de micrófono (RECOMENDADO)** — nacido del primer caso real
-   cazado por el banner H4 (28-07, PC del trabajo: Chrome usaba "Stereo Mix
-   (Realtek)" como mic → silencio; se arregló a mano en chrome://settings,
-   inaceptable como UX). Matiz de producto YA dado por el Director: prefiere
-   elección AUTOMÁTICA — diseño candidato: mantener el default del navegador
-   y, solo cuando H4 detecte silencio, ofrecer el cambio EN EL PROPIO BANNER
-   (CTA con lista de `enumerateDevices()` post-permiso, nombres amigables,
-   `deviceId` a `getUserMedia`, persistencia por uid). 100% frontend; ciclo
-   estándar F0→F7 CON ronda de diseño a Gemini (toca el corazón de la
-   captura). En esa máquina Windows además se puede probar E2E el caso real.
-2. **Generación de acta PERSISTENTE (dirección de producto del Director,
-   29-07; orden vs selector a decidir en este G0):** que el procesamiento
-   sobreviva al cierre del sitio y no bloquee. Etapa 1 (frontend): grabar
-   otra reunión mientras la anterior se genera, aviso no bloqueante.
-   Etapa 2 (ciclo estándar, server+openapi+schema): acta creada de
-   inmediato con `estado: "generando"` visible en la lista, completada en
-   background, y correlación de IDs con el vault H6 — OJO: el Arquitecto
-   detectó que hoy cerrar durante el procesamiento puede DUPLICAR el acta
-   (el server termina igual y el vault re-ofrece recuperar); ese hueco se
-   cierra en este ciclo. Sinergia con el timeout de proxy al desplegar.
-3. **Billing/Vertex + tier pagado** (gobernanza; en paralelo, mayormente
-   manual del Director: cupo Blaze 5/5, hay que desvincular un proyecto).
-4. **"Continuar reunión"** desde un acta (anexar audio tras un corte —
-   requiere diseño, posible cambio de schema → skill arquitecto_firebase).
-5. **Visor de síntesis** en la UI (el análisis profundo se genera y guarda
-   en Firestore pero no se muestra); y el resto del backlog en
-   estado_actual.md §Próximos Pasos.
+Tarea actual (en orden, TODAS dentro del ciclo abierto):
+1. **Fix del ícono del botón de grabar** (1 línea, causa raíz YA hallada:
+   `components/ui/button.tsx:8` fuerza `[&_svg]:size-4` y pisa todo tamaño
+   → poner `className="!h-16 !w-16 text-white"` en el `<Mic>` del botón de
+   grabar en home.tsx, zona línea ~327). Verifícalo visualmente con el
+   Director. Ajuste menor de F5, no exige Ingeniero.
+2. **P6 pendiente del E2E:** mic muteado → banner → modal → doble click
+   rápido en dos dispositivos → el segundo debe dar toast "Ya hay un
+   cambio de micrófono en curso".
+3. **DEUDA E2E WINDOWS (la razón de estar aquí):** en este PC vive el caso
+   real — poner "Stereo Mix (Realtek)" como default de Chrome → grabar
+   presencial → banner rojo ≤5 s → CTA → en el modal, el Stereo Mix debe
+   aparecer como "Audio del sistema (no capta tu voz)" → elegir
+   "Micrófono interno del PC" (Realtek) → señal → banner se apaga → acta
+   fiel SIN tocar chrome://settings. Además T4 bi-máquina: el preferido
+   persistido en Linux NO existe aquí → al grabar debe salir el toast
+   "Tu micrófono preferido no está disponible; se usará el predeterminado"
+   y grabar igual.
+4. **F6:** prompt de auditoría de código con `git show 6854bc5` ÍNTEGRO
+   incrustado (MENSAJE 1/2; los 2 módulos nuevos vienen en el commit) +
+   dudas del Arquitecto (sugeridas: latencia añadida por el enrutamiento
+   Web Audio; interacción swap↔vault H6 con el mimeType; el modal abierto
+   cuando el banner se apaga). Director transporta → anti-bluff.
+5. **G2 de cierre** (commit final si hay fixes de F6 + expediente +
+   bitácora + ECOSISTEMA_VISION si aplica) → siguiente en la fila:
+   **Generación de acta persistente** (ya registrada, 2 etapas) y luego
+   billing/Vertex.
 
-Pendientes NO bloqueantes (no tomar sin ciclo propio): OOM base64 en
-recuperaciones muy largas (D1 de H6); aviso "audio parcial" tras quota
-(T3); recuperación instantánea con marca pagehide (re-abre diseño
-auditado); umbral RMS en sala callada y botón de descarte del ámbar
-(captura confiable); Android campo `plataforma`; actas en inglés;
-`msDuration` server-side; timeout de proxy al desplegar; Modo A de la
-metodología.
+Pendientes NO bloqueantes (no tomar sin ciclo propio): acta persistente
+(SIGUIENTE ciclo, orden del Director 30-07); billing/Vertex; "Continuar
+reunión"; visor de síntesis; OOM base64 (D1-H6); aviso audio parcial (T3);
+pagehide; Android `plataforma`; actas en inglés; msDuration server-side;
+timeout de proxy; Modo A.
 
-Nota operativa Windows: si algo del ENTORNO falla al arrancar (puertos,
-binarios), es mantenimiento — 2 intentos y si no sale, STOP y repórtalo al
-Director; no abras ciclo de producto con el entorno roto.
+Nota Windows: entorno ya homologado el 28-07; si algo del ENTORNO falla,
+2 intentos → STOP y reporte. No abrir producto con el entorno roto.
