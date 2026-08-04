@@ -1,17 +1,14 @@
-# Prompt de arranque — próxima sesión (generado el 30-07-2026 noche; arranque en WINDOWS, ciclo selector_microfono ABIERTO)
+# Prompt de arranque — próxima sesión (generado el 04-08-2026 en Windows; arranque en LINUX, sin ciclo abierto)
 
 > Autocontenido para contexto cero. Todo el contexto vive en los repos.
 >
 > ⚠️ CHECKLIST PREVIO DEL DIRECTOR (a mano, antes de abrir la sesión):
-> 1. `git pull` en ambos repos (ya clonados en Windows desde el 28-07):
->    NexoExpress (`main`) y ActaExpressWeb (rama **`linux`**, punta esperada
->    **`6854bc5`** — checkpoint de la tanda del selector de micrófono).
-> 2. Verificar que el `.env` sigue en la raíz de ActaExpressWeb (colocado el
->    28-07). Si falta: viaja a mano, NUNCA por repo ni chat.
-> 3. Levantar la app: `bash dev.sh` bajo **Git Bash** (particularidades
->    Windows en `docs/bitacora_28_07_2026.md` sesión 2: Node portable,
->    `pnpm.cmd`, script-shell sh.exe; `fuser` no existe). OJO: el pull trae
->    lockfile nuevo → correr `pnpm install` antes si Vite se queja.
+> 1. `git pull` en ambos repos: NexoExpress (`main`) y ActaExpressWeb
+>    (rama **`linux`**, punta esperada **`f6b6158`** — cierre del ciclo
+>    selector de micrófono: fixes de F6 + ícono).
+> 2. `.env` sigue en la raíz de ActaExpressWeb de la máquina Linux (nunca
+>    viaja por repo ni chat).
+> 3. Levantar la app si toca E2E: `./dev.sh` (frontend 5173, API 8080).
 > 4. Abrir Claude Code (Fable 5) con el workspace en NexoExpress y pegar el
 >    bloque de abajo como PRIMER mensaje.
 
@@ -33,57 +30,51 @@ a paso". Continuamos trabajo previo — NO empieces de cero.
 
 Contexto obligatorio antes de proponer nada:
 1. `docs/METODOLOGIA_TRIPLE_IA.md`.
-2. `docs/estado_actual.md` (checklist del ciclo VIGENTE selector_microfono)
-   + bitácoras `bitacora_30_07_2026.md` (última, Linux) y
-   `bitacora_28_07_2026.md` sesión 2 (particularidades Windows).
-3. Expediente EN CURSO: `auditorias/2026-07-30_selector_microfono/` — lee
-   `verificacion_f5.md` (estado exacto: qué pasó en el E2E Linux, la
-   limitación de plataforma documentada, y los pendientes) y
-   `validacion_antibluff_diseno_ronda1.md` (diseño congelado + 2 cambios).
-4. `schemas/firestore_schema.md` y README (sin cambios en este ciclo:
-   100% frontend).
+2. `docs/estado_actual.md` (histórico de metas; el checklist vigente quedó
+   CERRADO) + bitácora `bitacora_04_08_2026.md` (última: sesión Windows,
+   cierre del selector con E2E bi-máquina y F6 en 2 rondas).
+3. `ECOSISTEMA_VISION.md` — roadmap por fases.
+4. `schemas/firestore_schema.md` y README — OJO: el próximo ciclo probable
+   (acta persistente, etapa 2) SÍ toca server/openapi/schema; el schema se
+   actualiza en F1/F3, nunca lo decide el Ingeniero.
+5. Expediente de referencia de formato: `auditorias/2026-07-30_selector_microfono/`
+   (19 archivos, CERRADO — incluye 2 rondas de auditoría con 1 BUG refutado
+   con evidencia y 2 corregidos).
 
-Punto exacto donde quedó el cursor: **ciclo 2026-07-30_selector_microfono
-ABIERTO con checkpoint `6854bc5` pusheado** (ActaExpressWeb linux). Hecho:
-G0/G1, diseño auditado APROBADO CON CAMBIOS + anti-bluff, tanda MT-M1..M7
-implementada (hot-swap por Web Audio con cerrojo y statechange-resume,
-modal con nombres amigables y nota del SO, preferido persistido con
-fallback declarado), F5 parte 1 verificada, E2E Linux: P1 regresión ✅ y
-P2 modal APROBADA por el Director.
+Punto exacto donde quedó el cursor: **NO hay ciclo abierto.** El 04-08 se
+cerró `2026-07-30_selector_microfono` (hot-swap de mic desde el banner H4
++ nombres amigables + preferido persistido; E2E bi-máquina con el caso
+real Stereo Mix resuelto en el PC Windows; F6 en 2 rondas: 2 BUGs
+corregidos en `f6b6158`, 1 refutado con `useMicLevel.ts:32`).
 
-Tarea actual (en orden, TODAS dentro del ciclo abierto):
-1. **Fix del ícono del botón de grabar** (1 línea, causa raíz YA hallada:
-   `components/ui/button.tsx:8` fuerza `[&_svg]:size-4` y pisa todo tamaño
-   → poner `className="!h-16 !w-16 text-white"` en el `<Mic>` del botón de
-   grabar en home.tsx, zona línea ~327). Verifícalo visualmente con el
-   Director. Ajuste menor de F5, no exige Ingeniero.
-2. **P6 pendiente del E2E:** mic muteado → banner → modal → doble click
-   rápido en dos dispositivos → el segundo debe dar toast "Ya hay un
-   cambio de micrófono en curso".
-3. **DEUDA E2E WINDOWS (la razón de estar aquí):** en este PC vive el caso
-   real — poner "Stereo Mix (Realtek)" como default de Chrome → grabar
-   presencial → banner rojo ≤5 s → CTA → en el modal, el Stereo Mix debe
-   aparecer como "Audio del sistema (no capta tu voz)" → elegir
-   "Micrófono interno del PC" (Realtek) → señal → banner se apaga → acta
-   fiel SIN tocar chrome://settings. Además T4 bi-máquina: el preferido
-   persistido en Linux NO existe aquí → al grabar debe salir el toast
-   "Tu micrófono preferido no está disponible; se usará el predeterminado"
-   y grabar igual.
-4. **F6:** prompt de auditoría de código con `git show 6854bc5` ÍNTEGRO
-   incrustado (MENSAJE 1/2; los 2 módulos nuevos vienen en el commit) +
-   dudas del Arquitecto (sugeridas: latencia añadida por el enrutamiento
-   Web Audio; interacción swap↔vault H6 con el mimeType; el modal abierto
-   cuando el banner se apaga). Director transporta → anti-bluff.
-5. **G2 de cierre** (commit final si hay fixes de F6 + expediente +
-   bitácora + ECOSISTEMA_VISION si aplica) → siguiente en la fila:
-   **Generación de acta persistente** (ya registrada, 2 etapas) y luego
-   billing/Vertex.
+Tarea actual: **F0/G0 del próximo ciclo.** La fila del Director (orden
+fijado el 30-07, confirmado el 04-08):
+1. **Acta persistente** (dirección de producto 29-07, detalle en
+   estado_actual.md §Próximos Pasos punto 3): que el procesamiento
+   sobreviva al cierre del sitio y no bloquee grabar otra reunión.
+   Etapa 1 frontend (desacoplar grabación de procesamiento); Etapa 2
+   ciclo estándar server+openapi+schema (`estado: "generando"`,
+   correlación anti-duplicado con el vault H6 — riesgo detectado: cerrar
+   durante el procesamiento deja la sesión en el vault Y el server
+   probablemente termina → reprocesar duplicaría).
+2. **Página de Configuración** (la "tuerca", dirección 04-08): Tema
+   claro/oscuro; Audio con selector de mic SIEMPRE accesible (hallazgo del
+   E2E: el preferido protege tan bien que no hay camino de UI para
+   cambiarlo voluntariamente); tipo de cuenta y uso. Absorbe la iteración
+   2 del selector: probe "Recomendado" (RMS ~0,5 s por dispositivo) +
+   dedupe de entradas virtuales del SO (hubo 3 opciones-trampa de 4 en el
+   modal del E2E Windows).
+3. **Billing/Vertex** (gobernanza; cupo Blaze 5/5, el Director quiere pagar).
 
-Pendientes NO bloqueantes (no tomar sin ciclo propio): acta persistente
-(SIGUIENTE ciclo, orden del Director 30-07); billing/Vertex; "Continuar
-reunión"; visor de síntesis; OOM base64 (D1-H6); aviso audio parcial (T3);
-pagehide; Android `plataforma`; actas en inglés; msDuration server-side;
-timeout de proxy; Modo A.
+Presenta el F0 del que el Director elija (o confírmale el 1 como default)
+con micro-tareas + DoD ANTES de tocar nada.
 
-Nota Windows: entorno ya homologado el 28-07; si algo del ENTORNO falla,
-2 intentos → STOP y reporte. No abrir producto con el entorno roto.
+Pendientes NO bloqueantes (no tomar sin ciclo propio): "Continuar reunión";
+visor de síntesis; OOM base64 (D1-H6); aviso audio parcial (T3); pagehide;
+Android `plataforma`; actas en inglés; msDuration server-side; timeout de
+proxy; Modo A; D1 del selector (posible drift del enrutamiento Web Audio en
+sesiones de 1-2 h — solo monitoreo, sin señal de problema real).
+
+Nota bi-máquina: Windows (trabajo) quedó 100% operativo (entorno homologado
+28-07 + E2E 04-08); si una sesión vuelve a Windows, particularidades en
+`bitacora_28_07_2026.md` sesión 2 (Node portable, `pnpm.cmd`, `bash dev.sh`).
