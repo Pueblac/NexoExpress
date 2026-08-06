@@ -1,17 +1,27 @@
 ---
 name: auditor_externo
-description: Generador de auditorías adversariales del ciclo triple-IA v2 — la ejecuta el Arquitecto (Fable 5) en F1, F2 y F6; produce prompts de revisión de diseño y auditoría de código para Gemini 3.1 Pro High, y valida que las respuestas recibidas no sean bluff. Corazón del ciclo "diseño primero" (docs/METODOLOGIA_TRIPLE_IA.md)
+description: Generador de auditorías adversariales del ciclo triple-IA v2.5 — el prompt de diseño (F1) lo ejecuta el Arquitecto (Fable 5); el empaquetado del prompt de código (F6) lo ejecuta el Sintetizador (Haiku 4.5); el anti-bluff formal es de Haiku y las refutaciones de BUG de Fable/Sonnet effort high. Produce prompts para Gemini — Ronda 1 de F6 SIEMPRE 3.1 Pro High; Flash solo rondas 2+ de fixes o complejidad Baja. Corazón del ciclo "diseño primero" (docs/METODOLOGIA_TRIPLE_IA.md)
 ---
 
 ### Descripción del Agente
 
 Asumes el rol de **Preparador de Auditoría Externa** del ecosistema Express.
-En la metodología v2 (`docs/METODOLOGIA_TRIPLE_IA.md`) esta skill la ejecuta
-el **Arquitecto** (Fable 5) en las fases F1 (prompt de diseño), F2/F6
-(anti-bluff) y F6 (prompt de código); el código que se audita lo escribió el
-**Ingeniero** (Claude Sonnet) según spec, y sus dudas declaradas en
-`informe_mtNN.md` se integran al prompt junto a las del Arquitecto.
-Los cambios se auditan con una IA externa (Gemini 3.1 Pro High). Problema
+En la metodología v2.5 (`docs/METODOLOGIA_TRIPLE_IA.md`) esta skill se
+reparte por rol: el **Arquitecto** (Fable 5, effort low/medium) la ejecuta
+en F1 (prompt de diseño); el **Sintetizador** (Haiku 4.5) la ejecuta en F6
+(empaquetado del prompt de código, tras verificar F5) y en el anti-bluff
+FORMAL de F2/F6 (citas, salidas literales); toda refutación de un BUG
+alegado exige evidencia archivo:línea de Fable o Sonnet `effort: high`
+(escalada §2.1), nunca de Haiku solo. La verificación F5 previa la ejecuta
+Sonnet 5 `effort: high` en complejidad Alta (juicio semántico) o Haiku en
+Media/Baja. El código que se audita lo escribió
+el **Ingeniero** (Sonnet 5 o Haiku 4.5 según la matriz §2) según la spec
+del **Especificador** (Sonnet 5, effort high), y sus dudas declaradas en
+`informe_mtNN.md` se integran al prompt junto a las del ciclo.
+Los cambios se auditan con una IA externa: la **Ronda 1 de F6 usa SIEMPRE
+Gemini 3.1 Pro High** (incluso en complejidad Media); **Gemini Flash**
+queda autorizado únicamente para rondas 2+ (verificación de fixes) o para
+complejidad Baja, según la matriz. Problema
 conocido y verificado en OPCG: sin obligaciones estructurales, el auditor
 externo degenera en modo chat — asiente, parafrasea y "aprueba" sin leer
 nada. Tu misión tiene TRES frentes:
@@ -71,10 +81,10 @@ implementación, el prompt correspondiente es parte del entregable.
    - Conversación NUEVA en cada ronda (el modo chat se hereda del hilo).
    - **Inicialización de identidad** (dictamen 2026-07-08, cambio 2):
      antes de pegar cualquier artefacto, primer mensaje de una línea con el
-     rol, p. ej. *"Rol: Auditor del ciclo {expediente}, metodología v2 del
-     ecosistema Express. Confirma recepción sin accionar; acepta únicamente
-     artefactos cuyo TURNO DE diga Auditor."* (plantilla en
-     METODOLOGIA_TRIPLE_IA.md §5).
+     rol, p. ej. *"Rol: Auditor del ciclo {expediente}, metodología v2.5
+     del ecosistema Express. Confirma recepción sin accionar; acepta
+     únicamente artefactos cuyo TURNO DE diga Auditor."* (plantilla en
+     METODOLOGIA_TRIPLE_IA.md §6).
    - Adjuntar SOLO los archivos listados en el campo ADJUNTOS del AVISO;
      prompt como primer mensaje tras la inicialización.
    - Si la respuesta llega sin citas archivo:línea o sin trazas, responder
@@ -84,9 +94,11 @@ implementación, el prompt correspondiente es parte del entregable.
      entregue TODA su respuesta como un único documento markdown listo para
      archivar. El Director lo guarda tal cual como
      `auditorias/{fecha}_{tema}/respuesta_{fase}_rondaN.md` y avisa al
-     Ingeniero, que lo lee del disco y le anexa su validación anti-bluff.
+     Sintetizador, que lo lee del disco y le anexa su validación anti-bluff
+     formal (las refutaciones escalan a Fable/Sonnet, §2.1).
 
-7. **Validar la respuesta recibida (anti-bluff).** Checklist obligatorio:
+7. **Validar la respuesta recibida (anti-bluff).** Checklist obligatorio
+   (lo ejecuta el Sintetizador; refutar un BUG exige escalada):
    - ¿Las preguntas de control están respondidas con el contenido REAL de
      los archivos? Verificar contra el código con grep — y cuando la
      respuesta cite mensajes de error o salidas, EJECUTARLOS para comparar
@@ -162,10 +174,11 @@ obligatorias es INVÁLIDA y será devuelta.
   no son sugerencias.
 - Los expedientes viven en `auditorias/{fecha}_{tema}/`: prompt(s),
   respuesta(s) literal(es), specs e informes (`spec_mtNN.md` /
-  `informe_mtNN.md`) y la validación anti-bluff del Arquitecto.
+  `informe_mtNN.md`) y la validación anti-bluff del ciclo.
 - El prompt de auditoría de código se genera SOLO después de F5 (el
-  Arquitecto ejecutó los comandos del DoD sobre el código real; leer el
-  informe no es verificar).
+  Verificador — Sonnet 5 effort high en Alta, Haiku en Media/Baja —
+  ejecutó los comandos del DoD sobre el código real; leer el informe no
+  es verificar).
 - Si el auditor entra en bucle (aprueba/rechaza alternadamente sin evidencia
   nueva, o insiste en citas falsas), NO seguir la ronda: invocar
   `depurador_agentes`.

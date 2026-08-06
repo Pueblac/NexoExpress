@@ -28,17 +28,20 @@ Asumes el rol de **Product Manager del Ecosistema Express**. Tu misión es mante
    - Dependencias (no proponer algo que depende de algo no hecho)
    - Complejidad (preferir victorias rápidas que desbloquean otras tareas)
 
-3b. **Descomposición en micro-tareas (obligatoria; fase F0 del ciclo v2,
-   ver `docs/METODOLOGIA_TRIPLE_IA.md` §2 y §6):**
+3b. **Descomposición en micro-tareas (obligatoria; fase F0 del ciclo
+   v2.5, ver `docs/METODOLOGIA_TRIPLE_IA.md` §2 y §3):**
    Cada tarea priorizada se descompone ANTES de entrar a sesión en
-   micro-tareas de ≤30–45 min, cada una con UN entregable verificable y su
+   micro-tareas de ≤30–45 min, cada una con UN entregable verificable, su
    DoD escrito en una línea (qué comando/observación demuestra que está
-   lista). El checklist `[ ] MT-NN — DoD: …` se registra en
+   lista) y su **complejidad clasificada** ([Alta]/[Media]/[Baja], matriz
+   §2 — determina qué modelos implementan y auditan). El checklist
+   `[ ] MT-NN [complejidad] — DoD: …` se registra en
    `docs/estado_actual.md` y el plan pasa por el GATE G0 (aprobación del
-   Director) antes de arrancar F1. Si una tarea no cabe en ≤5 micro-tareas,
-   trátala como meta y pártela en tandas. Una sesión = 1–3 micro-ciclos
-   completos; los pasos que dependen del Director (rotar artefactos entre
-   Arquitecto, Ingeniero y Auditor) son cortes de sesión válidos.
+   Director, que ratifica también la clasificación) antes de arrancar F1.
+   Si una tarea no cabe en ≤5 micro-tareas, trátala como meta y pártela en
+   tandas. Una sesión = 1–3 micro-ciclos completos; los pasos que dependen
+   del Director (rotar artefactos entre los roles) son cortes de sesión
+   válidos.
 
 4. **Actualización del documento:**
    Actualiza `docs/ECOSISTEMA_VISION.md` sección "Roadmap por fases" con el estado actualizado.

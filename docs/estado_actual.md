@@ -1,12 +1,20 @@
 # Estado Actual — NexoExpress (Coordinador del Ecosistema)
 
 **Estado Global del Ecosistema:** 🟢 VERDE
-**Última Actualización:** 04-08-2026
-**Metodología vigente:** v2 Triple-IA (`docs/METODOLOGIA_TRIPLE_IA.md`, adoptada 09-07-2026)
+**Última Actualización:** 06-08-2026
+**Metodología vigente:** **v2.5 Optimizada Triple-IA** (`docs/METODOLOGIA_TRIPLE_IA.md`, adoptada 06-08-2026 — única metodología del ecosistema, sin fallbacks; roles por modelo/parámetros + matriz de complejidad + optimización de tokens)
 
 ---
 
-## ✅ Checklist de Micro-Tareas Vigente
+## ✅ Meta vigente (CERRADA 06-08-2026): Transición a la Metodología v2.5 Optimizada
+
+**Meta (CERRADA 06-08-2026 — NexoExpress main, refactor documental por vía directa ordenada por el Director; feedback del Arquitecto → 2 ajustes → G2 concedido el mismo día):** adoptar la **v2.5 Optimizada** como metodología ÚNICA del ecosistema: roles por modelo/parámetros (Fable F0/F1 effort low-medium; Sonnet effort high F3 y F5-Alta; Sonnet/Haiku F4; Haiku Sintetizador F5 Media/Baja + empaquetado F6; Gemini F2/F6 con Ronda 1 SIEMPRE Pro High), matriz de complejidad Alta/Media/Baja clasificada en F0 y ratificada en G0, estrategia de tokens (caching + effort), regla de escalada §2.1, y **eliminación física de `METODOLOGIA_DUAL_IA.md` sin fallback** (el viejo "colapso v1" pasa a ser la "vía rápida v2.5"). Verificación: cero referencias operativas huérfanas a v1/dual (las menciones históricas en bitácoras/expedientes/metas cerradas se conservan como memoria jurídica). Detalle en `bitacora_06_08_2026.md`.
+
+**Cursor: CICLO CERRADO (06-08).** **Siguiente: G0 del próximo ciclo — PRIMER ciclo bajo v2.5** (el G0 debe traer clasificación de complejidad por MT). Fila del Director: acta persistente → página de Configuración (tuerca) → billing/Vertex.
+
+---
+
+## 📁 Meta anterior (CERRADA 04-08-2026)
 
 **Meta (CERRADA 04-08-2026 — código en `6854bc5` + `f6b6158`, ActaExpressWeb linux, pusheados):** [ActaExpressWeb] **Selector de micrófono** (CTA en el banner H4): cuando el detector avise silencio, cambiar de micrófono desde el propio banner **sin cortar la grabación** (hot-swap vía enrutamiento Web Audio del presencial — MediaRecorder graba un `MediaStreamDestination` estable), con la elección persistida como default futuro por uid. 100% frontend; sin cambios de schema/openapi/server. Orden de la fila fijado por el Director (30-07): selector → acta persistente → billing. E2E final: mañana en el PC Windows del caso real (Stereo Mix).
 **Expediente:** `auditorias/2026-07-30_selector_microfono/`
@@ -147,7 +155,7 @@
 
 | Proyecto | Estado | % MVP | Prioridad ahora |
 |---|---|---|---|
-| ActaExpressWeb | 🟢 Activo | ~93% | Próximo G0 (candidato: selector de micrófono) |
+| ActaExpressWeb | 🟢 Activo | ~93% | Próximo G0 bajo v2.5 (fila: acta persistente → Configuración → billing) |
 | ActaExpress Android | 🟡 En pausa | ~60% | Paridad con Web (campo `plataforma`) |
 | BitácoraExpress | 🟢 Activo en Linux | 100% (MVP) | MVP Completado, mantenimiento |
 | NexoExpress | 🟢 Activo | 100% | Orquestación, RAG Docs y Mantenimiento |
@@ -156,6 +164,7 @@
 
 ## 📌 Hitos Recientes del Ecosistema
 
+- **Metodología v2.5 Optimizada adoptada (06-08):** roles por modelo/`effort` (Fable macro F0/F1; Sonnet specs F3 + F5-Alta; Sonnet/Haiku F4; Haiku Sintetizador; Gemini con F6-r1 siempre Pro High), matriz de complejidad, optimización de tokens y **legacy Dual-IA eliminada sin fallback** — metodología única del ecosistema. Ajustes del Director en G2: F5-Alta a Sonnet effort high (juicio semántico) y Flash solo en rondas 2+/Baja.
 - **Resiliencia de grabación cerrada (28-07):** vault IndexedDB que persiste los chunks de 1 s al vuelo + tarjeta de recuperación tras crash/cierre de pestaña (heartbeat 30 s, poll 10 s, silo por uid, borrado solo en acta-OK/descarte/422). E2E en 2 rondas con cierre REAL de pestaña → acta fiel; auditoría APROBADO CON OBSERVACIONES con anti-bluff válida y cero bugs de código (`2871a74` en ActaExpressWeb linux; expediente `2026-07-25_resiliencia_grabacion`, 17 archivos). Primer F3′ disparado por E2E (MT-H6e).
 - **Captura confiable cerrada (23-07):** selector explícito presencial/virtual persistido por uid, fin del fallback silencioso de fuente de audio (H3), detector de micrófono muerto con banner por severidad en los primeros 5–10 s (H4) y tarjeta prominente de procesamiento. Ciclo v2 completo con E2E 6/6 y auditoría APROBADO CON OBSERVACIONES cuyo único BUG alegado (T5) fue refutado con evidencia por el Arquitecto (`35580f0` en ActaExpressWeb linux; expediente `2026-07-17_captura_confiable`, 16 archivos).
 - **Robustez del pipeline cerrada (17-07):** guard 422 pre-gasto (300 B/s), centinelas anti-confabulación en ambos prompts + `looksEmpty` reconciliada, thinkingBudget 4096 en síntesis (thoughts reales: 1145 vs 62.912), timeout File API proporcional y mensaje de espera. Ciclo v2 completo con E2E real y auditoría APROBADO (`c382c4c` en ActaExpressWeb linux; expediente `2026-07-14_robustez_pipeline`, 15 archivos).
@@ -172,13 +181,13 @@
 
 ---
 
-## 🚀 Próximos 5 Pasos Globales (actualizado 28-07 tras cerrar Resiliencia H6)
+## 🚀 Próximos 5 Pasos Globales (actualizado 06-08 tras adoptar la v2.5)
 
 1. ~~[Si la sesión es en WINDOWS] Micro-ciclo de setup del entorno~~ ✅ **CERRADO 28-07** (`3ca3b1d`): entorno Windows homologado y probado E2E; particularidades en bitácora 28-07 sesión 2.
 2. ~~[ActaExpressWeb] Micro-ciclo bug del basurero~~ ✅ **CERRADO 29-07** (`74e3d32`): borrado funcional en lista (diálogo controlado, sin navegación espuria) y detalle (botón nuevo); E2E 5/5. **El siguiente ciclo se decide en G0 — candidato recomendado: selector de micrófono (punto 4).**
 3. **[ActaExpressWeb] Generación de acta PERSISTENTE (dirección de producto del Director, 29-07):** que el procesamiento sobreviva al cierre del sitio y no bloquee la app. **Etapa 1 (fácil, frontend):** desacoplar grabación de procesamiento — poder grabar otra reunión mientras la anterior se genera, con aviso no bloqueante. **Etapa 2 (ciclo estándar, toca server+openapi+schema):** el server crea el acta INMEDIATAMENTE con `estado: "generando"` (visible en la lista), completa en background, y correlación de IDs con el vault H6 para evitar el duplicado detectado por el Arquitecto (hoy, cerrar durante el procesamiento deja la sesión en el vault Y el server probablemente termina igual → reprocesar duplicaría). Sinergia: resuelve de paso el riesgo de timeout de proxy al desplegar. Orden vs selector de micrófono: a decidir en G0 (recomendación del Arquitecto: selector primero por tamaño/dolor diario).
 4. **[Backlog]** ~~Selector de micrófono en la app~~ → **en ciclo (2026-07-30, ABIERTO — ver checklist vigente)**; **[NUEVO 04-08] Página de CONFIGURACIÓN (la "tuerca") — dirección de producto del Director, Windows y Linux:** panel de ajustes en el frontend con (a) **Tema** claro/oscuro; (b) **Audio**: selector de micrófono SIEMPRE accesible — para cambiar el preferido persistido sin esperar a que el banner H4 detecte silencio (hallazgo del E2E: el preferido protege tan bien que ya no hay camino de UI para cambiarlo voluntariamente); (c) tipo de cuenta y uso, entre otros. **Absorbe la "iteración 2 del selector"** (nacida del E2E Windows 04-08: 3 opciones-trampa de 4 por entradas virtuales duplicadas del SO y labels no obvios → sondear dispositivos en la ventana de detección y marcar "**Recomendado**" a los que SÍ captan señal + dedupe de entradas virtuales; candidato técnico: probe RMS ~0,5 s por dispositivo, permiso ya concedido). "Puede hacerse después" (Director) — ciclo propio con G0. **"Continuar reunión"** desde un acta (anexar audio tras un corte — dirección de producto del Director, ciclo propio); visor de síntesis en la UI; Android campo `plataforma`; actas en inglés; `msDuration` server-side; timeout de proxy al desplegar; **de captura confiable:** umbral RMS sala callada, descarte del ámbar, useEffect defensivo; **de resiliencia H6:** OOM base64 en recuperaciones muy largas (D1), aviso "audio parcial" tras quota (T3), recuperación casi instantánea con marca pagehide (cambia el diseño auditado).
-5. **[Metodología]** Diseño del "Modo A" partiendo de `docs/arquitectura_mas_cloud.md` (cuando el Director lo priorice).
+5. **[Metodología]** ~~Transición a v2.5~~ ✅ **CERRADA 06-08** (metodología única, legacy eliminado). Queda: retro del PRIMER ciclo v2.5 (¿matriz clasificó bien? ¿F5-Haiku sostiene en Media/Baja? ¿ahorro medible?) y diseño del "Modo A" partiendo de `docs/arquitectura_mas_cloud.md` (cuando el Director lo priorice).
 
 ---
 
