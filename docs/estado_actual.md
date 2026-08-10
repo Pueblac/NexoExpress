@@ -1,12 +1,34 @@
 # Estado Actual — NexoExpress (Coordinador del Ecosistema)
 
 **Estado Global del Ecosistema:** 🟢 VERDE
-**Última Actualización:** 06-08-2026
-**Metodología vigente:** **v2.5 Optimizada Triple-IA** (`docs/METODOLOGIA_TRIPLE_IA.md`, adoptada 06-08-2026 — única metodología del ecosistema, sin fallbacks; roles por modelo/parámetros + matriz de complejidad + optimización de tokens)
+**Última Actualización:** 09-08-2026
+**Metodología vigente:** **Triple-IA v2.6** (`docs/METODOLOGIA_TRIPLE_IA.md`, adoptada 09-08-2026 — única metodología del ecosistema, sin fallbacks; conserva íntegra la maquinaria de v2/v2.5 y añade Asesor del Director §1.1, Glosa Pedagógica Inline §4.3, Paradas de Observación §3.1 y Recalibración Dinámica G0′ §3.2)
 
 ---
 
-## ✅ Meta vigente (CERRADA 06-08-2026): Transición a la Metodología v2.5 Optimizada
+## ✅ Meta vigente (CERRADA 09-08-2026): Adopción de la Metodología v2.6 + separación de NexoOrchestrator
+
+**Meta (CERRADA 09-08-2026 — commit `8b55ed1` en NexoExpress main; G2 concedido por el Director):** adoptar la **v2.6** como metodología ÚNICA del ecosistema y **separar la plataforma del producto**.
+
+Lo adoptado en v2.6, todo apuntando al mismo problema —que el Director pueda decidir de verdad en los gates sin leer el código—:
+- **Asesor Estratégico del Director** (Gemini 3.6 Flash en Antigravity): traduce lo que se aprueba. NO decide, NO vota, NO produce artefactos del expediente y **NUNCA comparte conversación con el Auditor** (ambos son Gemini; si conviven en un hilo, la auditoría adversarial queda contaminada).
+- **Glosa Pedagógica Inline**: analogía en lenguaje ordinario donde aparece el término, y toda decisión pedida al Director formulada en el eje **reversibilidad × impacto de negocio**.
+- **Paradas de Observación**: toda meta con UI, datos o indicadores predeclara en F0 qué verá el Director, cuándo, cómo lo comprueba solo y **qué la haría fallida**. Infraestructura pura puede eximirse, pero la exención se declara y se ratifica en G0 — por omisión no pasa el gate.
+- **Recalibración Dinámica (Mini-Gate G0′)**: si en F4/F5 la evidencia predeclarada no se sostiene, se DETIENE y se pide permiso. Solo toca la evidencia, **nunca el alcance**.
+
+**Separación de repositorios (09-08):** la infraestructura del orquestador autónomo se movió a **`NexoOrchestrator`** (repo propio, rama `main`): 23 archivos verificados por hash SHA-256 uno a uno antes de borrar el origen. **NexoExpress vuelve a ser solo el coordinador de las aplicaciones del producto.**
+
+**Evidencia empírica que motivó la v2.6** — el ciclo `2026-08-06_docker_orchestrator` (MT-D2, núcleo de ejecución del orquestador; expediente hoy en NexoOrchestrator) recorrió **6 rondas de corrección y 6 de verificación** más una auditoría externa que devolvió **RECHAZADO**, encontrando defectos reales cada vez. Dos lecciones: (a) **ningún defecto serio lo encontró quien escribió el código**, y varios fueron fallos de diseño del Arquitecto —incluida una **retractación firmada** sobre un vector declarado cerrado sin estarlo—; (b) el Director atravesó seis rondas **sin nada que ver**, aprobando sobre artefactos que no podía verificar. Detalle en `bitacora_09_08_2026.md`.
+
+**Cursor: CICLO CERRADO (09-08).** **Siguiente: G0 del próximo ciclo — PRIMER ciclo bajo v2.6** (el G0 debe traer clasificación de complejidad por MT **y Parada de Observación predeclarada o exención ratificada**).
+
+**Pendientes del ciclo del orquestador (en NexoOrchestrator, no bloquean a NexoExpress):** (1) F5 sobre la ronda F4⁶ de MT-D2 — corrección aplicada y verificada por el Arquitecto, **falta verificación independiente**; (2) ronda 2 de F6 con el paquete regenerado, que debe presentar la neutralización de hooks **como mitigación con su ataque residual descrito**; (3) regresión abierta por la mudanza —el workspace por defecto se deducía de la ubicación del archivo y ahora apunta a todos los proyectos del disco— documentada en `NexoOrchestrator/MIGRACION.md`, mitigable declarando `NEXO_WORKSPACE_ROOTS`, corrección pendiente a fallo cerrado: **primera micro-tarea del repo nuevo**.
+
+Fila del Director sin tocar: acta persistente → página de Configuración (tuerca) → billing/Vertex.
+
+---
+
+## 📁 Meta anterior (CERRADA 06-08-2026): Transición a la Metodología v2.5 Optimizada
 
 **Meta (CERRADA 06-08-2026 — NexoExpress main, refactor documental por vía directa ordenada por el Director; feedback del Arquitecto → 2 ajustes → G2 concedido el mismo día):** adoptar la **v2.5 Optimizada** como metodología ÚNICA del ecosistema: roles por modelo/parámetros (Fable F0/F1 effort low-medium; Sonnet effort high F3 y F5-Alta; Sonnet/Haiku F4; Haiku Sintetizador F5 Media/Baja + empaquetado F6; Gemini F2/F6 con Ronda 1 SIEMPRE Pro High), matriz de complejidad Alta/Media/Baja clasificada en F0 y ratificada en G0, estrategia de tokens (caching + effort), regla de escalada §2.1, y **eliminación física de `METODOLOGIA_DUAL_IA.md` sin fallback** (el viejo "colapso v1" pasa a ser la "vía rápida v2.5"). Verificación: cero referencias operativas huérfanas a v1/dual (las menciones históricas en bitácoras/expedientes/metas cerradas se conservan como memoria jurídica). Detalle en `bitacora_06_08_2026.md`.
 
