@@ -1,12 +1,12 @@
 ---
 name: auditor_externo
-description: Generador de auditorías adversariales del ciclo triple-IA v2.5 — el prompt de diseño (F1) lo ejecuta el Arquitecto (Fable 5); el empaquetado del prompt de código (F6) lo ejecuta el Sintetizador (Haiku 4.5); el anti-bluff formal es de Haiku y las refutaciones de BUG de Fable/Sonnet effort high. Produce prompts para Gemini — Ronda 1 de F6 SIEMPRE 3.1 Pro High; Flash solo rondas 2+ de fixes o complejidad Baja. Corazón del ciclo "diseño primero" (docs/METODOLOGIA_TRIPLE_IA.md)
+description: Generador de auditorías adversariales del ciclo triple-IA v2.6 — el prompt de diseño (F1) lo ejecuta el Arquitecto (Fable 5); el empaquetado del prompt de código (F6) lo ejecuta el Sintetizador (Haiku 4.5); el anti-bluff formal es de Haiku y las refutaciones de BUG de Fable/Sonnet effort high. Produce prompts para Gemini — Ronda 1 de F6 SIEMPRE 3.1 Pro High; Flash solo rondas 2+ de fixes o complejidad Baja. El Asesor del Director NO interviene aquí ni comparte conversación con el Auditor. Corazón del ciclo "diseño primero" (docs/METODOLOGIA_TRIPLE_IA.md)
 ---
 
 ### Descripción del Agente
 
 Asumes el rol de **Preparador de Auditoría Externa** del ecosistema Express.
-En la metodología v2.5 (`docs/METODOLOGIA_TRIPLE_IA.md`) esta skill se
+En la metodología v2.6 (`docs/METODOLOGIA_TRIPLE_IA.md`) esta skill se
 reparte por rol: el **Arquitecto** (Fable 5, effort low/medium) la ejecuta
 en F1 (prompt de diseño); el **Sintetizador** (Haiku 4.5) la ejecuta en F6
 (empaquetado del prompt de código, tras verificar F5) y en el anti-bluff
@@ -73,6 +73,20 @@ implementación, el prompt correspondiente es parte del entregable.
    certeza hay. Precedente OPCG: así se confirmó un bypass real que el
    implementador solo intuía.
 
+4-bis. **Declarar la deuda ya adjudicada y no vender cierres falsos**
+   (v2.6, lección del ciclo `2026-08-06_docker_orchestrator`). El prompt
+   debe incluir una lista explícita de los límites **ya conocidos y
+   asumidos** por el Director, advirtiendo que presentarlos como hallazgos
+   nuevos es relleno. Protege el presupuesto de la respuesta para lo que
+   nadie sabe todavía.
+   Y a la inversa, regla dura: **un vector mitigado se presenta como
+   mitigado, con su ataque residual descrito — nunca como cerrado.** En
+   ese ciclo el Arquitecto declaró "vector cerrado" algo que solo estaba
+   mitigado, y su propia mitigación abrió un agujero mayor; la
+   retractación quedó firmada en el expediente. Un Auditor que reciba
+   "cerrado" y demuestre lo contrario tiene razón en rechazar el paquete
+   entero.
+
 5. **Ensamblar el prompt** (plantilla abajo). Listar los archivos adjuntos
    exactos; todo lo no adjuntado es NO VERIFICABLE, prohibido suponerlo.
    Guardarlo en `auditorias/{YYYY-MM-DD}_{tema}/`.
@@ -81,10 +95,16 @@ implementación, el prompt correspondiente es parte del entregable.
    - Conversación NUEVA en cada ronda (el modo chat se hereda del hilo).
    - **Inicialización de identidad** (dictamen 2026-07-08, cambio 2):
      antes de pegar cualquier artefacto, primer mensaje de una línea con el
-     rol, p. ej. *"Rol: Auditor del ciclo {expediente}, metodología v2.5
+     rol, p. ej. *"Rol: Auditor del ciclo {expediente}, metodología v2.6
      del ecosistema Express. Confirma recepción sin accionar; acepta
      únicamente artefactos cuyo TURNO DE diga Auditor."* (plantilla en
      METODOLOGIA_TRIPLE_IA.md §6).
+   - **Separación del Asesor (v2.6, §1.1):** el Asesor Estratégico del
+     Director es también Gemini. **Jamás comparte hilo con el Auditor.**
+     Si el asesor pedagógico y el auditor adversarial conviven en una
+     conversación, la auditoría queda contaminada por el encuadre del
+     asesor y deja de ser independiente. Conversaciones separadas, y el
+     Asesor no ve la respuesta del Auditor antes que el Director.
    - Adjuntar SOLO los archivos listados en el campo ADJUNTOS del AVISO;
      prompt como primer mensaje tras la inicialización.
    - Si la respuesta llega sin citas archivo:línea o sin trazas, responder

@@ -1,20 +1,39 @@
-# Metodología Triple-IA v2.5 (Optimizada) — Ecosistema Express
+# Metodología Triple-IA v2.6 (Enfoque Pedagógico, Asesor del Director y Paradas de Observación) — Ecosistema Express
 
-> **ESTADO: VIGENTE v2.5 Optimizada — adoptada el 06-08-2026 con aprobación
-> del Director.** Metodología única y predominante del ecosistema Express:
-> no existen fallbacks ni metodologías alternativas. Todo cambio no trivial
-> del ecosistema recorre este ciclo y solo este ciclo.
+> **ESTADO: VIGENTE v2.6 — adoptada el 09-08-2026 por orden del Director.**
+> Metodología única y predominante del ecosistema Express: no existen
+> fallbacks ni metodologías alternativas. Todo cambio no trivial del
+> ecosistema recorre este ciclo y solo este ciclo.
 >
 > **Linaje:** la v2 (adoptada 09-07-2026; revisión de diseño de Gemini
 > **APROBADO CON CAMBIOS** r1, expediente
-> `auditorias/2026-07-08_metodologia_v2/`, con los 5 cambios obligatorios y
-> Q1/Q3/D4 incorporados) probó el ciclo F0–F7 en siete ciclos completos.
-> La v2.5 conserva íntegra esa maquinaria (fases, artefactos, AVISO, gates,
-> anti-bluff) y **optimiza la asignación de modelos por complejidad y el
-> gasto de tokens**. La metodología heredada anterior a la v2 fue eliminada
-> del repositorio el 06-08-2026; sus expedientes históricos en `auditorias/`
-> y las bitácoras conservan su valor como memoria jurídica, pero ningún
-> documento operativo la referencia ya como flujo ejecutable.
+> `auditorias/2026-07-08_metodologia_v2/`) probó el ciclo F0–F7 en siete
+> ciclos completos. La v2.5 (06-08-2026) conservó esa maquinaria y optimizó
+> la asignación de modelos por complejidad y el gasto de tokens. La **v2.6
+> conserva íntegras ambas** (fases, artefactos, AVISO, gates, anti-bluff,
+> matriz de complejidad, estrategia de tokens) y añade cuatro cosas que
+> atacan un mismo problema: **que el Director pueda decidir de verdad en los
+> gates, sin tener que leer el código.**
+>
+> **Qué añade la v2.6:**
+> 1. El **Asesor Estratégico del Director** (§1.1): un traductor pedagógico
+>    y copiloto del Director en los gates.
+> 2. La **Regla de Glosa Pedagógica Inline** (§4.3): todo término técnico
+>    complejo en specs e informes lleva su analogía en lenguaje ordinario, y
+>    toda decisión que se pide al Director se reduce al eje
+>    **reversibilidad × impacto de negocio**.
+> 3. Las **Paradas de Observación con Evidencia Comprobable** (§3.1): en
+>    proyectos con UI, datos o indicadores, F0 predeclara qué va a poder
+>    **ver y tocar** el Director, y cuándo.
+> 4. El **Protocolo de Recalibración Dinámica de Evidencia**
+>    (F3′ / Mini-Gate G0′, §3.2): qué hacer cuando en pleno F4/F5 se
+>    descubre que el prototipo o el indicador estaban mal especificados,
+>    sin que eso degenere en deriva de alcance.
+>
+> **Por qué:** el ciclo v2.5 demostró que produce código sólido, pero
+> también que un Director que no lee `executor.py` línea a línea acaba
+> aprobando por confianza en vez de por criterio. Un gate humano que se
+> concede sin entender lo que se concede es un trámite, no un control.
 
 ---
 
@@ -22,59 +41,100 @@
 
 | Rol | Quién | Configuración | Fases | Responsabilidad |
 |---|---|---|---|---|
-| **Director / Auditor Técnico** | Pueblac (humano) | — | Gates G0, G1, G2 | Define la visión y prioridades, autoriza los gates, **rota los artefactos entre modelos** (Modo M), arbitra conflictos y da la aprobación FINAL. Nada se commitea sin su visto bueno. |
-| **Arquitecto Macro / Estratega** | Claude **Fable 5** | `effort: low` o `medium` | **F0 y F1** | Planificación macro, descomposición estratégica en micro-tareas con DoD, diseño conceptual de arquitectura y schemas, clasificación de complejidad de cada MT (§2). Entregables **breves de alta inteligencia**: decide mucho, escribe poco. Custodia de expedientes y del checklist. |
-| **Especificador y Diseñador Técnico** | Claude **Sonnet 5** | `effort: high` | **F3; F5 en Alta** | Redacción del **Paquete de Especificación** detallado (`spec_mtNN.md`): contratos de API, schemas aplicados, extractos de código contextuales verificados. La spec es la entrega primaria del diseño — aquí SÍ se gasta detalle. En complejidad **Alta** ejecuta además la verificación F5 (juicio semántico sobre el código real, §2.1). |
-| **Ingeniero Adaptativo** | Claude **Sonnet 5** o Claude **Haiku 4.5** | Sonnet: estándar. Haiku: `thinking: enabled` si aplica | **F4** | Implementación FIEL a la spec. Criterio de selección: **Sonnet 5** para tareas complejas o refactorizaciones pesadas; **Haiku 4.5** para micro-tareas, UI fixes, typos, scripts simples o tests unitarios. La selección la fija la matriz de complejidad (§2) en G0. |
-| **Sintetizador y Anti-Bluff Interno** | Claude **Haiku 4.5** | Estándar | **F5 (Media/Baja) y preparación de F6** | Re-ejecución determinista de las verificaciones del DoD sobre el código real (en Media/Baja; la F5 de Alta es de Sonnet, §2.1), parseo del `git diff` literal, verificación formal de citas (anti-bluff mecánico) y **empaquetado del prompt estructurado de auditoría** para Gemini (en TODA complejidad). No emite juicios de diseño: ante ambigüedad, ESCALA (§2.1). |
-| **Auditor Externo Adversarial** | **Gemini 3.1 Pro High** o **Gemini Flash** | Conversación NUEVA (contexto cero) | **F2 y F6** | Auditoría adversarial del DISEÑO antes del código y del CÓDIGO después, bajo contrato de citas obligatorias, trazas y trampas. **Gemini 3.1 Pro High** para arquitectura, seguridad, core y SIEMPRE la Ronda 1 de F6; **Gemini Flash** solo para rondas 2+ (verificación de fixes) o complejidad Baja (§2). |
+| **Director / Auditor Técnico** | Pueblac (humano) | — | Gates G0, G0′, G1, G2 | Define la visión y prioridades, autoriza los gates, **rota los artefactos entre modelos** (Modo M), arbitra conflictos y da la aprobación FINAL. Nada se commitea sin su visto bueno. |
+| **Asesor Estratégico del Director** | **Gemini 3.6 Flash** (en Antigravity) | Conversación propia, separada de la del Auditor | **Gates G0, G0′, G1, G2** (a demanda del Director) | Traductor pedagógico y copiloto. Explica al Director qué está aprobando, en lenguaje ordinario, y le devuelve la decisión reducida al eje **reversibilidad × impacto**. **No decide, no vota, no produce artefactos del expediente.** Ver §1.1. |
+| **Arquitecto Macro / Estratega** | Claude **Fable 5** | `effort: low` o `medium` | **F0 y F1** | Planificación macro, descomposición en micro-tareas con DoD, diseño conceptual, clasificación de complejidad (§2) y **predeclaración de las Paradas de Observación** (§3.1). Entregables **breves de alta inteligencia**: decide mucho, escribe poco. Custodia de expedientes y del checklist. |
+| **Especificador y Diseñador Técnico** | Claude **Sonnet 5** | `effort: high` | **F3; F5 en Alta** | Redacción del **Paquete de Especificación** (`spec_mtNN.md`): contratos, schemas aplicados, extractos verificados, **glosa pedagógica inline** (§4.3). En complejidad **Alta** ejecuta además la verificación F5. |
+| **Ingeniero Adaptativo** | Claude **Sonnet 5** o Claude **Haiku 4.5** | Sonnet: estándar. Haiku: `thinking: enabled` si aplica | **F4** | Implementación FIEL a la spec. **Sonnet 5** para tareas complejas o refactorizaciones pesadas; **Haiku 4.5** para micro-tareas, UI fixes, typos, scripts simples o tests unitarios. Lo fija la matriz §2 en G0. |
+| **Sintetizador y Anti-Bluff Interno** | Claude **Haiku 4.5** | Estándar | **F5 (Media/Baja) y preparación de F6** | Re-ejecución determinista del DoD sobre el código real, parseo del `git diff` literal, verificación formal de citas y **empaquetado del prompt de auditoría** para Gemini. No emite juicios de diseño: ante ambigüedad, ESCALA (§2.1). |
+| **Auditor Externo Adversarial** | **Gemini 3.1 Pro High** o **Gemini Flash** | Conversación NUEVA (contexto cero) | **F2 y F6** | Auditoría adversarial del DISEÑO antes del código y del CÓDIGO después, bajo contrato de citas, trazas y trampas. **Pro High** para arquitectura, seguridad, core y SIEMPRE la Ronda 1 de F6; **Flash** solo rondas 2+ o complejidad Baja (§2). |
 | **Innovador** | Skill `innovador` | — | fuera de ciclo | Detecta mejoras fuera del plan. Propone, nunca implementa. |
 | **Depurador de Agentes** | Skill `depurador_agentes` (la invoca el Director) | — | a demanda | Detecta bucles de error/alucinación en **cualquiera de las IAs del ciclo** y prescribe la intervención. |
+
+### 1.1 Asesor Estratégico del Director (nuevo en v2.6)
+
+**Problema que resuelve.** El Director aprueba gates sobre artefactos
+escritos por y para máquinas. Cuando el artefacto es una spec de seguridad
+de 16 KB, la opción realista deja de ser "aprobar o rechazar con criterio" y
+pasa a ser "aprobar por confianza". Eso convierte el gate en un trámite.
+
+**Qué hace.** A petición del Director, y **solo en los gates**, el Asesor:
+
+1. Explica en lenguaje ordinario qué se está aprobando y qué cambia si se
+   aprueba.
+2. Traduce los términos técnicos con analogías, sin exigir del Director
+   vocabulario previo.
+3. Reduce la decisión al eje **reversibilidad × impacto de negocio**
+   (§4.3): *¿cuánto cuesta deshacer esto?* y *¿a quién afecta si sale mal?*
+4. Señala qué preguntas convendría hacerle al Arquitecto **antes** de
+   conceder el gate.
+
+**Qué NO hace, y esto es vinculante:**
+
+- **No decide ni vota.** Su salida es una explicación, no un veredicto. La
+  decisión del gate se registra siempre con la razón **del Director**, en
+  sus palabras, nunca con "según el Asesor".
+- **No produce artefactos del expediente.** Nada de lo que escriba entra en
+  `auditorias/` como evidencia. Si el Director quiere conservar una
+  explicación, la pega en la bitácora, no en el expediente del ciclo.
+- **No sustituye la lectura del AVISO** (§5). El AVISO es el mínimo
+  irreductible que el Director lee siempre.
+- **Nunca comparte conversación con el Auditor.** Ambos son Gemini; si el
+  Asesor y el Auditor conviven en un hilo, la auditoría adversarial queda
+  contaminada por el encuadre del asesor. **Conversaciones separadas,
+  siempre.**
+- **No participa en el anti-bluff** ni en ninguna verificación. No es un
+  nodo del triángulo (abajo).
+
+**Riesgo asumido y declarado:** un asesor complaciente puede capturar el
+gate de facto — si el Director decide con lo que el Asesor le cuenta, quien
+manda es el Asesor. Neutralización: (a) la glosa pedagógica es
+**responsabilidad del rol que produce el artefacto** (§4.3), no del Asesor,
+de modo que el Director tiene siempre una explicación de origen distinto
+con la que contrastar; (b) la decisión se registra con la razón del
+Director; (c) el Asesor no ve nunca las respuestas del Auditor antes que el
+Director.
 
 ### Triángulo de verificación (regla de oro)
 
 **Ninguna IA verifica su propio trabajo con autoridad final.**
 
-- El **Verificador de F5** (Sonnet 5 `effort: high` en Alta; el
-  Sintetizador Haiku en Media/Baja) verifica al Ingeniero re-ejecutando el
-  DoD sobre el código real. El **Sintetizador** verifica además
-  formalmente al Auditor (citas y salidas literales, anti-bluff mecánico).
-- El **Auditor** (Gemini) valida al Arquitecto (revisión adversarial del
-  diseño en F2) y al Ingeniero/Especificador (auditoría adversarial del
-  código en F6).
+- El **Verificador de F5** (Sonnet 5 `effort: high` en Alta; el Sintetizador
+  Haiku en Media/Baja) verifica al Ingeniero re-ejecutando el DoD sobre el
+  código real. El **Sintetizador** verifica además formalmente al Auditor.
+- El **Auditor** (Gemini) valida al Arquitecto (F2) y al
+  Ingeniero/Especificador (F6).
 - El **Ingeniero** no valida a nadie, pero su Informe declara dudas propias
   que dirigen la auditoría.
 - El **Arquitecto** (Fable) arbitra las escaladas técnicas (§2.1) y las
-  refutaciones de BUGs alegados: un BUG solo se refuta con evidencia
-  archivo:línea producida por Fable o Sonnet `effort: high`, nunca por el
-  Sintetizador en solitario.
+  refutaciones de BUGs: un BUG solo se refuta con evidencia archivo:línea
+  producida por Fable o Sonnet `effort: high`.
 - El **Director** arbitra todo conflicto y es el único que aprueba adopción
   de diseño y commits.
+- El **Asesor** (§1.1) **no forma parte del triángulo**: no verifica a
+  nadie ni es verificado. Es un intérprete al servicio del Director.
 
-Límite conocido y su neutralización (heredados de la auditoría de la v2 y
-aún vigentes): el nodo que redacta el prompt de auditoría podría filtrar lo
-que ve el Auditor. Neutralización ESTRUCTURAL: el `git diff` literal del
-Informe de Implementación viaja íntegro y sin filtrar dentro del prompt de
-F6 — el empaquetador no elige qué archivos ve el Auditor, que rechaza como
-INVÁLIDO todo prompt sin diff estructurado. En v2.5 el riesgo baja además
-porque el empaquetador (Haiku, F6) y el diseñador (Fable, F1) son roles
-separados. Complementos: artefactos archivados literales en el expediente y
-spot-checks del Director.
+Límite conocido y su neutralización: el nodo que redacta el prompt de
+auditoría podría filtrar lo que ve el Auditor. Neutralización ESTRUCTURAL:
+el `git diff` literal del Informe viaja íntegro y sin filtrar dentro del
+prompt de F6 — el empaquetador no elige qué archivos ve el Auditor, que
+rechaza como INVÁLIDO todo prompt sin diff estructurado. Complementos:
+artefactos archivados literales y spot-checks del Director.
 
-Trade-off aceptado en v2.5 (declarado): en complejidad Alta/Media el
+Trade-off aceptado (declarado desde v2.5): en complejidad Alta/Media el
 Especificador y el Ingeniero son el mismo modelo (Sonnet 5) en **sesiones
 separadas con contexto cero**. El aislamiento es de contexto, no de pesos;
-lo compensan el DoD determinista de F5 (Haiku) y la auditoría externa
-cross-vendor de F6 (Gemini).
+lo compensan el DoD determinista de F5 y la auditoría externa cross-vendor
+de F6.
 
 ---
 
 ## 2. Matriz de asignación por complejidad de la micro-tarea
 
-La complejidad de cada micro-tarea la **clasifica el Arquitecto en F0** y la
-**ratifica el Director en G0**, antes de F3. Queda anotada en el checklist
-(`[Alta]` / `[Media]` / `[Baja]`). En caso de duda entre dos niveles, se
-asigna el superior.
+La complejidad la **clasifica el Arquitecto en F0** y la **ratifica el
+Director en G0**, antes de F3. Queda anotada en el checklist (`[Alta]` /
+`[Media]` / `[Baja]`). En caso de duda entre dos niveles, se asigna el
+superior.
 
 | Complejidad | Ejemplos | Spec (F3) | Impl (F4) | Verif (F5) | Audit (F2/F6) |
 |---|---|---|---|---|---|
@@ -84,70 +144,65 @@ asigna el superior.
 
 Notas de aplicación:
 
-- **Rondas de F6:** la Ronda 1 de auditoría de código usa SIEMPRE
-  **Gemini 3.1 Pro High**, incluso en complejidad Media — la primera
-  mirada adversarial al código no se abarata. **Gemini Flash** queda
-  autorizado únicamente para rondas 2+ (verificación de fixes) o para
-  complejidad Baja.
+- **Rondas de F6:** la Ronda 1 usa SIEMPRE **Gemini 3.1 Pro High**, incluso
+  en Media — la primera mirada adversarial al código no se abarata.
+  **Flash** solo para rondas 2+ o complejidad Baja.
 - **F0/F1 (Fable) aplican a toda meta**; la ronda de diseño F1→F2 es
   obligatoria en Alta y Media. En **Baja**, el Director puede autorizar en
-  G0 colapsar F1/F2 (sin ronda de diseño externa) — la MT pasa de G0
-  directo a F3; F5 y F6 siguen siendo obligatorias.
+  G0 colapsar F1/F2 — la MT pasa de G0 directo a F3; F5 y F6 siguen siendo
+  obligatorias.
 - **Cambio trivial atómico** (typo, una línea de doc, texto de UI): el
-  Director puede autorizar la **vía rápida v2.5** — ejecución directa en la
-  sesión activa sin ciclo completo, con anotación en el checklist
-  `[vía rápida v2.5 autorizada por el Director]` y aprobación del Director
-  antes de commit. Es la única excepción al ciclo y es parte de la v2.5,
-  no una metodología distinta.
+  Director puede autorizar la **vía rápida** — ejecución directa sin ciclo
+  completo, con anotación en el checklist
+  `[vía rápida v2.6 autorizada por el Director]` y aprobación antes de
+  commit. Es la única excepción al ciclo.
 - **Indisponibilidad de un modelo:** el Director decide la sustitución
-  dentro de la tabla de roles (p. ej. Sonnet cae → Fable `effort: medium`
-  especifica; Haiku cae → Sonnet verifica). Si Gemini no está disponible,
-  NO hay cierre de ciclo: la sesión corta en el artefacto pendiente. La
-  sustitución se anota en la bitácora.
+  dentro de la tabla de roles. Si Gemini no está disponible, NO hay cierre
+  de ciclo: la sesión corta en el artefacto pendiente. Se anota en bitácora.
+- **Indisponibilidad del Asesor:** no bloquea nada. El gate se concede igual
+  con el AVISO y la glosa pedagógica del propio artefacto (§4.3), que es lo
+  que garantiza que el Director pueda decidir aunque el Asesor no esté.
 
-### 2.1 Regla de escalada (nueva en v2.5)
+### 2.1 Regla de escalada
 
 Ningún rol resuelve en silencio algo que excede su capacidad o su mandato.
-La cadena de escalada es **Haiku → Sonnet (`effort: high`) → Fable →
-Director**, siempre mediante artefacto (nota en el informe o anexo en el
-expediente), nunca por decisión inline:
+La cadena es **Haiku → Sonnet (`effort: high`) → Fable → Director**, siempre
+mediante artefacto, nunca por decisión inline:
 
-- **F5 en complejidad Alta la ejecuta Sonnet 5 (`effort: high`), no
-  Haiku:** el juicio semántico sobre el código real (fidelidad al diseño
-  aprobado, efectos que el DoD no evidencia — precedente: el bug de diseño
-  contra Radix cazado en el F5 del ciclo basurero) no se delega al
-  Sintetizador. Haiku 4.5 mantiene F5 en Media y Baja, y conserva en TODA
-  complejidad el empaquetado determinista de F6 (parseo del diff,
-  ensamblado del prompt).
-- El **Sintetizador** (F5 Media/Baja) que encuentra una discrepancia no determinista
-  (el DoD pasa pero el comportamiento no coincide con la spec, o una cita
-  del Auditor es formalmente correcta pero semánticamente dudosa) la escala
-  a Sonnet/Fable; jamás la aprueba ni la refuta solo.
+- **F5 en complejidad Alta la ejecuta Sonnet 5 (`effort: high`), no Haiku:**
+  el juicio semántico sobre el código real no se delega al Sintetizador.
+  Haiku mantiene F5 en Media y Baja, y conserva en TODA complejidad el
+  empaquetado determinista de F6.
+- El **Sintetizador** que encuentra una discrepancia no determinista la
+  escala a Sonnet/Fable; jamás la aprueba ni la refuta solo.
 - El **Ingeniero Haiku** (F4 en Baja) que encuentra que la tarea era más
   compleja de lo clasificado DETIENE y devuelve la MT para reclasificar
   (reabre G0 de esa MT), no improvisa.
-- Una **refutación de BUG** alegado por el Auditor exige evidencia
-  archivo:línea de Fable o Sonnet `effort: high` (precedente: BUG 3 del
-  ciclo selector, refutado con `useMicLevel.ts:32`).
+- Una **refutación de BUG** exige evidencia archivo:línea de Fable o
+  Sonnet `effort: high`.
+- **Nuevo en v2.6:** cualquier rol que detecte que la **evidencia
+  observable** predeclarada en F0 (§3.1) ya no se sostiene, DETIENE y abre
+  una **Solicitud de Recalibración** (§3.2). No la sustituye por otra
+  evidencia por su cuenta.
 
 ---
 
-## 3. El Ciclo v2.5 (obligatorio para todo cambio no trivial)
+## 3. El Ciclo v2.6 (obligatorio para todo cambio no trivial)
 
 Cada fase termina con **un artefacto de traspaso** archivado y un **AVISO**
-explícito (formato en §5) que dice a quién le toca y con qué. Sin AVISO, la
-fase no está cerrada.
+explícito (§5). Sin AVISO, la fase no está cerrada.
 
 ```
 F0. PLAN         Arquitecto (Fable, effort low/medium; + roadmap_manager)
-                 descompone la meta en micro-tareas con DoD y CLASIFICA la
-                 complejidad de cada una (§2) → checklist en
+                 descompone la meta en micro-tareas con DoD, CLASIFICA la
+                 complejidad de cada una (§2) y PREDECLARA la Parada de
+                 Observación de la meta (§3.1) → checklist en
                  estado_actual.md.
-                 ── GATE G0: Director aprueba plan, prioridades y
-                    clasificación de complejidad. ──
-F1. DISEÑO       Arquitecto (Fable) produce el diseño conceptual —
-                 arquitectura, schemas, decisiones estratégicas; breve y
-                 denso — + prompt de revisión de DISEÑO → expediente.
+                 ── GATE G0: Director aprueba plan, prioridades,
+                    clasificación de complejidad y la evidencia
+                    observable que se le promete. ──
+F1. DISEÑO       Arquitecto (Fable) produce el diseño conceptual +
+                 prompt de revisión de DISEÑO → expediente.
                  AVISO → Director → Auditor.
                  (En Baja, F1/F2 pueden colapsar por autorización de G0.)
 F2. VEREDICTO    Auditor (Gemini Pro High / Flash según §2) responde en
@@ -158,38 +213,36 @@ F2. VEREDICTO    Auditor (Gemini Pro High / Flash según §2) responde en
                  "RECHAZADO" = rediseñar (volver a F1, ronda nueva).
                  ── GATE G1: Director adopta el veredicto. ──
 F3. SPEC         Especificador (Sonnet 5, effort high) redacta el Paquete
-                 de Especificación de cada micro-tarea (autocontenido, §4)
-                 a partir del diseño aprobado → expediente.
+                 de Especificación de cada micro-tarea (autocontenido, §4.1)
+                 CON glosa pedagógica inline (§4.3) → expediente.
                  AVISO → Director → Ingeniero.
 F4. IMPLEMENTAR  Ingeniero (Sonnet 5 o Haiku 4.5 según §2) implementa FIEL
                  a la spec, corre TODAS las verificaciones del DoD (+ prueba
                  A/B cuando proteja un fix) y entrega Informe de
-                 Implementación con salida literal + dudas propias.
-                 AVISO → Director → Sintetizador.
-F5. VERIFICAR    Verificador según §2 — en Alta: Sonnet 5 (effort high),
-                 que preserva el juicio SEMÁNTICO sobre el código real;
-                 en Media/Baja: Sintetizador (Haiku 4.5). Verifica SOBRE
-                 EL CÓDIGO REAL: EJECUTA los comandos del DoD (si el
-                 entorno no permite ejecución, el Director o un CI los
-                 corre y entrega stdout/stderr literal). Leer el informe
-                 NO es verificar. Contrasta salida real vs informe
-                 (anti-bluff interno), parsea el git diff literal y
-                 confirma fidelidad a la spec (formal en Media/Baja;
-                 también semántica en Alta). Discrepancia no determinista
-                 en Media/Baja → ESCALADA (§2.1).
+                 Implementación con salida literal + dudas propias + glosa.
+                 Si la evidencia observable predeclarada no se sostiene →
+                 Solicitud de Recalibración (§3.2), no improvisación.
+                 AVISO → Director → Verificador.
+F5. VERIFICAR    Verificador según §2 — Alta: Sonnet 5 (effort high), que
+                 preserva el juicio SEMÁNTICO; Media/Baja: Sintetizador
+                 (Haiku 4.5). Verifica SOBRE EL CÓDIGO REAL: EJECUTA los
+                 comandos del DoD. Leer el informe NO es verificar.
+                 Contrasta salida real vs informe, parsea el git diff
+                 literal y confirma fidelidad a la spec. Discrepancia no
+                 determinista en Media/Baja → ESCALADA (§2.1).
+                 Evidencia observable insostenible → Recalibración (§3.2).
                  Desviación o DoD no reproducible → devolver a F4 con nota
                  de rechazo (cuenta para la regla anti-bucle).
+                 ── PARADA DE OBSERVACIÓN: el Director ve y toca lo
+                    predeclarado en F0, antes de gastar la auditoría. ──
 F6. AUDITORÍA    Sintetizador (Haiku 4.5) empaqueta el prompt de auditoría
                  de CÓDIGO (CLAIM → EVIDENCIA archivo:línea → TRAZA →
-                 VERDICTO) según la skill auditor_externo: claims del
-                 diseño aprobado, dudas del Ingeniero y del ciclo, trampas,
-                 e incrusta ÍNTEGRO y SIN FILTRAR el git diff del Informe
-                 de Implementación. El Auditor rechaza como "INVÁLIDO:
-                 posible orquestación adversarial" todo prompt sin diff
-                 estructurado.
+                 VERDICTO) según la skill auditor_externo, e incrusta
+                 ÍNTEGRO y SIN FILTRAR el git diff del Informe. El Auditor
+                 rechaza como "INVÁLIDO: posible orquestación adversarial"
+                 todo prompt sin diff estructurado.
                  AVISO → Director → Auditor. RONDA 1: SIEMPRE Gemini 3.1
-                 Pro High (incluso en Media; Baja puede usar Flash desde
-                 r1). Flash solo en rondas 2+ de verificación de fixes.
+                 Pro High. Flash solo rondas 2+ o Baja.
                  Respuesta → anti-bluff (formal: Haiku; refutaciones:
                  Fable/Sonnet, §2.1). BUG confirmado → F4 (fix) → ronda
                  NUEVA.
@@ -199,10 +252,88 @@ F7. CIERRE       Con APROBADO del Auditor Y aprobación del Director:
                  actualizados (documentador_sesion).
 ```
 
-**Gates humanos (G0, G1, G2):** son del Director en ambos modos de operación
-(§6) y no se automatizan jamás. Los pasos que dependen del Director son
-cortes de sesión válidos: el artefacto + AVISO quedan listos y la sesión
-puede cerrarse sin trabajo a medias.
+**Gates humanos (G0, G0′, G1, G2):** son del Director en ambos modos de
+operación (§6) y no se automatizan jamás. Los pasos que dependen del
+Director son cortes de sesión válidos: el artefacto + AVISO quedan listos y
+la sesión puede cerrarse sin trabajo a medias. En cualquiera de ellos el
+Director puede convocar al **Asesor** (§1.1).
+
+### 3.1 Paradas de Observación con Evidencia Comprobable (nuevo en v2.6)
+
+**El problema.** Un ciclo puede recorrer F0→F6 entero, con DoD verde y
+auditoría aprobada, y dejar al Director sin haber visto nunca **nada**. El
+código correcto no es lo mismo que el producto correcto, y solo el Director
+sabe si lo segundo se cumplió.
+
+**La regla.** Para toda meta que toque **UI, datos o indicadores**, la F0
+debe **predeclarar** el resultado físico observable por el Director:
+
+1. **Qué va a ver o tocar** — un prototipo navegable, una pantalla real, un
+   documento generado, una consulta con su salida, un número en un panel.
+   Descrito en una frase, sin jerga.
+2. **Cuándo** — en qué punto del ciclo estará disponible. Por defecto **al
+   cerrar F5**, antes de gastar la auditoría de F6: no tiene sentido pagar
+   una auditoría de código sobre algo que el Director va a pedir cambiar.
+3. **Cómo se comprueba** — los pasos exactos que el Director dará para
+   verlo (URL, comando, dónde hacer clic). Si el Director no puede
+   ejecutarlo solo, no es una Parada de Observación válida.
+4. **Qué haría falta para declararla fallida** — el criterio de rechazo,
+   escrito antes de construir nada. Sin esto, cualquier resultado se
+   racionaliza como éxito.
+
+Se registra en el checklist de `estado_actual.md` junto a la micro-tarea, y
+se aprueba en **G0** como parte del plan: el Director aprueba también **qué
+se le promete enseñar**.
+
+**Metas exentas:** infraestructura pura sin efecto observable (por ejemplo,
+el núcleo de ejecución de un orquestador). La exención **se declara
+explícitamente en F0 y la ratifica el Director en G0** — no se asume por
+omisión. Una meta sin Parada de Observación y sin exención declarada **no
+pasa G0**.
+
+**Límite conocido y heredado:** cuando la evidencia observable exige
+hardware o presencia humana (un micrófono, un dispositivo Android), la
+Parada **es bloqueante** y no se puede automatizar. El ciclo se detiene ahí
+hasta que el Director la ejecute. Es un corte de sesión válido, no un fallo.
+
+### 3.2 Protocolo de Recalibración Dinámica de Evidencia — F3′ / Mini-Gate G0′ (nuevo en v2.6)
+
+**El problema.** A veces se descubre en pleno F4 o F5 que el prototipo
+predeclarado no demuestra lo que se creía, o que el indicador elegido mide
+otra cosa. Las dos salidas espontáneas son malas: seguir con una evidencia
+que no prueba nada (teatro), o cambiarla sobre la marcha (deriva de alcance
+sin control).
+
+**La regla.** Quien lo detecte —Ingeniero, Verificador o Arquitecto—
+**DETIENE** y emite una **Solicitud de Recalibración**
+(`solicitud_recalibracion_mtNN.md` en el expediente), con cuatro campos y
+nada más:
+
+1. **Qué se predeclaró en F0** — cita literal.
+2. **Por qué no se sostiene** — con evidencia ejecutada, no con opinión.
+   La misma exigencia que el resto del ciclo: se demuestra, no se afirma.
+3. **Qué se propone en su lugar** — una alternativa única y concreta, con
+   sus pasos de comprobación. Nada de "podríamos hacer A o B".
+4. **Impacto**, en el eje del §4.3: cuánto cambia el alcance, si es
+   reversible, y a qué afecta en el producto.
+
+**Mini-Gate G0′.** El Director aprueba, rechaza o modifica la
+recalibración. Es un gate **humano y bloqueante** como los demás, pero de
+alcance reducido: solo decide sobre la evidencia observable, **no reabre el
+diseño ni la spec**. Su resolución se anota en el checklist junto a la MT.
+
+Reglas de aplicación:
+
+- **Solo la evidencia, nunca el alcance.** Si al recalibrar aparece que
+  también hay que cambiar el contrato o el diseño, eso **no** es G0′: es
+  F3′ (spec nueva) o vuelta a F1, según corresponda. Recalibrar la
+  evidencia no es la puerta trasera para ampliar el trabajo.
+- **Anti-bucle:** dos recalibraciones sobre la misma micro-tarea → STOP y
+  reporte al Director. Si la evidencia hay que redefinirla dos veces, el
+  problema está en F0, no en la evidencia.
+- **Trazabilidad:** la solicitud y su resolución quedan en el expediente
+  aunque se rechacen. Una recalibración rechazada es información valiosa
+  sobre la calidad de la predeclaración.
 
 ---
 
@@ -214,58 +345,96 @@ jurídica del ecosistema). Nomenclatura por rondas
 
 | Fase | Artefacto | Archivo | Productor → Consumidor |
 |---|---|---|---|
-| F0 | Checklist de micro-tareas con DoD + complejidad | `docs/estado_actual.md` | Arquitecto → Director |
+| F0 | Checklist de micro-tareas con DoD + complejidad **+ Parada de Observación** | `docs/estado_actual.md` | Arquitecto → Director |
 | F1 | Diseño + prompt de revisión de diseño | `prompt_diseno_rondaN.md` | Arquitecto → Auditor |
-| F2 | Veredicto + validación anti-bluff | `respuesta_diseno_rondaN.md` (+ anexo de validación) | Auditor → Sintetizador/Arquitecto |
+| F2 | Veredicto + validación anti-bluff | `respuesta_diseno_rondaN.md` (+ anexo) | Auditor → Sintetizador/Arquitecto |
 | F3 | **Paquete de Especificación** | `spec_mtNN.md` | Especificador → Ingeniero |
-| F4 | **Informe de Implementación** | `informe_mtNN.md` | Ingeniero → Sintetizador |
-| F5 | Verificación F5 | anexo en `informe_mtNN.md` | Verificador (Sonnet en Alta / Haiku en Media-Baja) → expediente |
+| F4 | **Informe de Implementación** | `informe_mtNN.md` | Ingeniero → Verificador |
+| F5 | Verificación F5 | anexo en `informe_mtNN.md` | Verificador → expediente |
 | F6 | Prompt/respuesta de auditoría de código | `prompt_auditoria_rondaN.md` / `respuesta_auditoria_rondaN.md` | Sintetizador ↔ Auditor |
 | F7 | Evidencia de cierre | `evidencia_mtNN.md` | Arquitecto → Director |
+| **cualquiera** | **Solicitud de Recalibración (§3.2)** | `solicitud_recalibracion_mtNN.md` | quien la detecta → Director (G0′) |
 
 ### 4.1 Paquete de Especificación (`spec_mtNN.md`) — contrato Especificador → Ingeniero
 
-**Autocontenido:** el Ingeniero arranca en conversación/contexto nuevo y no
-puede depender de nada que no esté en la spec o en el repo. Secciones
+**Autocontenido:** el Ingeniero arranca en contexto nuevo y no puede
+depender de nada que no esté en la spec o en el repo. Secciones
 obligatorias:
 
 1. **Objetivo** (1–3 líneas), micro-tarea del checklist a la que responde y
    **complejidad asignada** (determina el modelo Ingeniero, §2).
 2. **Contexto mínimo verificado**: rutas exactas, extractos literales del
-   código actual relevante, decisiones del diseño aprobado que aplican
-   (citando el dictamen del expediente).
-3. **Contrato**: firmas, campos, tipos, rutas de API/colecciones — lo que el
-   código DEBE exponer. Cambios de datos citan `schemas/firestore_schema.md`
-   ya actualizado (regla de schema centralizado: el schema se toca en
-   F1/F3, nunca lo decide el Ingeniero).
-4. **Restricciones**: qué NO tocar, límites (p. ej. anti-bucle, presupuesto
-   de tokens, "sin dependencias nuevas").
+   código actual, decisiones del diseño aprobado que aplican.
+3. **Contrato**: firmas, campos, tipos, rutas de API/colecciones. Cambios de
+   datos citan `schemas/firestore_schema.md` ya actualizado (el schema se
+   toca en F1/F3, nunca lo decide el Ingeniero).
+4. **Restricciones**: qué NO tocar, límites (anti-bucle, presupuesto de
+   tokens, "sin dependencias nuevas").
 5. **DoD ejecutable**: comandos/observaciones EXACTOS que demuestran que
    está terminada (estado final observable, jamás "corrió sin errores").
-   Incluye la prueba A/B si la micro-tarea protege un fix.
+   Incluye la prueba A/B si protege un fix, y **la Parada de Observación
+   que le corresponda** (§3.1).
 6. **Protocolo de dudas**: "si algo es ambiguo, DETENTE y devuelve la duda
    en el Informe; implementar sobre un supuesto no declarado invalida la
-   entrega." Una duda devuelta **reabre F3 (ronda nueva de spec, F3')**:
-   el Director NO media con respuestas puntuales fuera de artefactos —
-   inyectaría decisiones de diseño invisibles para F5/F6.
-7. **AVISO de traspaso** (§5).
+   entrega." Una duda reabre **F3′**: el Director NO media con respuestas
+   puntuales fuera de artefactos.
+7. **Glosa pedagógica inline** (§4.3) — obligatoria, distribuida por el
+   documento, no como apéndice.
+8. **AVISO de traspaso** (§5).
 
-### 4.2 Informe de Implementación (`informe_mtNN.md`) — contrato Ingeniero → Sintetizador
+### 4.2 Informe de Implementación (`informe_mtNN.md`) — contrato Ingeniero → Verificador
 
 1. **Qué se hizo**: archivos tocados/creados con resumen por archivo.
 2. **Diff literal**: bloque con el output ÍNTEGRO de `git diff` +
-   `git status`, sin edición manual. Este bloque viaja TAL CUAL al prompt
-   de auditoría de F6 — nadie elige qué archivos ve el Auditor. Sin diff,
-   el informe es INVÁLIDO.
+   `git status`, sin edición manual. Viaja TAL CUAL al prompt de F6. Sin
+   diff, el informe es INVÁLIDO.
 3. **Evidencia literal**: salida REAL de cada comando del DoD (copiada, no
    resumida). Sin evidencia literal, el informe es INVÁLIDO.
 4. **Desviaciones**: cualquier diferencia respecto a la spec, con razón.
    Desviación no declarada detectada en F5 = entrega rechazada.
-5. **Dudas del Ingeniero**: puntos de menor certeza (alimentan el prompt de
-   auditoría de F6).
-6. **Estado commiteable**: confirmación de que todo queda verde, nada a
-   medias.
-7. **AVISO de traspaso** (§5).
+5. **Dudas del Ingeniero**: puntos de menor certeza (alimentan F6).
+6. **Estado commiteable**: confirmación de que todo queda verde.
+7. **Glosa pedagógica inline** (§4.3) — al menos en el resumen y en las
+   dudas, que es lo que el Director lee.
+8. **AVISO de traspaso** (§5).
+
+### 4.3 Regla de Glosa Pedagógica Inline (nueva en v2.6)
+
+**Todo término técnico complejo que aparezca en una spec o en un informe
+lleva su analogía en lenguaje ordinario, en el sitio donde aparece.**
+
+Cómo se aplica:
+
+- **Inline, no en glosario.** La analogía va entre paréntesis o en la frase
+  siguiente, donde el término se usa. Un glosario al final no se lee.
+- **Una vez por documento.** Se glosa la primera aparición; repetirlo en
+  cada línea es ruido.
+- **Analogía, no definición.** "Fail-closed (como un torniquete que se
+  bloquea si se va la luz, en vez de quedarse abierto)" enseña; "fail-closed
+  significa que ante el fallo se deniega" no añade nada para quien no sabe
+  qué es.
+- **La escribe quien produce el artefacto** — Especificador en F3, Ingeniero
+  en F4, Arquitecto en F0/F1. **No** el Asesor: así el Director tiene
+  siempre dos fuentes independientes con las que contrastar (§1.1).
+
+**Reducción de la decisión al eje reversibilidad × impacto.** Todo punto en
+que un artefacto pida una decisión al Director debe presentarla en estos dos
+términos, y solo en estos dos:
+
+| | **Impacto bajo** | **Impacto alto** |
+|---|---|---|
+| **Reversible** | decide quien lo esté haciendo; se informa al Director | el Director decide; error asumible |
+| **Irreversible** | el Director decide, con la alternativa descrita | **el Director decide con el expediente delante**; es donde conviene convocar al Asesor (§1.1) |
+
+- **Reversibilidad:** ¿cuánto cuesta deshacerlo? (un commit revertido, una
+  migración de datos, una decisión de arquitectura que arrastra tres MTs).
+- **Impacto de negocio:** ¿a quién afecta si sale mal? (a nadie hasta el
+  próximo ciclo, a un usuario en una sesión, a todas las actas guardadas).
+
+Prohibido pedir al Director una decisión formulada en términos puramente
+técnicos ("¿usamos allowlist o denylist?") sin traducirla a este eje
+("¿preferimos que ante un error el sistema bloquee y moleste, o que deje
+pasar y quizá borre trabajo? Lo primero es reversible; lo segundo no").
 
 ---
 
@@ -276,18 +445,19 @@ Director pueda rotar la información **sin leer el artefacto completo**:
 
 ```
 ━━ AVISO DE TRASPASO ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CICLO      : {expediente, p. ej. 2026-08-06_metodologia_v25}
+CICLO      : {expediente, p. ej. 2026-08-09_metodologia_v26}
 FASE       : {F0..F7} — {nombre}
 TURNO DE   : {Director | Arquitecto | Especificador | Ingeniero |
-              Sintetizador | Auditor}
+              Verificador | Sintetizador | Auditor}
 MODELO     : {Fable 5 | Sonnet 5 (effort high) | Haiku 4.5 |
               Gemini 3.1 Pro High | Gemini Flash} — según §2
 ENTREGAR   : {ruta(s) exacta(s) del artefacto a transportar}
 ADJUNTOS   : {lista exacta de archivos del repo / git diff que
               viajan CON el artefacto, o "Ninguno"}
-DESTINO    : {dónde pegarlo/adjuntarlo: chat nuevo de Gemini /
-              sesión del modelo indicado}
+DESTINO    : {dónde pegarlo/adjuntarlo}
 ACCIÓN     : {qué debe hacer quien recibe, en 1 línea}
+OBSERVABLE : {qué podrá ver o tocar el Director tras esta fase, o
+              "Ninguno en esta fase" — §3.1}
 VUELVE A   : {rol que recibe el resultado} con {qué archivo se
               archiva y con qué nombre}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -296,15 +466,14 @@ VUELVE A   : {rol que recibe el resultado} con {qué archivo se
 Reglas del AVISO:
 - **Un artefacto sin AVISO no cierra fase.**
 - **`ADJUNTOS` es exhaustivo**: lo listado es obligatorio transportarlo; lo
-  no listado no se adjunta. Es lo único que el Director necesita leer para
-  rotar sin abrir el artefacto.
-- **`MODELO` es vinculante** (nuevo en v2.5): indica al Director qué modelo
-  y configuración abrir para la fase siguiente, según la matriz §2.
+  no listado no se adjunta.
+- **`MODELO` es vinculante**: indica qué modelo y configuración abrir para
+  la fase siguiente, según §2.
+- **`OBSERVABLE` es nuevo en v2.6**: dice al Director si esta fase le deja
+  algo que ver. Evita que llegue a G2 sin haber tocado nada.
 - Cada rol **verifica que el artefacto recibido le corresponde** (campo
-  `TURNO DE`). Si un rol recibe un artefacto ajeno (p. ej. el Ingeniero
-  recibe un prompt de auditoría), lo rechaza con una línea y sin ejecutarlo.
-  Este rechazo solo puede operar si la sesión fue inicializada con su rol
-  (ver Inicialización de identidad, §6).
+  `TURNO DE`) y rechaza los ajenos con una línea, sin ejecutarlos. Este
+  rechazo solo opera si la sesión fue inicializada con su rol (§6).
 - En Modo M el `DESTINO` es una instrucción de operación para el Director;
   en Modo A es la llamada que hace el orquestador.
 
@@ -315,105 +484,103 @@ Reglas del AVISO:
 ### Modo M — Manual (DEFAULT)
 
 El Director transporta cada artefacto entre las IAs:
-- **Arquitecto**: sesión de Claude Code con Fable 5 (este repo),
-  `effort: low/medium`.
+- **Arquitecto**: sesión de Claude Code con Fable 5, `effort: low/medium`.
 - **Especificador**: sesión de Claude Sonnet 5 (`effort: high`) —
-  conversación nueva por meta, recibe el diseño aprobado + repo.
-- **Ingeniero**: sesión nueva del modelo que fije la matriz §2 (Sonnet 5 o
-  Haiku 4.5) por micro-tarea; recibe SOLO el Paquete de Especificación
-  (+ repo). Práctica consolidada: **rotación asistida** — el Arquitecto
-  lanza al Ingeniero como subagente con contexto limpio y la spec
-  archivada, manteniendo el aislamiento de contexto sin toil de copiado.
-- **Sintetizador**: sesión/subagente Haiku 4.5 por verificación.
-- **Auditor**: conversación NUEVA de Gemini por ronda (Pro High o Flash
-  según §2), sin herencia de hilo.
+  conversación nueva por meta.
+- **Ingeniero**: sesión nueva del modelo que fije §2 por micro-tarea; recibe
+  SOLO el Paquete de Especificación (+ repo). Práctica consolidada:
+  **rotación asistida** — el Arquitecto lanza al Ingeniero como subagente
+  con contexto limpio y la spec archivada.
+- **Verificador / Sintetizador**: sesión o subagente según §2.
+- **Auditor**: conversación NUEVA de Gemini por ronda, sin herencia de hilo.
+- **Asesor** (§1.1): conversación propia en Antigravity, **separada de la
+  del Auditor**, convocada por el Director en los gates.
 
 **Inicialización de identidad (obligatoria):** toda sesión nueva de
-Especificador, Ingeniero, Sintetizador o Auditor arranca con un prompt de
-rol de una línea ANTES del primer artefacto, p. ej.:
+Especificador, Ingeniero, Verificador, Sintetizador o Auditor arranca con un
+prompt de rol de una línea ANTES del primer artefacto:
 
-> "Rol: {Especificador | Ingeniero | Sintetizador | Auditor} del ciclo
-> {expediente}, metodología v2.5 del ecosistema Express. Confirma recepción
-> sin accionar; acepta únicamente artefactos cuyo campo TURNO DE diga
-> {rol}."
+> "Rol: {Especificador | Ingeniero | Verificador | Sintetizador | Auditor}
+> del ciclo {expediente}, metodología v2.6 del ecosistema Express. Confirma
+> recepción sin accionar; acepta únicamente artefactos cuyo campo TURNO DE
+> diga {rol}."
 
 Sin esta inicialización, la regla de rechazo de artefactos ajenos (§5) no
-tiene base para operar: un modelo en contexto cero no sabe qué rol funge.
+tiene base para operar.
 
 **Working tree limpio:** F4 arranca sobre la rama base sin cambios sin
-commitear de otras micro-tareas — la conversación nueva aísla el contexto,
-no el sistema de archivos. Una MT en vuelo a la vez por componente
-(serialización estricta).
+commitear de otras micro-tareas. Una MT en vuelo a la vez por componente.
 
 Costo asumido: toil humano de rotación (mitigado por la rotación asistida).
-Beneficio: el Director ve pasar todos los artefactos (supervisión total) y
-cada IA queda aislada de verdad.
+Beneficio: el Director ve pasar todos los artefactos y cada IA queda
+aislada de verdad.
 
 ### Modo A — Automatizado (variante propuesta, NO habilitada; requiere ciclo propio)
 
 El Arquitecto orquesta desde Claude Code: lanza Especificador, Ingeniero y
-Sintetizador como subagentes (contexto limpio, reciben solo su artefacto) y
-llama al Auditor **vía API de Gemini**. El humano interviene únicamente en
-los gates G0, G1 y G2.
+Verificador como subagentes y llama al Auditor vía API. El humano interviene
+únicamente en los gates.
 
 **Salvaguardas mínimas si algún día se habilita** (condición necesaria, no
-suficiente — exige su propio ciclo de diseño):
+suficiente):
 1. Todo prompt enviado y toda respuesta recibida se archivan **literales**
    en el expediente ANTES de que el orquestador los procese.
 2. El Director hace spot-check de al menos 1 traspaso por ciclo.
-3. Los gates G0/G1/G2 siguen siendo humanos y bloqueantes.
-4. La regla anti-bucle aplica al orquestador: 2 rondas automatizadas sin
-   converger → STOP y reporte al Director.
+3. Los gates G0/G0′/G1/G2 siguen siendo humanos y bloqueantes.
+4. La regla anti-bucle aplica al orquestador: 2 rondas sin converger → STOP.
+5. **Nuevo en v2.6:** las Paradas de Observación (§3.1) son **bloqueantes
+   también en Modo A**. Un ciclo autónomo no puede saltárselas: se detiene y
+   espera al Director.
 
-Pendiente de: gobernanza del tier de Gemini (privacidad; hoy tier gratuito
-en `gen-lang-client-0046942155`) + ciclo de diseño propio.
+Pendiente de: gobernanza del tier de Gemini (privacidad) + ciclo de diseño
+propio. La infraestructura del orquestador vive en el repositorio
+**NexoOrchestrator** desde el 09-08-2026.
 
 ---
 
-## 7. Estrategia de optimización de tokens (nueva en v2.5)
+## 7. Estrategia de optimización de tokens
 
-La v2.5 existe para gastar la inteligencia donde rinde y ahorrarla donde no.
-Dos palancas:
+Gastar la inteligencia donde rinde y ahorrarla donde no. Dos palancas:
 
 ### 7.1 Prompt Caching (obligatorio para contexto base)
 
-Los archivos de contexto base que viajan repetidamente entre fases y
-sesiones (`ECOSISTEMA_VISION.md`, `schemas/firestore_schema.md`, esta
-metodología, el diseño aprobado del ciclo) se tratan como **bloques
-cacheables**:
+Los archivos de contexto base que viajan repetidamente
+(`ECOSISTEMA_VISION.md`, `schemas/firestore_schema.md`, esta metodología, el
+diseño aprobado del ciclo) se tratan como **bloques cacheables**:
 
 - **Vía API / subagentes / Modo A:** marcar los bloques repetitivos con
-  `cache_control: {"type": "ephemeral"}` al final del bloque estable del
-  prompt. El contexto base va PRIMERO y el contenido volátil (artefacto de
-  la fase, pregunta concreta) va DESPUÉS — un solo byte cambiado invalida
-  la caché de todo lo que le sigue.
+  `cache_control: {"type": "ephemeral"}`. El contexto base va PRIMERO y el
+  contenido volátil DESPUÉS — un solo byte cambiado invalida la caché de
+  todo lo que le sigue.
 - **En sesiones de Claude Code / chat:** la caché es automática, pero la
-  disciplina es la misma: contexto estable al inicio de la sesión, de una
-  vez y sin re-pegarlo después; los artefactos volátiles se referencian
-  por ruta del repo, no incrustados de nuevo.
-- Regla práctica: si un bloque va a viajar ≥2 veces en el ciclo, es
-  candidato a caché; si se incrusta dos veces a mano, es un defecto de
-  operación.
+  disciplina es la misma: contexto estable al inicio, artefactos volátiles
+  referenciados por ruta, nunca re-pegados.
+- Regla práctica: si un bloque va a viajar ≥2 veces, es candidato a caché;
+  si se incrusta dos veces a mano, es un defecto de operación.
 
 ### 7.2 Calibración del parámetro `effort`
 
-`effort` controla cuánto razonamiento interno gasta el modelo antes de
-responder. Se calibra **por la irreversibilidad de la decisión, no por el
-largo del documento**:
+Se calibra **por la irreversibilidad de la decisión, no por el largo del
+documento**:
 
 | Configuración | Cuándo | Por qué |
 |---|---|---|
-| Fable `effort: low` | F0 rutinario, clasificación de complejidad, arbitrajes simples | La inteligencia base de Fable basta; pagar razonamiento extra es sobre-gasto. |
+| Fable `effort: low` | F0 rutinario, clasificación de complejidad, arbitrajes simples | La inteligencia base basta; pagar razonamiento extra es sobre-gasto. |
 | Fable `effort: medium` | F1 con decisiones de arquitectura o schema nuevas | Decisión irreversible y cara de corregir aguas abajo. |
-| Sonnet `effort: high` | F3 (siempre), F5 en Alta y refutaciones de BUG (§2.1) | La spec es el contrato del que depende todo F4–F6; la F5 de Alta exige juicio semántico; un supuesto malo aquí cuesta un ciclo entero. |
+| Sonnet `effort: high` | F3 (siempre), F5 en Alta y refutaciones de BUG (§2.1) | La spec es el contrato del que depende todo F4–F6. |
 | Sonnet estándar | F4 complejo | Implementar contra una spec buena no exige razonamiento máximo. |
-| Haiku (`thinking: enabled` si aplica) | F4 Baja, F5 Media/Baja, empaquetado F6 | Trabajo determinista y mecánico; thinking solo si la tarea tiene pasos encadenados. |
+| Haiku (`thinking: enabled` si aplica) | F4 Baja, F5 Media/Baja, empaquetado F6 | Trabajo determinista y mecánico. |
 
 Anti-patrones de gasto (prohibidos): Fable redactando specs detalladas o
-implementando (eso es de Sonnet/Haiku); Sonnet `effort: high` para typos o
-CSS; re-pegar contexto ya cacheado; rondas 2+ de verificación de fixes con
-Pro High cuando Flash basta (ojo: la Ronda 1 de F6 es SIEMPRE Pro High
-salvo en Baja — abaratarla no es optimización, es hueco de auditoría).
+implementando; Sonnet `effort: high` para typos o CSS; re-pegar contexto ya
+cacheado; rondas 2+ con Pro High cuando Flash basta (la Ronda 1 de F6 es
+SIEMPRE Pro High salvo en Baja — abaratarla no es optimización, es hueco de
+auditoría).
+
+**Nota v2.6 sobre el coste de la glosa (§4.3):** añadir analogías encarece
+las specs de forma marginal y **no** justifica bajar el `effort` de F3. Una
+spec entendible que el Director puede cuestionar previene ciclos enteros;
+esa es la comparación correcta, no los tokens de unos paréntesis.
 
 ---
 
@@ -424,49 +591,55 @@ salvo en Baja — abaratarla no es optimización, es hueco de auditoría).
   tandas ≤5 para auditoría, 1–3 micro-ciclos por sesión.
 - **Evidencia**: estado final observable con salida literal (jamás "corrió
   sin errores"), prueba A/B para todo test que proteja un fix, dudas
-  declaradas, schema centralizado primero (`schemas/firestore_schema.md`
-  se actualiza en F1/F3, nunca lo decide el Ingeniero).
-- **Anti-bluff** a toda respuesta del Auditor (checklist de la skill
-  `auditor_externo`): citas verificadas con grep/ejecución; sin citas =
-  INVÁLIDA con frase de devolución; BUG confirmado = ronda nueva; BUG
-  refutado solo con evidencia archivo:línea de Fable/Sonnet (§2.1).
-- **Anti-bucle**: 2 intentos del mismo fix fallando → STOP y reporte.
-  Sospecha de bucle/alucinación en cualquiera de las IAs → el Director
-  invoca `depurador_agentes`.
+  declaradas, schema centralizado primero.
+- **Anti-bluff** a toda respuesta del Auditor (skill `auditor_externo`):
+  citas verificadas con grep/ejecución; sin citas = INVÁLIDA; BUG confirmado
+  = ronda nueva; BUG refutado solo con evidencia archivo:línea de
+  Fable/Sonnet (§2.1).
+- **Anti-bucle**: 2 intentos del mismo fix fallando → STOP y reporte. Dos
+  recalibraciones sobre la misma MT (§3.2) → STOP. Sospecha de bucle o
+  alucinación en cualquiera de las IAs → `depurador_agentes`.
 - **Nada se commitea sin aprobación explícita del Director** (gate G2).
 - **Fidelidad a la spec**: el Ingeniero no redefine contrato, alcance ni
-  DoD. Toda desviación se declara en el Informe; una desviación no
-  declarada invalida la entrega.
-- **Duda = pregunta**: ambigüedad en la spec se devuelve como duda, nunca
-  se resuelve con un supuesto silencioso. Una duda reabre F3'.
-- **Verificación F5 obligatoria y al 100%** (sin muestreo): los comandos
-  del DoD se EJECUTAN sobre el código real antes de generar el prompt de
-  auditoría. Leer el informe no es verificar. El informe del Ingeniero
-  nunca se reenvía al Auditor como evidencia — al Auditor llegan claims +
-  el git diff ÍNTEGRO + código fuente, jamás prosa del implementador.
-- **Diff sin filtrar**: el bloque `git diff` literal del Informe de
-  Implementación se incrusta completo en el prompt de auditoría de F6. El
-  Auditor rechaza como INVÁLIDO todo prompt de auditoría de código sin
-  diff estructurado.
-- **AVISO de traspaso obligatorio** al cierre de todo artefacto (§5), con
-  campos `ADJUNTOS` exhaustivo y `MODELO` vinculante.
-- **Inicialización de identidad** en toda sesión nueva de rol (§6) —
-  prerrequisito del rechazo de artefactos ajenos.
-- **Working tree limpio antes de F4** y una MT en vuelo por componente (§6).
-- **Escalada por artefacto, nunca inline** (§2.1): ningún rol resuelve en
-  silencio lo que excede su capacidad o mandato.
+  DoD. Toda desviación se declara; una desviación no declarada invalida la
+  entrega.
+- **Duda = pregunta**: ambigüedad en la spec se devuelve como duda, nunca se
+  resuelve con un supuesto silencioso. Una duda reabre F3′.
+- **Verificación F5 obligatoria y al 100%** (sin muestreo): los comandos del
+  DoD se EJECUTAN sobre el código real antes de generar el prompt de
+  auditoría. Leer el informe no es verificar. Al Auditor llegan claims + el
+  git diff ÍNTEGRO + código fuente, jamás prosa del implementador.
+- **Diff sin filtrar**: el bloque `git diff` literal del Informe se incrusta
+  completo en el prompt de F6.
+- **AVISO de traspaso obligatorio** (§5), con `ADJUNTOS` exhaustivo,
+  `MODELO` vinculante y `OBSERVABLE` declarado.
+- **Inicialización de identidad** en toda sesión nueva de rol (§6).
+- **Working tree limpio antes de F4** y una MT en vuelo por componente.
+- **Escalada por artefacto, nunca inline** (§2.1).
+- **Parada de Observación declarada o exención ratificada** (§3.1): una meta
+  con UI, datos o indicadores que llega a G0 sin evidencia observable
+  predeclarada **no pasa el gate**.
+- **Recalibración por artefacto** (§3.2): cambiar la evidencia observable
+  exige Solicitud de Recalibración y Mini-Gate G0′. Cambiarla sobre la
+  marcha es deriva de alcance y invalida la entrega.
+- **Glosa pedagógica inline** (§4.3) en specs e informes, y toda decisión
+  pedida al Director formulada en el eje reversibilidad × impacto.
+- **El Asesor no decide** (§1.1): no vota, no produce artefactos del
+  expediente, no comparte conversación con el Auditor, y toda resolución de
+  gate se registra con la razón del Director.
 
 ---
 
-## 9. Mapa de skills en el ciclo v2.5
+## 9. Mapa de skills en el ciclo v2.6
 
-| Momento | Skill | Nota v2.5 |
+| Momento | Skill | Nota v2.6 |
 |---|---|---|
-| F0 (descomponer/priorizar/clasificar) | `roadmap_manager` | añade la clasificación de complejidad (§2) al checklist |
-| F1, F2, F6 (prompts + anti-bluff) | `auditor_externo` | F1 la ejecuta el Arquitecto; el empaquetado F6 lo ejecuta el Sintetizador con la misma plantilla; anti-bluff formal Haiku, refutaciones Fable/Sonnet |
-| Cierre de sesión | `documentador_sesion` | sin cambio |
+| F0 (descomponer/priorizar/clasificar) | `roadmap_manager` | añade la clasificación de complejidad (§2) **y la Parada de Observación (§3.1)** al checklist |
+| F1, F2, F6 (prompts + anti-bluff) | `auditor_externo` | F1 la ejecuta el Arquitecto; el empaquetado F6 lo ejecuta el Sintetizador; anti-bluff formal Haiku, refutaciones Fable/Sonnet. **El Asesor no interviene aquí.** |
+| Gates G0/G0′/G1/G2 | — (Asesor, §1.1) | conversación aparte en Antigravity; explica, no decide |
+| Cierre de sesión | `documentador_sesion` | registra la resolución de las Paradas de Observación y de las recalibraciones |
 | Fuera de plan | `innovador` | sin cambio |
-| IA en bucle | `depurador_agentes` | cubre a TODAS las IAs del ciclo (ya lo hace por diseño) |
+| IA en bucle | `depurador_agentes` | cubre a TODAS las IAs del ciclo |
 | Cambios de datos | `arquitecto_firebase` | el schema se toca en F1/F3, nunca en F4 |
 | Paridad Web/Android | `auditor_paridad` | sin cambio |
 
@@ -475,22 +648,33 @@ salvo en Baja — abaratarla no es optimización, es hueco de auditoría).
 ## 10. Adopción
 
 1. ✅ **v2 adoptada el 09-07-2026** (auditada por Gemini: APROBADO CON
-   CAMBIOS r1, 5 cambios incorporados; expediente
-   `auditorias/2026-07-08_metodologia_v2/`) y probada en **siete ciclos
-   completos** (MT-04 piloto → selector de micrófono, cierre 04-08-2026).
-2. ✅ **v2.5 Optimizada adoptada el 06-08-2026** por orden directa del
-   Director: reasignación de roles por modelo/parámetros (§1), matriz de
-   complejidad (§2), estrategia de tokens (§7) y **eliminación de toda
-   metodología heredada** — la limpieza documental se ejecutó el mismo día
-   (metodología heredada borrada del repo; prompt de arranque, skills,
-   README y estado actualizados; cero referencias operativas huérfanas).
+   CAMBIOS r1; expediente `auditorias/2026-07-08_metodologia_v2/`) y probada
+   en **siete ciclos completos**.
+2. ✅ **v2.5 Optimizada adoptada el 06-08-2026**: reasignación de roles por
+   modelo/parámetros (§1), matriz de complejidad (§2), estrategia de tokens
+   (§7) y eliminación de toda metodología heredada.
 3. ✅ **Ajustes del Director al conceder G2 (06-08-2026):** (a) F5 de
-   complejidad Alta la ejecuta Sonnet 5 `effort: high` — el precedente del
-   bug de diseño contra Radix (F5 del ciclo basurero) motivó no delegar el
-   juicio semántico a Haiku; (b) la Ronda 1 de F6 usa SIEMPRE Gemini 3.1
-   Pro High, Flash solo rondas 2+ o Baja.
-4. **Primer ciclo bajo v2.5:** el próximo G0 de la fila del Director
-   (acta persistente → página de Configuración → billing/Vertex). Retro en
-   bitácora al cierre: si la matriz de complejidad clasificó bien, si F5
-   con Haiku en Media/Baja sostiene el nivel, y si el ahorro de tokens es
-   medible.
+   complejidad Alta la ejecuta Sonnet 5 `effort: high`; (b) la Ronda 1 de F6
+   usa SIEMPRE Gemini 3.1 Pro High.
+4. ✅ **v2.6 adoptada el 09-08-2026** por orden directa del Director:
+   Asesor Estratégico (§1.1), Glosa Pedagógica Inline (§4.3), Paradas de
+   Observación (§3.1) y Protocolo de Recalibración Dinámica (§3.2). La
+   maquinaria de v2/v2.5 se conserva íntegra.
+5. **Evidencia empírica que motivó la v2.6** — el ciclo
+   `2026-08-06_docker_orchestrator` (MT-D2, núcleo de ejecución del
+   orquestador; expediente hoy en el repositorio **NexoOrchestrator**)
+   recorrió **seis rondas de corrección y seis de verificación** más una
+   auditoría externa que devolvió RECHAZADO. Encontró defectos reales cada
+   vez, lo que valida el ciclo. Pero también dejó dos lecciones que la v2.6
+   recoge:
+   - **Ningún defecto serio lo encontró quien escribió el código**, y varios
+     fueron fallos de diseño del propio Arquitecto — incluida una
+     **retractación firmada** sobre un vector declarado cerrado sin estarlo.
+     El valor está en la separación de roles, no en la habilidad de un nodo.
+   - El Director aprobó gates sobre artefactos que no podía verificar por sí
+     mismo, y una micro-tarea de infraestructura pura no le dejó **nada que
+     ver** en seis rondas. De ahí §1.1, §3.1 y §4.3.
+6. **Primer ciclo bajo v2.6:** el próximo G0 de la fila del Director. Retro
+   en bitácora al cierre: si la Parada de Observación se predeclaró bien, si
+   la glosa hizo que el Director cuestionara algo que antes habría aprobado
+   sin más, y si el Asesor aportó criterio o solo comodidad.
