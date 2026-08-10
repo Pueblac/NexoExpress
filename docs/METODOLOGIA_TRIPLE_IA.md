@@ -34,6 +34,13 @@
 > también que un Director que no lee `executor.py` línea a línea acaba
 > aprobando por confianza en vez de por criterio. Un gate humano que se
 > concede sin entender lo que se concede es un trámite, no un control.
+>
+> **Sustitución de modelo vigente desde el 10-08-2026** (mecanismo del §2,
+> "Indisponibilidad de un modelo" — no es una versión nueva de la
+> metodología): Anthropic cambió las condiciones de acceso a **Fable 5**,
+> así que el Arquitecto Macro pasa a **Opus 5**. El Director no se limitó a
+> un reemplazo 1:1 y escaló también los roles de mayor juicio del ciclo;
+> detalle completo y justificación en §10, punto 7.
 
 ---
 
@@ -43,9 +50,9 @@
 |---|---|---|---|---|
 | **Director / Auditor Técnico** | Pueblac (humano) | — | Gates G0, G0′, G1, G2 | Define la visión y prioridades, autoriza los gates, **rota los artefactos entre modelos** (Modo M), arbitra conflictos y da la aprobación FINAL. Nada se commitea sin su visto bueno. |
 | **Asesor Estratégico del Director** | **Gemini 3.6 Flash** (en Antigravity) | Conversación propia, separada de la del Auditor | **Gates G0, G0′, G1, G2** (a demanda del Director) | Traductor pedagógico y copiloto. Explica al Director qué está aprobando, en lenguaje ordinario, y le devuelve la decisión reducida al eje **reversibilidad × impacto**. **No decide, no vota, no produce artefactos del expediente.** Ver §1.1. |
-| **Arquitecto Macro / Estratega** | Claude **Fable 5** | `effort: low` o `medium` | **F0 y F1** | Planificación macro, descomposición en micro-tareas con DoD, diseño conceptual, clasificación de complejidad (§2) y **predeclaración de las Paradas de Observación** (§3.1). Entregables **breves de alta inteligencia**: decide mucho, escribe poco. Custodia de expedientes y del checklist. |
-| **Especificador y Diseñador Técnico** | Claude **Sonnet 5** | `effort: high` | **F3; F5 en Alta** | Redacción del **Paquete de Especificación** (`spec_mtNN.md`): contratos, schemas aplicados, extractos verificados, **glosa pedagógica inline** (§4.3). En complejidad **Alta** ejecuta además la verificación F5. |
-| **Ingeniero Adaptativo** | Claude **Sonnet 5** o Claude **Haiku 4.5** | Sonnet: estándar. Haiku: `thinking: enabled` si aplica | **F4** | Implementación FIEL a la spec. **Sonnet 5** para tareas complejas o refactorizaciones pesadas; **Haiku 4.5** para micro-tareas, UI fixes, typos, scripts simples o tests unitarios. Lo fija la matriz §2 en G0. |
+| **Arquitecto Macro / Estratega** | Claude **Opus 5** | `effort: low` o `medium` | **F0 y F1** | Planificación macro, descomposición en micro-tareas con DoD, diseño conceptual, clasificación de complejidad (§2) y **predeclaración de las Paradas de Observación** (§3.1). Entregables **breves de alta inteligencia**: decide mucho, escribe poco. Custodia de expedientes y del checklist. |
+| **Especificador y Diseñador Técnico** | Claude **Opus 5** (Alta) o Claude **Sonnet 5** (Media/Baja) | `effort: high` | **F3; F5 en Alta** | Redacción del **Paquete de Especificación** (`spec_mtNN.md`): contratos, schemas aplicados, extractos verificados, **glosa pedagógica inline** (§4.3). En complejidad **Alta**, el mismo rol (Opus) ejecuta además la verificación F5 — juicio semántico sobre el código real. |
+| **Ingeniero** | Claude **Sonnet 5** | Estándar | **F4, toda complejidad** | Implementación FIEL a la spec. Desde el 10-08 es un rol único, sin split por complejidad (antes Sonnet/Haiku según §2) — ver §10.7. |
 | **Sintetizador y Anti-Bluff Interno** | Claude **Haiku 4.5** | Estándar | **F5 (Media/Baja) y preparación de F6** | Re-ejecución determinista del DoD sobre el código real, parseo del `git diff` literal, verificación formal de citas y **empaquetado del prompt de auditoría** para Gemini. No emite juicios de diseño: ante ambigüedad, ESCALA (§2.1). |
 | **Auditor Externo Adversarial** | **Gemini 3.1 Pro High** o **Gemini Flash** | Conversación NUEVA (contexto cero) | **F2 y F6** | Auditoría adversarial del DISEÑO antes del código y del CÓDIGO después, bajo contrato de citas, trazas y trampas. **Pro High** para arquitectura, seguridad, core y SIEMPRE la Ronda 1 de F6; **Flash** solo rondas 2+ o complejidad Baja (§2). |
 | **Innovador** | Skill `innovador` | — | fuera de ciclo | Detecta mejoras fuera del plan. Propone, nunca implementa. |
@@ -99,16 +106,18 @@ Director.
 
 **Ninguna IA verifica su propio trabajo con autoridad final.**
 
-- El **Verificador de F5** (Sonnet 5 `effort: high` en Alta; el Sintetizador
+- El **Verificador de F5** (Opus 5 `effort: high` en Alta; el Sintetizador
   Haiku en Media/Baja) verifica al Ingeniero re-ejecutando el DoD sobre el
   código real. El **Sintetizador** verifica además formalmente al Auditor.
 - El **Auditor** (Gemini) valida al Arquitecto (F2) y al
   Ingeniero/Especificador (F6).
 - El **Ingeniero** no valida a nadie, pero su Informe declara dudas propias
   que dirigen la auditoría.
-- El **Arquitecto** (Fable) arbitra las escaladas técnicas (§2.1) y las
+- El **Arquitecto** (Opus) arbitra las escaladas técnicas (§2.1) y las
   refutaciones de BUGs: un BUG solo se refuta con evidencia archivo:línea
-  producida por Fable o Sonnet `effort: high`.
+  producida por Opus — el Arquitecto en F0/F1 o el mismo Opus en su rol de
+  Verificador de F5-Alta. El Ingeniero (Sonnet) no puede refutar hallazgos
+  sobre código que él mismo escribió (sigue siendo la regla de oro).
 - El **Director** arbitra todo conflicto y es el único que aprueba adopción
   de diseño y commits.
 - El **Asesor** (§1.1) **no forma parte del triángulo**: no verifica a
@@ -121,11 +130,14 @@ prompt de F6 — el empaquetador no elige qué archivos ve el Auditor, que
 rechaza como INVÁLIDO todo prompt sin diff estructurado. Complementos:
 artefactos archivados literales y spot-checks del Director.
 
-Trade-off aceptado (declarado desde v2.5): en complejidad Alta/Media el
-Especificador y el Ingeniero son el mismo modelo (Sonnet 5) en **sesiones
-separadas con contexto cero**. El aislamiento es de contexto, no de pesos;
-lo compensan el DoD determinista de F5 y la auditoría externa cross-vendor
-de F6.
+Trade-off heredado, parcialmente resuelto por la sustitución del 10-08
+(§10.7): en **Alta**, Especificador/Verificador (Opus) e Ingeniero (Sonnet)
+son ahora modelos distintos — el trade-off que v2.5 declaró y aceptó
+**desaparece para esa franja**. En **Media/Baja** persiste: el Especificador
+y el Ingeniero siguen siendo el mismo modelo (Sonnet 5) en **sesiones
+separadas con contexto cero**. El aislamiento sigue siendo de contexto, no
+de pesos; lo compensan el DoD determinista de F5 y la auditoría externa
+cross-vendor de F6.
 
 ---
 
@@ -138,16 +150,16 @@ superior.
 
 | Complejidad | Ejemplos | Spec (F3) | Impl (F4) | Verif (F5) | Audit (F2/F6) |
 |---|---|---|---|---|---|
-| **Alta** | Core, algoritmos RAG, schema Firestore, pipeline de IA | Sonnet 5 (`effort: high`) | **Sonnet 5** | **Sonnet 5** (`effort: high`) | **Gemini 3.1 Pro High** |
+| **Alta** | Core, algoritmos RAG, schema Firestore, pipeline de IA | **Opus 5** (`effort: high`) | **Sonnet 5** | **Opus 5** (`effort: high`) | **Gemini 3.1 Pro High** |
 | **Media** | UI features, handlers de API, integraciones | Sonnet 5 (`effort: high`) | **Sonnet 5** | Haiku 4.5 | F2: **Flash** · F6 r1: **Gemini 3.1 Pro High** · F6 r2+: **Flash** |
-| **Baja / Trivial** | CSS, fixes simples, docs, types | Sonnet 5 (`effort: high`) | **Haiku 4.5** | Haiku 4.5 | **Gemini Flash** |
+| **Baja / Trivial** | CSS, fixes simples, docs, types | Sonnet 5 (`effort: high`) | **Sonnet 5** | Haiku 4.5 | **Gemini Flash** |
 
 Notas de aplicación:
 
 - **Rondas de F6:** la Ronda 1 usa SIEMPRE **Gemini 3.1 Pro High**, incluso
   en Media — la primera mirada adversarial al código no se abarata.
   **Flash** solo para rondas 2+ o complejidad Baja.
-- **F0/F1 (Fable) aplican a toda meta**; la ronda de diseño F1→F2 es
+- **F0/F1 (Opus) aplican a toda meta**; la ronda de diseño F1→F2 es
   obligatoria en Alta y Media. En **Baja**, el Director puede autorizar en
   G0 colapsar F1/F2 — la MT pasa de G0 directo a F3; F5 y F6 siguen siendo
   obligatorias.
@@ -159,6 +171,7 @@ Notas de aplicación:
 - **Indisponibilidad de un modelo:** el Director decide la sustitución
   dentro de la tabla de roles. Si Gemini no está disponible, NO hay cierre
   de ciclo: la sesión corta en el artefacto pendiente. Se anota en bitácora.
+  (Precedente: la sustitución de Fable por Opus del 10-08-2026, §10.7.)
 - **Indisponibilidad del Asesor:** no bloquea nada. El gate se concede igual
   con el AVISO y la glosa pedagógica del propio artefacto (§4.3), que es lo
   que garantiza que el Director pueda decidir aunque el Asesor no esté.
@@ -166,20 +179,27 @@ Notas de aplicación:
 ### 2.1 Regla de escalada
 
 Ningún rol resuelve en silencio algo que excede su capacidad o su mandato.
-La cadena es **Haiku → Sonnet (`effort: high`) → Fable → Director**, siempre
-mediante artefacto, nunca por decisión inline:
+La cadena es **Haiku → Sonnet → Opus → Director**, siempre mediante
+artefacto, nunca por decisión inline — con una excepción: **Sonnet nunca
+resuelve ni refuta una ambigüedad o un BUG sobre una micro-tarea que él
+mismo implementó como Ingeniero.** Ahí la cadena salta directo a Opus,
+porque desde el 10-08 Sonnet es exclusivamente el Ingeniero, y el Ingeniero
+no verifica su propio trabajo con autoridad final (regla de oro, arriba).
 
-- **F5 en complejidad Alta la ejecuta Sonnet 5 (`effort: high`), no Haiku:**
-  el juicio semántico sobre el código real no se delega al Sintetizador.
-  Haiku mantiene F5 en Media y Baja, y conserva en TODA complejidad el
+- **F5 en complejidad Alta la ejecuta Opus 5 (`effort: high`), no Haiku ni
+  Sonnet:** el juicio semántico sobre el código real no se delega al
+  Sintetizador, y el Ingeniero no verifica lo que implementó. Haiku
+  mantiene F5 en Media y Baja, y conserva en TODA complejidad el
   empaquetado determinista de F6.
 - El **Sintetizador** que encuentra una discrepancia no determinista la
-  escala a Sonnet/Fable; jamás la aprueba ni la refuta solo.
-- El **Ingeniero Haiku** (F4 en Baja) que encuentra que la tarea era más
-  compleja de lo clasificado DETIENE y devuelve la MT para reclasificar
-  (reabre G0 de esa MT), no improvisa.
-- Una **refutación de BUG** exige evidencia archivo:línea de Fable o
-  Sonnet `effort: high`.
+  escala a Opus; jamás la aprueba ni la refuta solo.
+- El **Ingeniero** (F4, toda complejidad, siempre Sonnet desde el 10-08)
+  que encuentra que la tarea era más compleja de lo clasificado DETIENE y
+  devuelve la MT para reclasificar (reabre G0 de esa MT), no improvisa.
+- Una **refutación de BUG** exige evidencia archivo:línea de Opus — el
+  Arquitecto o el Verificador de F5-Alta — nunca de Sonnet, que en su
+  calidad de Ingeniero no puede refutar hallazgos sobre código que él mismo
+  escribió.
 - **Nuevo en v2.6:** cualquier rol que detecte que la **evidencia
   observable** predeclarada en F0 (§3.1) ya no se sostiene, DETIENE y abre
   una **Solicitud de Recalibración** (§3.2). No la sustituye por otra
@@ -193,7 +213,7 @@ Cada fase termina con **un artefacto de traspaso** archivado y un **AVISO**
 explícito (§5). Sin AVISO, la fase no está cerrada.
 
 ```
-F0. PLAN         Arquitecto (Fable, effort low/medium; + roadmap_manager)
+F0. PLAN         Arquitecto (Opus, effort low/medium; + roadmap_manager)
                  descompone la meta en micro-tareas con DoD, CLASIFICA la
                  complejidad de cada una (§2) y PREDECLARA la Parada de
                  Observación de la meta (§3.1) → checklist en
@@ -201,29 +221,31 @@ F0. PLAN         Arquitecto (Fable, effort low/medium; + roadmap_manager)
                  ── GATE G0: Director aprueba plan, prioridades,
                     clasificación de complejidad y la evidencia
                     observable que se le promete. ──
-F1. DISEÑO       Arquitecto (Fable) produce el diseño conceptual +
+F1. DISEÑO       Arquitecto (Opus) produce el diseño conceptual +
                  prompt de revisión de DISEÑO → expediente.
                  AVISO → Director → Auditor.
                  (En Baja, F1/F2 pueden colapsar por autorización de G0.)
 F2. VEREDICTO    Auditor (Gemini Pro High / Flash según §2) responde en
                  conversación nueva. Director archiva la respuesta literal.
                  Anti-bluff: verificación formal por el Sintetizador;
-                 disputas semánticas escalan a Fable (§2.1).
+                 disputas semánticas escalan a Opus (§2.1).
                  "APROBADO CON CAMBIOS" = incorporar los cambios.
                  "RECHAZADO" = rediseñar (volver a F1, ronda nueva).
                  ── GATE G1: Director adopta el veredicto. ──
-F3. SPEC         Especificador (Sonnet 5, effort high) redacta el Paquete
-                 de Especificación de cada micro-tarea (autocontenido, §4.1)
-                 CON glosa pedagógica inline (§4.3) → expediente.
+F3. SPEC         Especificador (Opus 5 en Alta / Sonnet 5 en Media-Baja,
+                 effort high) redacta el Paquete de Especificación de cada
+                 micro-tarea (autocontenido, §4.1) CON glosa pedagógica
+                 inline (§4.3) → expediente.
                  AVISO → Director → Ingeniero.
-F4. IMPLEMENTAR  Ingeniero (Sonnet 5 o Haiku 4.5 según §2) implementa FIEL
-                 a la spec, corre TODAS las verificaciones del DoD (+ prueba
-                 A/B cuando proteja un fix) y entrega Informe de
-                 Implementación con salida literal + dudas propias + glosa.
+F4. IMPLEMENTAR  Ingeniero (Sonnet 5, toda complejidad desde el 10-08)
+                 implementa FIEL a la spec, corre TODAS las verificaciones
+                 del DoD (+ prueba A/B cuando proteja un fix) y entrega
+                 Informe de Implementación con salida literal + dudas
+                 propias + glosa.
                  Si la evidencia observable predeclarada no se sostiene →
                  Solicitud de Recalibración (§3.2), no improvisación.
                  AVISO → Director → Verificador.
-F5. VERIFICAR    Verificador según §2 — Alta: Sonnet 5 (effort high), que
+F5. VERIFICAR    Verificador según §2 — Alta: Opus 5 (effort high), que
                  preserva el juicio SEMÁNTICO; Media/Baja: Sintetizador
                  (Haiku 4.5). Verifica SOBRE EL CÓDIGO REAL: EJECUTA los
                  comandos del DoD. Leer el informe NO es verificar.
@@ -244,8 +266,7 @@ F6. AUDITORÍA    Sintetizador (Haiku 4.5) empaqueta el prompt de auditoría
                  AVISO → Director → Auditor. RONDA 1: SIEMPRE Gemini 3.1
                  Pro High. Flash solo rondas 2+ o Baja.
                  Respuesta → anti-bluff (formal: Haiku; refutaciones:
-                 Fable/Sonnet, §2.1). BUG confirmado → F4 (fix) → ronda
-                 NUEVA.
+                 Opus, §2.1). BUG confirmado → F4 (fix) → ronda NUEVA.
 F7. CIERRE       Con APROBADO del Auditor Y aprobación del Director:
                  ── GATE G2: Director autoriza commit + push. ──
                  Mensaje referenciando el ciclo; bitácora y estado
@@ -449,7 +470,7 @@ CICLO      : {expediente, p. ej. 2026-08-09_metodologia_v26}
 FASE       : {F0..F7} — {nombre}
 TURNO DE   : {Director | Arquitecto | Especificador | Ingeniero |
               Verificador | Sintetizador | Auditor}
-MODELO     : {Fable 5 | Sonnet 5 (effort high) | Haiku 4.5 |
+MODELO     : {Opus 5 | Sonnet 5 | Haiku 4.5 |
               Gemini 3.1 Pro High | Gemini Flash} — según §2
 ENTREGAR   : {ruta(s) exacta(s) del artefacto a transportar}
 ADJUNTOS   : {lista exacta de archivos del repo / git diff que
@@ -484,13 +505,13 @@ Reglas del AVISO:
 ### Modo M — Manual (DEFAULT)
 
 El Director transporta cada artefacto entre las IAs:
-- **Arquitecto**: sesión de Claude Code con Fable 5, `effort: low/medium`.
-- **Especificador**: sesión de Claude Sonnet 5 (`effort: high`) —
-  conversación nueva por meta.
-- **Ingeniero**: sesión nueva del modelo que fije §2 por micro-tarea; recibe
-  SOLO el Paquete de Especificación (+ repo). Práctica consolidada:
-  **rotación asistida** — el Arquitecto lanza al Ingeniero como subagente
-  con contexto limpio y la spec archivada.
+- **Arquitecto**: sesión de Claude Code con Opus 5, `effort: low/medium`.
+- **Especificador**: sesión de Claude Opus 5 en Alta / Sonnet 5 en
+  Media-Baja (`effort: high`) — conversación nueva por meta.
+- **Ingeniero**: sesión nueva de Sonnet 5 (toda complejidad desde el
+  10-08); recibe SOLO el Paquete de Especificación (+ repo). Práctica
+  consolidada: **rotación asistida** — el Arquitecto lanza al Ingeniero
+  como subagente con contexto limpio y la spec archivada.
 - **Verificador / Sintetizador**: sesión o subagente según §2.
 - **Auditor**: conversación NUEVA de Gemini por ronda, sin herencia de hilo.
 - **Asesor** (§1.1): conversación propia en Antigravity, **separada de la
@@ -506,7 +527,10 @@ prompt de rol de una línea ANTES del primer artefacto:
 > diga {rol}."
 
 Sin esta inicialización, la regla de rechazo de artefactos ajenos (§5) no
-tiene base para operar.
+tiene base para operar. **Desde el 10-08 esta disciplina pesa más que
+antes**: en complejidad Alta, Opus ocupa Arquitecto, Especificador y
+Verificador — la inicialización de identidad es lo único que garantiza que
+cada una de esas sesiones arranque realmente en frío (§10.7).
 
 **Working tree limpio:** F4 arranca sobre la rama base sin cambios sin
 commitear de otras micro-tareas. Una MT en vuelo a la vez por componente.
@@ -565,17 +589,20 @@ documento**:
 
 | Configuración | Cuándo | Por qué |
 |---|---|---|
-| Fable `effort: low` | F0 rutinario, clasificación de complejidad, arbitrajes simples | La inteligencia base basta; pagar razonamiento extra es sobre-gasto. |
-| Fable `effort: medium` | F1 con decisiones de arquitectura o schema nuevas | Decisión irreversible y cara de corregir aguas abajo. |
-| Sonnet `effort: high` | F3 (siempre), F5 en Alta y refutaciones de BUG (§2.1) | La spec es el contrato del que depende todo F4–F6. |
-| Sonnet estándar | F4 complejo | Implementar contra una spec buena no exige razonamiento máximo. |
-| Haiku (`thinking: enabled` si aplica) | F4 Baja, F5 Media/Baja, empaquetado F6 | Trabajo determinista y mecánico. |
+| Opus `effort: low` | F0 rutinario, clasificación de complejidad, arbitrajes simples | La inteligencia base basta; pagar razonamiento extra es sobre-gasto. |
+| Opus `effort: medium` | F1 con decisiones de arquitectura o schema nuevos | Decisión irreversible y cara de corregir aguas abajo. |
+| Opus `effort: high` | F3 y F5 en **Alta**, refutaciones de BUG (§2.1) | La spec y la verificación de Alta son el punto de mayor apalancamiento del ciclo; el precedente de MT-D2 (seis rondas, retractación firmada) confirma que aquí no se abarata. |
+| Sonnet `effort: high` | F3 en **Media/Baja** | La spec sigue siendo el contrato del que depende F4–F6, aunque la complejidad no justifique escalar a Opus. |
+| Sonnet estándar | F4, toda complejidad | Implementar contra una spec buena no exige razonamiento máximo. |
+| Haiku (`thinking: enabled` si aplica) | F5 Media/Baja, empaquetado F6 | Trabajo determinista y mecánico. |
 
-Anti-patrones de gasto (prohibidos): Fable redactando specs detalladas o
-implementando; Sonnet `effort: high` para typos o CSS; re-pegar contexto ya
-cacheado; rondas 2+ con Pro High cuando Flash basta (la Ronda 1 de F6 es
-SIEMPRE Pro High salvo en Baja — abaratarla no es optimización, es hueco de
-auditoría).
+Anti-patrones de gasto (prohibidos): **Opus implementando** (F4 es
+exclusivo de Sonnet, toda complejidad); **Opus redactando specs o
+verificando F5 en Media/Baja** (ahí basta Sonnet/Haiku — reservar Opus para
+Alta es lo que hace sostenible la escalada del 10-08); Sonnet `effort: high`
+para typos o CSS; re-pegar contexto ya cacheado; rondas 2+ con Pro High
+cuando Flash basta (la Ronda 1 de F6 es SIEMPRE Pro High salvo en Baja —
+abaratarla no es optimización, es hueco de auditoría).
 
 **Nota v2.6 sobre el coste de la glosa (§4.3):** añadir analogías encarece
 las specs de forma marginal y **no** justifica bajar el `effort` de F3. Una
@@ -594,8 +621,8 @@ esa es la comparación correcta, no los tokens de unos paréntesis.
   declaradas, schema centralizado primero.
 - **Anti-bluff** a toda respuesta del Auditor (skill `auditor_externo`):
   citas verificadas con grep/ejecución; sin citas = INVÁLIDA; BUG confirmado
-  = ronda nueva; BUG refutado solo con evidencia archivo:línea de
-  Fable/Sonnet (§2.1).
+  = ronda nueva; BUG refutado solo con evidencia archivo:línea de Opus
+  (§2.1) — nunca del Ingeniero sobre su propio código.
 - **Anti-bucle**: 2 intentos del mismo fix fallando → STOP y reporte. Dos
   recalibraciones sobre la misma MT (§3.2) → STOP. Sospecha de bucle o
   alucinación en cualquiera de las IAs → `depurador_agentes`.
@@ -613,7 +640,9 @@ esa es la comparación correcta, no los tokens de unos paréntesis.
   completo en el prompt de F6.
 - **AVISO de traspaso obligatorio** (§5), con `ADJUNTOS` exhaustivo,
   `MODELO` vinculante y `OBSERVABLE` declarado.
-- **Inicialización de identidad** en toda sesión nueva de rol (§6).
+- **Inicialización de identidad** en toda sesión nueva de rol (§6) — desde
+  el 10-08, requisito reforzado cuando Opus enlaza varios roles del mismo
+  ciclo.
 - **Working tree limpio antes de F4** y una MT en vuelo por componente.
 - **Escalada por artefacto, nunca inline** (§2.1).
 - **Parada de Observación declarada o exención ratificada** (§3.1): una meta
@@ -635,7 +664,7 @@ esa es la comparación correcta, no los tokens de unos paréntesis.
 | Momento | Skill | Nota v2.6 |
 |---|---|---|
 | F0 (descomponer/priorizar/clasificar) | `roadmap_manager` | añade la clasificación de complejidad (§2) **y la Parada de Observación (§3.1)** al checklist |
-| F1, F2, F6 (prompts + anti-bluff) | `auditor_externo` | F1 la ejecuta el Arquitecto; el empaquetado F6 lo ejecuta el Sintetizador; anti-bluff formal Haiku, refutaciones Fable/Sonnet. **El Asesor no interviene aquí.** |
+| F1, F2, F6 (prompts + anti-bluff) | `auditor_externo` | F1 la ejecuta el Arquitecto; el empaquetado F6 lo ejecuta el Sintetizador; anti-bluff formal Haiku, refutaciones Opus. **El Asesor no interviene aquí.** |
 | Gates G0/G0′/G1/G2 | — (Asesor, §1.1) | conversación aparte en Antigravity; explica, no decide |
 | Cierre de sesión | `documentador_sesion` | registra la resolución de las Paradas de Observación y de las recalibraciones |
 | Fuera de plan | `innovador` | sin cambio |
@@ -678,3 +707,50 @@ esa es la comparación correcta, no los tokens de unos paréntesis.
    en bitácora al cierre: si la Parada de Observación se predeclaró bien, si
    la glosa hizo que el Director cuestionara algo que antes habría aprobado
    sin más, y si el Asesor aportó criterio o solo comodidad.
+7. **Sustitución de modelo — Fable 5 fuera del roster (10-08-2026).**
+   Anthropic cambió las condiciones de acceso a Fable 5; deja de ser la
+   opción por defecto del Arquitecto. Invocando el mecanismo YA PREVISTO en
+   §2 ("Indisponibilidad de un modelo: el Director decide la sustitución
+   dentro de la tabla de roles") — **no** una versión nueva de la
+   metodología, solo la tabla de §1/§2 actualizada:
+   - **Arquitecto Macro (F0/F1):** Opus 5, mismo `effort: low/medium`.
+     Sustitución directa en el mismo nicho.
+   - **Especificador + Verificador Semántico F5-Alta:** Opus 5,
+     `effort: high` — escala junto con el Arquitecto, no solo lo reemplaza.
+     Motivo: el precedente de MT-D2 (seis rondas de defectos, una auditoría
+     RECHAZADA, una retractación firmada) es la evidencia más fuerte que
+     tiene el ecosistema de que el juicio semántico en Alta es donde menos
+     conviene ahorrar.
+   - **Especificador — Media/Baja:** sin cambio, sigue en Sonnet 5
+     `effort: high`. Escalar aquí habría sido el mismo anti-patrón de
+     sobre-gasto que §7.2 ya prohibía para Fable.
+   - **Ingeniero (F4):** se retira el split con Haiku 4.5; **Sonnet 5
+     ejecuta F4 en toda complejidad.** Simplifica la matriz y le da a
+     Sonnet una función única y clara.
+   - **Sintetizador (F5 Media/Baja + empaquetado F6):** sin cambio, Haiku
+     4.5 — es trabajo determinista, no hay irreversibilidad que justifique
+     escalarlo.
+   - **Auditor y Asesor:** sin cambio — son Gemini, ajenos al cambio de
+     disponibilidad de Claude.
+
+   **Efecto colateral en la regla de oro:** con Sonnet reducido a Ingeniero
+   puro, la refutación de BUGs y la resolución de ambigüedades semánticas
+   dejan de poder pasar por Sonnet — el Ingeniero no verifica ni refuta su
+   propio trabajo. Esa autoridad se concentra en Opus (§2.1, Triángulo de
+   verificación). Como contrapartida, en Alta el trade-off que v2.5 había
+   declarado y aceptado (Especificador e Ingeniero comparten modelo)
+   **desaparece**: son ahora Opus y Sonnet, modelos distintos.
+
+   **Riesgo nuevo y declarado:** en Alta, Opus ocupa Arquitecto,
+   Especificador y Verificador — tres de los cuatro nodos internos del
+   ciclo. La separación que protege esa complejidad pasa a depender casi
+   por completo de (a) que cada sesión de Opus arranque realmente en frío,
+   con la inicialización de identidad de §6 sin excepción, y (b) la
+   auditoría cross-vendor de Gemini en F6, cuya Ronda 1 sigue siendo
+   SIEMPRE Pro High en Alta — ese requisito pasa de ser buena disciplina a
+   ser el principal cortafuegos del triángulo en esta franja.
+
+   **Provisional:** esta sustitución queda vigente hasta que el Director la
+   revierta o Fable 5 vuelva a estar disponible en condiciones aceptables.
+   No requiere un nuevo ciclo de diseño para revertirse — basta con otra
+   entrada en este punto.

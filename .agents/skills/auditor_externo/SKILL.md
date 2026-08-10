@@ -1,23 +1,26 @@
 ---
 name: auditor_externo
-description: Generador de auditorías adversariales del ciclo triple-IA v2.6 — el prompt de diseño (F1) lo ejecuta el Arquitecto (Fable 5); el empaquetado del prompt de código (F6) lo ejecuta el Sintetizador (Haiku 4.5); el anti-bluff formal es de Haiku y las refutaciones de BUG de Fable/Sonnet effort high. Produce prompts para Gemini — Ronda 1 de F6 SIEMPRE 3.1 Pro High; Flash solo rondas 2+ de fixes o complejidad Baja. El Asesor del Director NO interviene aquí ni comparte conversación con el Auditor. Corazón del ciclo "diseño primero" (docs/METODOLOGIA_TRIPLE_IA.md)
+description: Generador de auditorías adversariales del ciclo triple-IA v2.6 — el prompt de diseño (F1) lo ejecuta el Arquitecto (Opus 5, sustituye a Fable 5 desde el 10-08-2026); el empaquetado del prompt de código (F6) lo ejecuta el Sintetizador (Haiku 4.5); el anti-bluff formal es de Haiku y las refutaciones de BUG son de Opus (Arquitecto o Verificador de F5-Alta), nunca de Sonnet sobre su propio código como Ingeniero. Produce prompts para Gemini — Ronda 1 de F6 SIEMPRE 3.1 Pro High; Flash solo rondas 2+ de fixes o complejidad Baja. El Asesor del Director NO interviene aquí ni comparte conversación con el Auditor. Corazón del ciclo "diseño primero" (docs/METODOLOGIA_TRIPLE_IA.md)
 ---
 
 ### Descripción del Agente
 
 Asumes el rol de **Preparador de Auditoría Externa** del ecosistema Express.
 En la metodología v2.6 (`docs/METODOLOGIA_TRIPLE_IA.md`) esta skill se
-reparte por rol: el **Arquitecto** (Fable 5, effort low/medium) la ejecuta
-en F1 (prompt de diseño); el **Sintetizador** (Haiku 4.5) la ejecuta en F6
-(empaquetado del prompt de código, tras verificar F5) y en el anti-bluff
-FORMAL de F2/F6 (citas, salidas literales); toda refutación de un BUG
-alegado exige evidencia archivo:línea de Fable o Sonnet `effort: high`
-(escalada §2.1), nunca de Haiku solo. La verificación F5 previa la ejecuta
-Sonnet 5 `effort: high` en complejidad Alta (juicio semántico) o Haiku en
-Media/Baja. El código que se audita lo escribió
-el **Ingeniero** (Sonnet 5 o Haiku 4.5 según la matriz §2) según la spec
-del **Especificador** (Sonnet 5, effort high), y sus dudas declaradas en
-`informe_mtNN.md` se integran al prompt junto a las del ciclo.
+reparte por rol: el **Arquitecto** (Opus 5, effort low/medium — sustituye a
+Fable 5 desde el 10-08-2026, §10.7) la ejecuta en F1 (prompt de diseño); el
+**Sintetizador** (Haiku 4.5) la ejecuta en F6 (empaquetado del prompt de
+código, tras verificar F5) y en el anti-bluff FORMAL de F2/F6 (citas,
+salidas literales); toda refutación de un BUG alegado exige evidencia
+archivo:línea de **Opus** (escalada §2.1) — el Arquitecto en F0/F1 o el
+mismo Opus como Verificador de F5-Alta — **nunca del Ingeniero (Sonnet)
+sobre su propia implementación**, y nunca de Haiku solo. La verificación F5
+previa la ejecuta Opus 5 `effort: high` en complejidad Alta (juicio
+semántico) o Haiku en Media/Baja. El código que se audita lo escribió
+el **Ingeniero** (Sonnet 5, toda complejidad desde el 10-08) según la spec
+del **Especificador** (Opus 5 en Alta / Sonnet 5 en Media-Baja, effort
+high), y sus dudas declaradas en `informe_mtNN.md` se integran al prompt
+junto a las del ciclo.
 Los cambios se auditan con una IA externa: la **Ronda 1 de F6 usa SIEMPRE
 Gemini 3.1 Pro High** (incluso en complejidad Media); **Gemini Flash**
 queda autorizado únicamente para rondas 2+ (verificación de fixes) o para
@@ -115,7 +118,8 @@ implementación, el prompt correspondiente es parte del entregable.
      archivar. El Director lo guarda tal cual como
      `auditorias/{fecha}_{tema}/respuesta_{fase}_rondaN.md` y avisa al
      Sintetizador, que lo lee del disco y le anexa su validación anti-bluff
-     formal (las refutaciones escalan a Fable/Sonnet, §2.1).
+     formal (las refutaciones escalan a Opus, §2.1 — nunca a Sonnet sobre su
+     propio código).
 
 7. **Validar la respuesta recibida (anti-bluff).** Checklist obligatorio
    (lo ejecuta el Sintetizador; refutar un BUG exige escalada):
@@ -196,7 +200,7 @@ obligatorias es INVÁLIDA y será devuelta.
   respuesta(s) literal(es), specs e informes (`spec_mtNN.md` /
   `informe_mtNN.md`) y la validación anti-bluff del ciclo.
 - El prompt de auditoría de código se genera SOLO después de F5 (el
-  Verificador — Sonnet 5 effort high en Alta, Haiku en Media/Baja —
+  Verificador — Opus 5 effort high en Alta, Haiku en Media/Baja —
   ejecutó los comandos del DoD sobre el código real; leer el informe no
   es verificar).
 - Si el auditor entra en bucle (aprueba/rechaza alternadamente sin evidencia
