@@ -20,11 +20,11 @@ Afirmaciones del paquete que hoy son falsas contra el documento vigente.
 
 | # | `prompt_diseno_ronda1.md` afirma | v3.0 vigente dice | Cita |
 |---|---|---|---|
-| A1 | «Roster desde el 10-08 (§10.7): **Arquitecto = Opus 5**» (línea 46) | Arquitecto = **Claude Fable 5.1** `high` | `docs/METODOLOGIA_TRIPLE_IA.md:39` |
-| A2 | «Especificador = Opus 5 en Alta, **Sonnet 5 en Media/Baja**» (línea 46-47) | Especificador = **Opus 5**, fijo, sin bifurcación | `docs/METODOLOGIA_TRIPLE_IA.md:40` |
-| A3 | «Verificador F5 = Opus 5 en Alta, **Haiku 4.5 en Media/Baja**» (línea 48) | Verificador = **Opus 5**, fijo | `docs/METODOLOGIA_TRIPLE_IA.md:42` |
-| A4 | «**Sintetizador** (empaquetado F6) = Haiku 4.5» (línea 49) | El Sintetizador **no figura en el roster** de §1 ni en la tabla de §2 | `docs/METODOLOGIA_TRIPLE_IA.md:32-45`, `:133-141` |
-| A5 | «Riesgo §10.7: **Opus ocupa tres de los cuatro nodos internos**» (líneas 52-55) | Con Fable en F0/F1, Opus ocupa **dos** (F3 y F5). El riesgo citado cambió de forma | `docs/METODOLOGIA_TRIPLE_IA.md:39-42` |
+| A1 | «Roster desde el 10-08 (§10.7): **Arquitecto = Opus 5**» (línea 46) | Arquitecto = **Claude Fable 5.1** `high` | `docs/METODOLOGIA_TRIPLE_IA.md:38` |
+| A2 | «Especificador = Opus 5 en Alta, **Sonnet 5 en Media/Baja**» (línea 46-47) | Especificador = **Opus 5**, fijo, sin bifurcación | `docs/METODOLOGIA_TRIPLE_IA.md:39` |
+| A3 | «Verificador F5 = Opus 5 en Alta, **Haiku 4.5 en Media/Baja**» (línea 48) | Verificador = **Opus 5**, fijo | `docs/METODOLOGIA_TRIPLE_IA.md:41` |
+| A4 | «**Sintetizador** (empaquetado F6) = Haiku 4.5» (línea 49) | El Sintetizador **no figura en el roster** de §1 ni en la tabla de §2 | `docs/METODOLOGIA_TRIPLE_IA.md:35-44`, `:133-141` |
+| A5 | «Riesgo §10.7: **Opus ocupa tres de los cuatro nodos internos**» (líneas 52-55) | Con Fable en F0/F1, Opus ocupa **dos** (F3 y F5). El riesgo citado cambió de forma | `docs/METODOLOGIA_TRIPLE_IA.md:38-41` |
 | A6 | «Modo de operación vigente (§6): **Modo M manual. El Director transporta cada artefacto a mano**» (líneas 57-59) | §6 pasó a ser «Modos de operación y **Emisión Determinista**». El transporte manual de prompts está **eliminado**: todo arranque lo genera `scripts/emitir_arranque.py` | `docs/METODOLOGIA_TRIPLE_IA.md:462`, `:466` |
 | A7 | «**la rotación asistida de §6**» (concepto usado para definir Ruta A) | El término **«rotación asistida» ya no existe** en la metodología (`grep` sin resultados). Ruta A / Ruta B sí sobreviven, definidas en **§6.3** | `docs/METODOLOGIA_TRIPLE_IA.md:495-503` |
 
@@ -46,7 +46,7 @@ escrito es la frontera completa (Auditor y Asesor) que MT-T4 iba a producir.
 **B2 — El cotejo de roster fechado (E1) necesita una tercera ventana.** El DoD de
 MT-T2 está construido sobre **dos** ventanas: Fable legítimo hasta el 06-08 y Opus
 desde el 10-08 (§10.7). La v3.0 **devuelve a Fable 5.1** al puesto de Arquitecto
-desde el 06-09 (`docs/METODOLOGIA_TRIPLE_IA.md:39`). Son **tres** ventanas. Si la
+desde el 06-09 (`docs/METODOLOGIA_TRIPLE_IA.md:38`). Son **tres** ventanas. Si la
 tabla del script se queda en la sustitución del 10-08, marcará **DESVIACIÓN en toda
 sesión futura del Arquitecto**, que es exactamente el modo de fallo que el propio
 DoD quería evitar («un cotejo contra el roster de hoy llenaría de falsas alarmas
@@ -95,3 +95,9 @@ Cubre `prompt_diseno_ronda1.md` (CONTEXTO 1) y los puntos de `diseno_f1.md` que
 dependen del roster o del modo de operación. **No** se ha revisado línea a línea
 el resto de `diseno_f1.md` (30.397 B); si el Arquitecto encuentra más desfases al
 reemitir, se añaden aquí.
+
+---
+
+## F. Corrección de este cotejo (06-09-2026)
+
+El Arquitecto detectó en F1 r3 que **las citas de este documento a la tabla de roles de §1 iban una fila desviadas** (decían 39/40/42 donde el disco dice 38/39/41). **Corregidas arriba.** Las citas a la tabla de §2 (`:136`, `:139`, `:141`) y las de las secciones C y D eran correctas. El fondo del cotejo —los 7 desfases de hecho y los 3 de fondo— no cambia; sí lo hace la lección: un cotejo que exige `archivo:línea` al Auditor debe verificar los suyos con `grep -n`, no de memoria.

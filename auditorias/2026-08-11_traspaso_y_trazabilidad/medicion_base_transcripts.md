@@ -166,6 +166,90 @@ que ninguna salida del script se commitee** (MT-T5).
 
 ---
 
+## 6. Re-medición del 06-09-2026 (F1 r3) — lo que queda en disco
+
+**Productor:** Arquitecto Macro (Claude Fable 5.1 High), sesión `def5412c`.
+**Motivo:** al reemitir el paquete de F2 bajo la v3.0 se comprobó contra disco
+si la medición de §2 seguía siendo reproducible. **No lo es.** §2 se conserva
+íntegro como registro congelado; esta sección registra el estado de hoy.
+**Método:** el mismo de §1 — sólo metadatos, **ningún campo `content` leído**;
+fechas convertidas a hora local (-03:00) para el cotejo de ventana de roster.
+Salida literal capturada con `python3 - | tee`:
+
+```
+== RE-MEDICION DE TRANSCRIPTS ==
+fecha: 2026-09-06 (local -03:00)
+ruta : /home/pueblac/.claude/projects/-home-pueblac-AndroidStudioProjects-NexoExpress
+
+--- HILO PRINCIPAL (por archivo de sesion) ---
+7479044c  turnos=  69  modelos={'claude-opus-5': 69}  effort={'high': 69}  tokens={'out': 64757, 'in': 138, 'cache_read': 4434475, 'cache_create': 164952}
+          ventana_local=2026-09-06T20:58:05.329000-03:00 -> 2026-09-06T21:10:17.332000-03:00  rama=['main']  cliente=['2.1.263']
+          turnos_por_ventana_roster={('V3(>=2026-09-06)', 'claude-opus-5'): 69}
+7a918db5  turnos=   9  modelos={'claude-opus-5': 9}  effort={'high': 9}  tokens={'out': 2155, 'in': 18, 'cache_read': 190042, 'cache_create': 21911}
+          ventana_local=2026-08-11T09:24:24.743000-03:00 -> 2026-08-11T09:24:58.315000-03:00  rama=['main']  cliente=['2.1.227']
+          turnos_por_ventana_roster={('V2(2026-08-10..2026-09-05)', 'claude-opus-5'): 9}
+970c3ab4  turnos= 133  modelos={'claude-opus-5': 133}  effort={'high': 133}  tokens={'out': 258624, 'in': 248, 'cache_read': 19343599, 'cache_create': 443159}
+          ventana_local=2026-08-11T07:57:13.342000-03:00 -> 2026-08-11T10:20:09.967000-03:00  rama=['main']  cliente=['2.1.227']
+          turnos_por_ventana_roster={('V2(2026-08-10..2026-09-05)', 'claude-opus-5'): 133}
+a0b9d1eb  turnos= 154  modelos={'claude-opus-5': 75, 'claude-sonnet-5': 79}  effort={'high': 154}  tokens={'out': 368178, 'in': 296, 'cache_read': 22817945, 'cache_create': 2172817}
+          ventana_local=2026-08-07T08:17:42.183000-03:00 -> 2026-08-11T07:43:48.015000-03:00  rama=['main']  cliente=['2.1.223']
+          turnos_por_ventana_roster={('V1(<=2026-08-09)', 'claude-opus-5'): 46, ('V2(2026-08-10..2026-09-05)', 'claude-opus-5'): 29, ('V2(2026-08-10..2026-09-05)', 'claude-sonnet-5'): 79}
+b26bb166  turnos=   7  modelos={'claude-opus-5': 7}  effort={'high': 7}  tokens={'out': 1452, 'in': 14, 'cache_read': 144593, 'cache_create': 20512}
+          ventana_local=2026-08-11T09:21:49.883000-03:00 -> 2026-08-11T09:22:09.338000-03:00  rama=['main']  cliente=['2.1.227']
+          turnos_por_ventana_roster={('V2(2026-08-10..2026-09-05)', 'claude-opus-5'): 7}
+def5412c  turnos=  33  modelos={'claude-fable-5-1': 33}  effort={'high': 33}  tokens={'out': 113286, 'in': 966, 'cache_read': 2358469, 'cache_create': 740789}
+          ventana_local=2026-09-06T21:12:20.205000-03:00 -> 2026-09-06T21:18:37.208000-03:00  rama=['main']  cliente=['2.1.263']
+          turnos_por_ventana_roster={('V3(>=2026-09-06)', 'claude-fable-5-1'): 33}
+
+--- SUBAGENTES (por sesion padre) ---
+(ninguna sesion en disco tiene directorio subagents/)
+
+--- SESIONES DE LA MEDICION BASE (11-08) AUSENTES HOY ---
+01175772: AUSENTE
+0403aebe: AUSENTE
+6a1327bc: AUSENTE
+caf731aa: AUSENTE
+f50ba75a: AUSENTE
+```
+
+### 6.1 Hallazgos nuevos
+
+**H-6. El cliente rota los transcripts.** Cinco de las siete sesiones de la
+medición base (11-08) **ya no existen** en `~/.claude/projects/`, y con ellas
+los **27 subagentes** de H-4 (hoy ninguna sesión en disco tiene directorio
+`subagents/`). Han pasado 26 días. Consecuencias que el diseño r3 incorpora:
+(a) el DoD (a) de MT-T2 («reproduce literalmente las 6 sesiones y los 3 bloques
+de subagentes») es **infalsable tal como estaba escrito** y se rebasa sobre lo
+que existe; (b) la trampa H-5 sólo puede probarse con un **fixture sintético**
+(un `subagents/agent-*.jsonl` de metadatos inventados, sin contenido) porque no
+queda ningún subagente real; (c) el bloque `TRAZABILIDAD` de MT-T5 debe
+generarse **al cerrar la sesión, el mismo día**: regenerarlo semanas después
+puede encontrar la sesión borrada; (d) la duda D3 del paquete de F2 («formato
+interno no garantizado») gana un segundo modo de fallo empírico: la
+**retención** tampoco está garantizada.
+
+**H-7. Fable 5.1 responde con un identificador distinto de Fable 5.** Esta
+sesión (`def5412c`, Arquitecto bajo v3.0) registra `claude-fable-5-1` en el
+100% de sus turnos; las sesiones de julio-agosto registraban `claude-fable-5`.
+La tabla de vigencias de E1 debe distinguirlos: una sesión de `claude-fable-5`
+fechada hoy sería una **desviación** (Fable 5 salió del roster el 10-08, §10.7),
+aunque «Fable» vuelva a ser el Arquitecto.
+
+**H-8. `a0b9d1eb` cruza la frontera del 10-08.** Con cotejo **por turno** y por
+fecha local: 46 turnos de `claude-opus-5` caen en la ventana en que el roster
+escrito decía Fable (07-08 → 09-08), 29 de Opus y 79 de Sonnet caen tras el
+10-08. La sustitución formal es del 10-08 (§10.7) pero la última sesión medida
+de Fable 5 cerró el **06-08** (`caf731aa`, F-1) y la primera de Opus abrió el
+**07-08**. Si la tabla de E1 no declara esa **transición** (07-08 → 09-08, ambos
+modelos legítimos), el script marcará 125/154 turnos (81%) en vez de los 79
+(51%) de Sonnet que sí son la anomalía. La decisión de declararla es del
+Director (ver `diseno_f1.md` §9.2).
+
+**H-9. La sesión `970c3ab4` (Arquitecto Opus 5, 11-08) sustituye a `caf731aa`
+como caso «correcto en su ventana, desviado contra el roster de hoy».** Es la
+prueba viva de por qué el cotejo va fechado: 133 turnos de Opus, legítimos el
+11-08 (V2), que un cotejo contra el roster vigente (Fable 5.1) marcaría al 100%.
+
 ━━ AVISO DE TRASPASO ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 CICLO      : 2026-08-11_traspaso_y_trazabilidad
 FASE       : F1 — Diseño (evidencia de apoyo)

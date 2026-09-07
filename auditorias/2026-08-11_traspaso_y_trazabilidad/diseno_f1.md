@@ -1,8 +1,8 @@
 # Diseño conceptual F1 — Directriz de Traspaso (Rutas A y B) + Trazabilidad de Sesión
 
 **Ciclo:** `2026-08-11_traspaso_y_trazabilidad`
-**Productor:** Arquitecto Macro — Claude Opus 5, metodología v2.6
-**Revisión:** **r2 — 11-08-2026, tras G0 concedido con enmiendas.**
+**Productor:** r1/r2 Arquitecto Macro — Claude Opus 5 (v2.6) · r3 Arquitecto Macro — Claude Fable 5.1 High (v3.0)
+**Revisión:** **r3 — 06-09-2026, actualización a la metodología v3.0 (ver §9; r2 del 11-08 conservada íntegra en §0–§8).**
 **Evidencia de apoyo:** `medicion_base_transcripts.md` · `prueba_traspaso.md`
 **Fuente de referencia:** ya **no es la versión simulada del encargo**, sino
 los documentos reales del proyecto hermano, leídos el 11-08:
@@ -532,22 +532,223 @@ falsable, que es la exigencia que este ecosistema aplica a todo lo demás.
 
 ---
 
+## 9. Revisión r3 (06-09-2026) — actualización a la metodología v3.0
+
+**Por qué existe esta sección.** El Director adoptó la **v3.0** el 06-09
+(`docs/METODOLOGIA_TRIPLE_IA.md` §10.8) con el paquete de F2 ya escrito bajo
+v2.6 y sin enviar. El Coordinador cotejó el desfase (`desfase_v3_para_f1r3.md`:
+7 desfases de hecho A1–A7, 3 de fondo B1–B3, una deuda interna C). Esta sección
+resuelve B1–B3, añade tres desfases de fondo que el cotejo no alcanzó a revisar
+(§9.4–§9.6, ámbito declarado en su §E) y deja al Director las decisiones que
+son suyas. §0–§8 **no se reescriben**: siguen siendo el diseño aprobado en G0;
+donde §9 contradice a §0–§8, **prevalece §9**.
+
+**Verificación previa de las citas del cotejo.** Las citas de §6 del cotejo
+(`:462`, `:466`, `:495-503`) son exactas. Las de la tabla de roles van **una
+línea por encima** de lo real: Arquitecto=Fable 5.1 está en `:38` (no `:39`),
+Especificador en `:39`, Verificador en `:41`, y «Admite Ruta A» / «NUNCA Ruta A»
+en `:500` / `:501`. El fondo del cotejo no cambia; el paquete de F2 cita las
+líneas correctas (regla del Auditor: cita no verificable = afirmación inventada).
+
+### 9.1 B1 — Ruta A: de «NO entra en esta tanda» a «admitida por v3.0, no instrumentada»
+
+**Hecho.** La v3.0 dice que el Ingeniero «admite **Ruta A** (subagente asistido
+lanzado por el Especificador) o Ruta B» (`docs/METODOLOGIA_TRIPLE_IA.md:500`) y
+`coordinador.json:71` fija `"ruta_traspaso": "A"` para el Ingeniero;
+`coordinador.json:142` amplía: «Arquitecto/Especificador -> Ingeniero admite
+Ruta A». D1 (G0, 11-08) decía lo contrario. La orden posterior del mismo
+Director prevalece: **Ruta A está admitida** para la arista
+Arquitecto/Especificador → Ingeniero. Pero la v3.0 la admite **sin ninguna de
+las salvaguardas de §3.5** (encargo archivado antes del lanzamiento, spot-check,
+archivo del primer mensaje del subagente) y sin el instrumento que la audita a
+posteriori (MT-T2/T3, aún F4). Mecánicamente, además, el emisor CLI sólo
+produce bloques `COPIAR` (`bloques/bloque_ingeniero.txt`, Ruta B): la Ruta A de
+la v3.0 es hoy una **declaración sin mecanismo**.
+
+**Decisión r3.** MT-T4 escribe la frontera **como la v3.0 la deja** (admitida en
+esa única arista) y le añade las **condiciones de uso** que no dependen del
+script y que por tanto valen desde hoy:
+
+1. **El encargo se archiva en el expediente ANTES de lanzar** el subagente, y
+   el prompt de lanzamiento **transporta rutas, no contenido** (§3.3). Es la
+   salvaguarda que deja huella en `git diff` y no necesita instrumento.
+2. **E4:** entrega interna larga sin dudas ni desviaciones → spot-check
+   obligatorio del Director (§3.4-bis).
+3. **Nunca cruza una arista de verificación** (regla estructural de §3.4) **ni
+   sustituye un gate humano**: el receptor sólo se lanza cuando el artefacto que
+   consume ya está archivado y el gate previo (G1) concedido. Esta segunda
+   cláusula es nueva en r3 y responde a `coordinador.json:142`: el Arquitecto
+   puede lanzar al Ingeniero **sólo** con la spec de F3 ya en el expediente,
+   nunca desde F1 saltándose G1 y F3.
+4. **El archivo del primer mensaje del subagente** (extraído del transcript,
+   §3.5) queda como condición **diferida a MT-T3**: hasta entonces la Ruta A
+   está «admitida, no instrumentada», y así lo dice el anexo.
+
+*Eje:* reversible (una regla del anexo) × impacto medio (visibilidad del
+Director sobre los traspasos). **Recomendación:** mantener la v3.0 tal cual y
+exigir las condiciones 1–3 desde el primer uso. La alternativa —congelar Ruta A
+hasta MT-T5, como decía D1— es igual de reversible; la elige el Director en G1.
+
+### 9.2 B2 — E1 con tres ventanas, transición declarada y cotejo por turno
+
+**Hecho.** La v3.0 devuelve al Arquitecto a Fable, ahora **5.1**, cuyo
+identificador real es **`claude-fable-5-1`** (H-7, distinto de `claude-fable-5`).
+Y `a0b9d1eb` cruza la frontera del 10-08 con 46 turnos de Opus en la ventana en
+que el roster escrito aún decía Fable (H-8).
+
+**Decisión r3 — tabla de vigencias del Arquitecto** (el resto de roles se
+tabula con el mismo criterio; sólo se cotejan roles del roster, un `--rol` fuera
+del roster —«coordinador», «director»— es `exit 1`):
+
+| Ventana | Fechas (locales) | Modelos legítimos | Fuente |
+|---|---|---|---|
+| V1 | hasta 2026-08-06 | `claude-fable-5` | v2/v2.5 (§10.2), última sesión medida `caf731aa` (F-1) |
+| **Transición** | 2026-08-07 → 2026-08-09 | `claude-fable-5`, `claude-opus-5` | Fable dejó de estar disponible antes de formalizarse la sustitución (§10.7); primera sesión Opus `a0b9d1eb` abre el 07-08 |
+| V2 | 2026-08-10 → 2026-09-05 | `claude-opus-5` | §10.7 |
+| V3 | desde 2026-09-06 | `claude-fable-5-1` | §10.8, medido en `def5412c` |
+
+**Cotejo por turno, no por sesión:** cada turno `assistant` se coteja contra la
+ventana de **su propia fecha local**. Una sesión que cruza una frontera no se
+adjudica entera a ninguna ventana. Veredictos literales que el DoD de MT-T2
+fija **antes** de escribir el script:
+
+- `a0b9d1eb --rol arquitecto` → **DESVIACIÓN**: `claude-sonnet-5` × 79 (51%)
+  fuera de roster en V2. Los 46 turnos de Opus de la transición **no** se
+  marcan.
+- `970c3ab4 --rol arquitecto` → **OK** (133 turnos `claude-opus-5`, V2), pese a
+  que el roster de hoy diga Fable 5.1. Sustituye a `caf731aa` como prueba de que
+  el cotejo va fechado (H-9).
+- `def5412c --rol arquitecto` → **OK** (V3, `claude-fable-5-1`).
+- `7479044c --rol arquitecto` → **DESVIACIÓN** (69 turnos `claude-opus-5` el
+  06-09, V3 exige `claude-fable-5-1`). Es una sesión del Coordinador, no del
+  Arquitecto: `--rol coordinador` → `exit 1`, rol fuera del roster.
+
+*Eje:* reversible (una fila de la tabla) × impacto bajo. **Punto que decide el
+Director:** si la transición 07-08 → 09-08 se declara (recomendado: es lo que
+ocurrió, y evitar falsas alarmas fue el motivo de E1) o si esos 46 turnos se
+marcan como desviación. El paquete de F2 lo somete al Auditor como duda D5.
+
+### 9.3 B3 — El bloque `TRAZABILIDAD` y el emisor CLI: dos mecanismos, dos momentos, sin acoplamiento
+
+`scripts/emitir_arranque.py` corre al **inicio** de un rol y escribe en
+`bloques/` (tránsito, ignorado por git — `.gitignore`); el bloque
+`TRAZABILIDAD` se produce al **cierre** de una sesión y va al AVISO de un
+artefacto en `auditorias/` (expediente, commiteado). No hay solapamiento de
+función ni de archivo. **Decisión r3:** MT-T5 **no toca** el emisor ni
+`coordinador.json` («No edite los scripts», `coordinador.json` línea 2) y se
+integra **por contrato**: el rol que cierra un artefacto ejecuta
+`analizar_sesion_ia.py --last --rol {rol} --esfuerzo {…}` y pega la salida
+literal en el campo `TRAZABILIDAD` de su AVISO. Regla añadida por H-6: **se
+genera el mismo día del cierre**, porque el cliente rota los transcripts. La
+puerta `antes_de_emitir` del emisor (`emitir_arranque.py:119-127`) queda
+documentada como punto de integración futuro, no usado en esta tanda.
+
+### 9.4 Desfase nuevo — dos plantillas del Verificador; se queda una
+
+**Hecho.** MT-T1 validó en PO-1 la plantilla fija de cinco huecos (§4.3,
+`plantilla_copiar.md` §1). La v3.0 trae **otra**: `docs/prompts_arranque/verificador.md`,
+emitida por CLI, con `{{TAREA}}` en texto libre (`:77`), `{{INSUMO}}` de una sola
+ruta (`:73`), salida a un directorio y no a un archivo (`:81`), **sin** punto 0
+fail-closed ni centinela, y con una filosofía distinta: «Tú decides qué se
+verifica (…) los criterios de aceptación de la orden son el mínimo, no el
+techo» (`:39-40`) frente al «el DoD que debes ejecutar es el de esa spec, y
+ninguno otro» de r2.
+
+**Decisión r3 — una sola plantilla: la del CLI**, porque la v3.0 manda que todo
+arranque se emita mecánicamente (`docs/METODOLOGIA_TRIPLE_IA.md:466`). MT-T4
+le **porta** lo que PO-1 demostró y ella no tiene:
+
+1. **Punto 0 fail-closed de directorio** («DETENIDO: directorio de trabajo
+   incorrecto»). Las rutas absolutas del CLI no lo sustituyen: una sesión
+   abierta fuera del repo escribiría igualmente en la ruta absoluta.
+2. **Centinela de cierre** `— CIERRE {CICLO} / {MT} / AAAA-MM-DD` y **nombre de
+   archivo fijo** `verificacion_mtNN.md` en el expediente (la tabla de §4 de la
+   metodología, `:347`, aún dice «anexo en informe_mtNN.md» — texto v2.6).
+3. **Prosa prohibida en el bloque emitido:** para el Verificador, `{{TAREA}}` es
+   literalmente `Verificar MT-NN del ciclo {CICLO}` y `{{INSUMO}}` es la ruta
+   del informe (que cita la spec). Cualquier otra frase en
+   `bloques/bloque_verificador.txt` lo hace **INVÁLIDO** y el Director lo devuelve
+   sin pegarlo — el mismo control de un vistazo que r2 le daba.
+
+Se **adopta la filosofía de la v3.0** («mínimo, no techo»): el bloque no puede
+*quitar* comprobaciones del DoD, pero el Verificador puede *añadir*. Es
+estrictamente mejor contra la trampa T1 (DoD débil en la spec) y no reabre el
+vector de encuadre, porque el bloque sigue sin reproducir el DoD.
+`plantilla_copiar.md` §1 pasa a ser **registro histórico de PO-1**, no plantilla
+vigente. *Riesgo residual declarado:* `{{TAREA}}` sigue siendo texto libre en el
+código (`emitir_arranque.py:159-160`) y quien lo teclea es el Arquitecto
+(`docs/PROMPT_ARRANQUE_SESION.md:42`); la prohibición se hace cumplir **a ojo**
+por el Director. Un validador en el emisor es candidato a una tanda posterior,
+no a esta (regla de tandas ≤5).
+
+### 9.5 Desfase nuevo — el Sintetizador desaparece; el empaquetado de F6 y el anti-bluff quedan sin dueño
+
+La tabla de §3.4 daba al Sintetizador (Haiku) el empaquetado de F6 lanzado por
+el Arquitecto. En v3.0 el Sintetizador **no figura** en §1 ni §2
+(`:32-45`, `:133-141`) aunque el cuerpo lo siga nombrando (`:94-96`, `:162-167`,
+`:221-223`, `:233`, `:444-445`). **Decisión r3:** la fila desaparece de la
+frontera; en su lugar el anexo dice: «el empaquetador de F6 es un rol **sin
+asignar** en v3.0; sea quien sea, **jamás lo lanza el Ingeniero** y el `git
+diff` viaja íntegro». Quién empaqueta F6 y quién hace el anti-bluff formal de
+las respuestas del Auditor es **deuda de documentación del Director** (cotejo
+§C ampliado). Propuesta no vinculante para el anti-bluff de esta F2: el
+**Verificador** (Opus 5, sesión nueva) — es el rol que juzga y no escribió el
+diseño; el Arquitecto refutando hallazgos sobre su propio diseño roza la regla
+de oro.
+
+### 9.6 Desfase nuevo — Ruta B-chat bajo el emisor CLI
+
+`resolver_insumo` mete el insumo como **ruta absoluta**
+(`scripts/emitir_arranque.py:95-108`). Gemini no tiene disco: un
+`bloque_auditor.txt` con una ruta es, para el Auditor, un bloque sin paquete.
+**Regla de operación r3 (va a MT-T4, variante B-chat):** mensaje 1 = el bloque
+emitido (identidad); mensaje 2 = el **contenido íntegro** del archivo insumo,
+pegado por el Director. El `bloque_auditor.txt` que hay hoy en `bloques/`
+(emitido 20:58, insumo `prompt_diseno_ronda1.md`) apunta al paquete
+**desfasado** y debe reemitirse con el nuevo.
+
+### 9.7 Lo que H-6 (rotación de transcripts) cambia en el plan
+
+- **MT-T2 DoD (a)** se rebasa: reproducir literalmente las sesiones que **siguen
+  en disco** (`a0b9d1eb`, `970c3ab4` ya cerrada con 133 turnos, `b26bb166`,
+  `7a918db5`; cifras congeladas en `medicion_base_transcripts.md` §6) y el
+  Verificador anota **cuáles existían** al ejecutar F5.
+- **MT-T2 DoD (d)** (trampa H-5) se prueba con un **fixture sintético** de
+  metadatos bajo `scripts/tests/fixtures/` — sin contenido real, porque el repo
+  es público y porque ya no queda ningún subagente real.
+- **MT-T5 / PO-3:** el bloque se genera al cierre, el mismo día.
+- **Copia de seguridad recomendada al Director**, fuera del repo y nunca al
+  expediente: `cp -r ~/.claude/projects/-home-pueblac-AndroidStudioProjects-NexoExpress ~/.claude/respaldo_nexo_2026-09-06` — preserva `a0b9d1eb` para PO-2
+  aunque el cliente la rote antes de F4/F5. Reversible, impacto nulo.
+
+### 9.8 Qué NO cambia en r3
+
+El triángulo y la regla de oro (`:92`); §1.1 Asesor y su separación del Auditor;
+§2 matriz y §2.1 escalada; §3.1 Paradas y §3.2 recalibración; §7.2 calibración
+de `effort`; MT-T1 y PO-1 (cerradas); la evidencia de
+`medicion_base_transcripts.md` §2 como registro; la decisión D3 (sólo el bloque
+agregado se commitea) y D4 (no bloqueante — reforzada por H-6); D-e/E5 (campo
+propio); la lista blanca fail-closed; la tanda 2 (Pre-F0) sigue fuera. La
+«desviación de matriz» de F2 (Flash vs Pro) **desaparece**: la v3.0 fija Pro
+High para F2 en toda complejidad (`:136`).
+
+---
+
 ━━ AVISO DE TRASPASO ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 CICLO      : 2026-08-11_traspaso_y_trazabilidad
-FASE       : F1 — Diseño conceptual r2 (CONGELADO tras G0 con enmiendas)
+FASE       : F1 — Diseño conceptual r3 (actualizado a v3.0; r2 congelada en §0–§8)
 TURNO DE   : Arquitecto
-MODELO     : Opus 5
+MODELO     : Claude Fable 5.1 High
 ENTREGAR   : auditorias/2026-08-11_traspaso_y_trazabilidad/diseno_f1.md
-ADJUNTOS   : auditorias/2026-08-11_traspaso_y_trazabilidad/medicion_base_transcripts.md
+ADJUNTOS   : auditorias/2026-08-11_traspaso_y_trazabilidad/medicion_base_transcripts.md (§6 nuevo)
              auditorias/2026-08-11_traspaso_y_trazabilidad/prueba_traspaso.md
-DESTINO    : expediente del ciclo → prompt_diseno_ronda1.md (F2, tanda 1)
-ACCIÓN     : Arquitecto genera el prompt de revisión de DISEÑO de la tanda 1
-             para Gemini 3.1 Pro High, conversación nueva. La tanda 2
-             (Pre-F0 → v2.7, §8) lleva su propia ronda F1→F2, separada
-OBSERVABLE : Ninguno en esta fase. Primera evidencia tocable: PO-1, con el
-             bloque ya escrito en prueba_traspaso.md §1.2
-TRAZABILIDAD: sesión 970c3ab4 · claude-opus-5 · effort high [medido del
-             transcript] · fase F1 · bloque por lectura ad-hoc, no por
-             scripts/analizar_sesion_ia.py (aún no existe — es F4)
+             auditorias/2026-08-11_traspaso_y_trazabilidad/desfase_v3_para_f1r3.md
+DESTINO    : expediente del ciclo → prompt_diseno_ronda1_v3.md (F2, tanda 1)
+ACCIÓN     : el Director lee §9.1 y §9.2 (las dos decisiones que son suyas) y
+             sigue los pasos del AVISO de prompt_diseno_ronda1_v3.md
+OBSERVABLE : Ninguno en esta fase. PO-1 ya se cobró; PO-2 llega con MT-T3
+TRAZABILIDAD: sesión def5412c · claude-fable-5-1 × 33 turnos · effort high
+             [medido del transcript, lectura ad-hoc — el script es F4]
+             · fase F1 r3 · cotejo roster V3: OK
 VUELVE A   : Director, para G1 sobre el veredicto de F2
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
