@@ -1,0 +1,144 @@
+{
+  "_lea_esto_primero": "Este archivo ES la metodología en forma operable: declara qué roles existen, con qué modelo y esfuerzo arrancan, qué artefacto produce cada uno y en qué orden se pasan el trabajo. Los scripts no saben nada que no esté aquí. No edite los scripts.",
+  "_regla_de_rutas": "Aquí NO se escriben rutas absolutas. El workspace se deduce de la ubicación del script y los repositorios de trabajo salen de `.claude/settings.json` (permissions.additionalDirectories). Así el kit se adapta solo al proyecto destino.",
+  "proyecto": {
+    "nombre": "NexoExpress (Ecosistema Express)",
+    "dominio": "Coordinación, arquitectura, especificación y aseguramiento de calidad del Ecosistema Express (ActaExpressWeb, BitacoraExpress, ActaExpress Android).",
+    "documento_metodologia": "docs/METODOLOGIA_TRIPLE_IA.md",
+    "documento_estado": "docs/estado_actual.md",
+    "documento_cadena_mando": "docs/METODOLOGIA_TRIPLE_IA.md",
+    "dir_plantillas": "docs/prompts_arranque"
+  },
+  "_sobre_los_roles": "Un rol se define por EL ÚNICO ARTEFACTO QUE PRODUCE Y EL DIRECTORIO DONDE LO ESCRIBE, con 1 modelo y 1 esfuerzo fijo sin bifurcaciones.",
+  "roles": {
+    "asesor": {
+      "orden": 0,
+      "en_la_linea": false,
+      "modelo": "Gemini 3.8 Flash High",
+      "ruta_traspaso": "B",
+      "artefacto": "traducción pedagógica y recomendación (reversibilidad × impacto)",
+      "escribe_en": "(ninguno — su recomendación no sale de la conversación)",
+      "_escribe_en_nota": "El Asesor NO produce artefactos: es el único rol sin directorio, y esa ausencia ES su definición — un rol que no escribe en ninguna parte no puede convertirse en otro sin que se note.",
+      "recibe_de": [
+        "director"
+      ],
+      "entrega_a": [
+        "director"
+      ],
+      "tarea": "opcional",
+      "insumo": "no",
+      "plantilla": "asesor.md"
+    },
+    "arquitecto": {
+      "orden": 1,
+      "en_la_linea": true,
+      "modelo": "Claude Fable 5.1 High",
+      "ruta_traspaso": "B",
+      "artefacto": "orden de arquitectura y plan (F0/F1) con Paradas de Observación",
+      "escribe_en": "auditorias/",
+      "recibe_de": [
+        "director"
+      ],
+      "entrega_a": [
+        "auditor",
+        "especificador"
+      ],
+      "tarea": "obligatoria",
+      "insumo": "opcional",
+      "plantilla": "arquitecto.md"
+    },
+    "especificador": {
+      "orden": 2,
+      "en_la_linea": true,
+      "modelo": "Claude Opus 5 High",
+      "ruta_traspaso": "B",
+      "artefacto": "especificación técnica (F3) con glosa pedagógica",
+      "escribe_en": "auditorias/",
+      "recibe_de": [
+        "arquitecto"
+      ],
+      "entrega_a": [
+        "ingeniero"
+      ],
+      "tarea": "obligatoria",
+      "insumo": "obligatorio",
+      "plantilla": "especificador.md"
+    },
+    "ingeniero": {
+      "orden": 3,
+      "en_la_linea": true,
+      "modelo": "Claude Sonnet 5 High",
+      "ruta_traspaso": "A",
+      "artefacto": "código implementado (F4) + entrega con evidencia literal",
+      "escribe_en": "auditorias/",
+      "recibe_de": [
+        "especificador"
+      ],
+      "entrega_a": [
+        "verificador"
+      ],
+      "tarea": "obligatoria",
+      "insumo": "obligatorio",
+      "plantilla": "ingeniero.md"
+    },
+    "verificador": {
+      "orden": 4,
+      "en_la_linea": true,
+      "modelo": "Claude Opus 5 High",
+      "ruta_traspaso": "B",
+      "_ruta_traspaso_nota": "NUNCA ruta A, sin excepción: en la ruta interna el emisor escribe el prompt del receptor, y decidir qué se verifica es la mitad de verificar.",
+      "artefacto": "veredicto de verificación (F5) CONFORME / NO CONFORME",
+      "escribe_en": "auditorias/",
+      "recibe_de": [
+        "ingeniero"
+      ],
+      "entrega_a": [
+        "auditor",
+        "director"
+      ],
+      "tarea": "obligatoria",
+      "insumo": "obligatorio",
+      "plantilla": "verificador.md"
+    },
+    "auditor": {
+      "orden": 5,
+      "en_la_linea": false,
+      "modelo": "Gemini 3.1 Pro High",
+      "ruta_traspaso": "B",
+      "artefacto": "veredicto de auditoría externa (F2/F6) APROBADO / OBSERVADO / RECHAZADO",
+      "escribe_en": "auditorias/",
+      "recibe_de": [
+        "director"
+      ],
+      "entrega_a": [
+        "director"
+      ],
+      "tarea": "obligatoria",
+      "insumo": "obligatorio",
+      "plantilla": "auditor.md"
+    }
+  },
+  "guardrails": {
+    "sello_de_rol": "Toda respuesta empieza por [ROL · MODELO · turno N]. Convierte la deriva en algo visible de un vistazo en el turno 30, sin recordar el turno 1. Un agente que deja de sellar ya derivó.",
+    "negaciones_por_artefacto": "Lo que un rol NO hace se escribe como artefactos y rutas ('no escribo código', 'no verifico mi propia orden'), nunca como cualidades ('no soy autoritario'). Un modelo no sabe si está siendo autoritario; sí sabe si está escribiendo un archivo.",
+    "nombrar_la_regla_antes_de_corregir": "Ante una corrección, el agente responde PRIMERO con una línea: qué regla violó. Solo después arregla. Si no la identifica, pregunta. Sin esto, corrige el síntoma que se le nombró y da el asunto por cerrado.",
+    "ningun_rol_escribe_su_propio_arranque": "Los arranques se emiten mecánicamente con scripts/emitir_arranque.py y los autoriza el Director.",
+    "una_conversacion_un_rol": "El rol se declara en frío en el primer mensaje. Si a mitad hace falta otro rol, se abre otra conversación. Reasignar en caliente es como se pierde la cuenta de quién es quién.",
+    "artefacto_fuera_de_turno_se_descarta": "Un artefacto producido por el rol equivocado no se recicla como borrador: arrastra premisas que nadie competente revisó. Se conserva como registro del incidente, no como insumo."
+  },
+  "reglas_duras": {
+    "evidencia_literal": "La salida REAL de cada comprobación, copiada íntegra. Sin ella la entrega es INVÁLIDA aunque el trabajo esté bien.",
+    "evidencia_sin_reformatear": "La salida se pega TAL CUAL sale del terminal o del archivo (`comando | tee archivo` y pegar el archivo): no se reformatea, no se alinea, no se reordena.",
+    "compuerta_empirica": "Leer la entrega no es verificar. Se re-ejecuta contra los archivos y datos reales.",
+    "parada_de_observacion": "Toda meta con UI o audio debe ser probada físicamente por el Director antes de gastar auditorías externas o commits.",
+    "duda_es_pregunta": "La ambigüedad se devuelve como duda; jamás se resuelve con un supuesto silencioso. Una duda reabre la orden.",
+    "anti_bucle": "Dos intentos del mismo arreglo fallando → STOP y reporte. No hay tercero.",
+    "mitigado_no_es_cerrado": "Un vector mitigado se presenta como mitigado, con su ataque residual descrito.",
+    "nada_se_commitea_sin_aprobacion": "El Director aprueba todo commit."
+  },
+  "no_exportable": {
+    "_por_que": "Se declara para que nadie lo descubra creyendo que es un fallo de instalación.",
+    "roster_de_modelos": "Asignaciones locales únicas: Asesor=Gemini 3.8 Flash High, Arquitecto=Claude Fable 5.1 High, Especificador=Claude Opus 5 High, Ingeniero=Claude Sonnet 5 High, Verificador=Claude Opus 5 High, Auditor=Gemini 3.1 Pro High.",
+    "que_roles_admiten_ruta_A": "Arquitecto/Especificador -> Ingeniero admite Ruta A (subagente asistido). El Verificador y el Auditor NUNCA admiten Ruta A."
+  }
+}

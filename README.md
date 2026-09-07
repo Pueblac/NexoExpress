@@ -50,9 +50,15 @@ NexoExpress/
 2. **Schema centralizado**: ningún proyecto crea colecciones Firestore sin documentarlas primero en `schemas/firestore_schema.md`.
 3. **Bitácora diaria**: cada sesión de desarrollo en el ecosistema genera su propia `docs/bitacora_DD_MM_YYYY.md` para mantener la trazabilidad.
 4. **Prefijos y Trazabilidad**: BitacoraExpress usa `be_` en todas sus colecciones para evitar colisiones. Toda acta debe incluir el campo `plataforma` ("web" o "android").
-5. **Metodología Triple-IA v2.6 — única y predominante del ecosistema** (ver `docs/METODOLOGIA_TRIPLE_IA.md`): Opus 5 (Arquitecto Macro, effort low/medium) planifica F0, diseña F1 y **predeclara la Parada de Observación**; el Especificador redacta las specs en F3 con **glosa pedagógica inline** — Opus 5 en complejidad Alta, Sonnet 5 en Media/Baja (effort high ambos); el Ingeniero de F4 es Sonnet 5 en toda complejidad; la verificación F5 la ejecuta Opus 5 (effort high) en Alta —juicio semántico— y Haiku 4.5 (Sintetizador) en Media/Baja; Haiku empaqueta la auditoría en toda complejidad; Gemini revisa el diseño ANTES y audita el código DESPUÉS (Ronda 1 de F6 SIEMPRE con 3.1 Pro High; Flash solo rondas 2+ de fixes o complejidad Baja), con validación anti-bluff de cada respuesta y el `git diff` íntegro como material de auditoría. El Director cuenta con un **Asesor Estratégico** (Gemini 3.6 Flash en Antigravity) que le traduce los gates a lenguaje ordinario y reduce cada decisión al eje **reversibilidad × impacto de negocio**: explica, pero **no decide**. *(Fable 5 sustituido por Opus 5 el 10-08-2026 — Anthropic cambió sus condiciones de acceso; detalle en METODOLOGIA_TRIPLE_IA.md §10.7.)* Todo cambio no trivial recorre el ciclo F0–F7; nada se commitea sin aprobación del Director (gate G2).
-   - **Paradas de Observación**: toda meta con UI, datos o indicadores predeclara en F0 qué podrá **ver y tocar** el Director y cuándo (por defecto al cerrar F5, antes de gastar la auditoría). Infraestructura pura puede eximirse, pero la exención se declara y se ratifica en G0 — por omisión no pasa el gate.
-   - **Recalibración dinámica (G0′)**: si en F4/F5 se descubre que el prototipo o el indicador estaban mal especificados, se DETIENE y se pide recalibración formal al Director. Cambiar la evidencia sobre la marcha es deriva de alcance e invalida la entrega.
+5. **Metodología Triple-IA v3.0 — única y predominante del ecosistema** (ver `docs/METODOLOGIA_TRIPLE_IA.md`): Rigor físico en disco, arranques mecanizados por CLI (`scripts/emitir_arranque.py`) y roster unificado fijo (1 modelo y 1 esfuerzo por rol):
+   - **Asesor Estratégico:** Gemini 3.8 Flash High (en Antigravity) traduce los gates al eje reversibilidad × impacto. No decide ni produce artefactos.
+   - **Arquitecto Macro:** Claude Fable 5.1 High planifica F0, diseña F1 y predeclara la Parada de Observación (§3.1).
+   - **Especificador Técnico:** Claude Opus 5 High redacta las specs F3 con glosa pedagógica inline (§4.3).
+   - **Ingeniero:** Claude Sonnet 5 High implementa en F4 con evidencia literal no reformateada (`| tee`).
+   - **Verificador Semántico:** Claude Opus 5 High ejecuta la compuerta empírica en F5 re-ejecutando DoDs en sesión en frío por Ruta B obligatoria.
+   - **Auditor Externo:** Gemini 3.1 Pro High audita de forma adversarial el diseño (F2) y el código con su diff (F6) en conversación nueva cross-vendor.
+   - **Guardrails obligatorios:** Sello de rol `[ROL · MODELO · turno N]` en toda respuesta, negaciones físicas por artefacto/ruta, nombrar regla violada antes de corregir, evidencia literal no reformateada (`| tee`) y hook git `commit-msg` anti-huellas.
+   - **Paradas de Observación**: toda meta con UI o audio debe ser probada físicamente por el Director antes de gastar auditorías externas o commits.
 6. **Micro-tareas**: toda meta se descompone en unidades de ≤30–45 min con DoD explícito antes de empezar; una sesión cierra 1–3 micro-ciclos completos.
 
 ## 🏗️ Firebase / Firestore Centralizado
@@ -72,4 +78,4 @@ Colecciones activas:
 Los skills están en la carpeta `.agents/skills/` y contienen instrucciones predefinidas para agentes IA (como Antigravity / Gemini). Al abrir cualquier proyecto del ecosistema o sesión de pair-programming con el agente, este detecta los skills disponibles para ayudarte a orquestar cambios arquitectónicos sin romper la paridad.
 
 ---
-*Mantenido por: Pueblac · Última actualización: 09-08-2026 (metodología v2.6)*
+*Mantenido por: Pueblac · Última actualización: 06-09-2026 (metodología v3.0)*

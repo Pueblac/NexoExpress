@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "/home/pueblac/AndroidStudioProjects/ActaExpressWeb",
+      "/home/pueblac/AndroidStudioProjects/BitacoraExpress",
+      "/home/pueblac/AndroidStudioProjects/ActaExpress"
+    ]
+  }
+}

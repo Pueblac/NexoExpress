@@ -1,62 +1,47 @@
-# Metodología Triple-IA v2.6 (Enfoque Pedagógico, Asesor del Director y Paradas de Observación) — Ecosistema Express
+# Metodología Triple-IA v3.0 (Rigor Físico, Emisión Determinista y Enfoque Pedagógico) — Ecosistema Express
 
-> **ESTADO: VIGENTE v2.6 — adoptada el 09-08-2026 por orden del Director.**
+> **ESTADO: VIGENTE v3.0 — adoptada el 06-09-2026 por orden del Director.**
 > Metodología única y predominante del ecosistema Express: no existen
 > fallbacks ni metodologías alternativas. Todo cambio no trivial del
 > ecosistema recorre este ciclo y solo este ciclo.
 >
-> **Linaje:** la v2 (adoptada 09-07-2026; revisión de diseño de Gemini
-> **APROBADO CON CAMBIOS** r1, expediente
-> `auditorias/2026-07-08_metodologia_v2/`) probó el ciclo F0–F7 en siete
-> ciclos completos. La v2.5 (06-08-2026) conservó esa maquinaria y optimizó
-> la asignación de modelos por complejidad y el gasto de tokens. La **v2.6
-> conserva íntegras ambas** (fases, artefactos, AVISO, gates, anti-bluff,
-> matriz de complejidad, estrategia de tokens) y añade cuatro cosas que
-> atacan un mismo problema: **que el Director pueda decidir de verdad en los
-> gates, sin tener que leer el código.**
+> **Linaje:** la v2 (adoptada 09-07-2026) probó el ciclo F0–F7; la v2.5 (06-08-2026)
+> optimizó modelos y gasto de tokens; la v2.6 (09-08-2026) introdujo el Asesor
+> del Director, Glosa Pedagógica y Paradas de Observación. La **v3.0**
+> incorpora la disciplina y herramientas de alto rigor de `kit_coordinador`:
 >
-> **Qué añade la v2.6:**
-> 1. El **Asesor Estratégico del Director** (§1.1): un traductor pedagógico
->    y copiloto del Director en los gates.
-> 2. La **Regla de Glosa Pedagógica Inline** (§4.3): todo término técnico
->    complejo en specs e informes lleva su analogía en lenguaje ordinario, y
->    toda decisión que se pide al Director se reduce al eje
->    **reversibilidad × impacto de negocio**.
-> 3. Las **Paradas de Observación con Evidencia Comprobable** (§3.1): en
->    proyectos con UI, datos o indicadores, F0 predeclara qué va a poder
->    **ver y tocar** el Director, y cuándo.
-> 4. El **Protocolo de Recalibración Dinámica de Evidencia**
->    (F3′ / Mini-Gate G0′, §3.2): qué hacer cuando en pleno F4/F5 se
->    descubre que el prototipo o el indicador estaban mal especificados,
->    sin que eso degenere en deriva de alcance.
->
-> **Por qué:** el ciclo v2.5 demostró que produce código sólido, pero
-> también que un Director que no lee `executor.py` línea a línea acaba
-> aprobando por confianza en vez de por criterio. Un gate humano que se
-> concede sin entender lo que se concede es un trámite, no un control.
->
-> **Sustitución de modelo vigente desde el 10-08-2026** (mecanismo del §2,
-> "Indisponibilidad de un modelo" — no es una versión nueva de la
-> metodología): Anthropic cambió las condiciones de acceso a **Fable 5**,
-> así que el Arquitecto Macro pasa a **Opus 5**. El Director no se limitó a
-> un reemplazo 1:1 y escaló también los roles de mayor juicio del ciclo;
-> detalle completo y justificación en §10, punto 7.
+> **Qué añade la v3.0:**
+> 1. **Emisión Determinista por CLI (`scripts/emitir_arranque.py`):** los
+>    arranques de rol se emiten mecánicamente desde `coordinador.json` y
+>    `.claude/settings.json` sin edición manual, resolviendo rutas absolutas
+>    y candados fail-closed.
+> 2. **Roster Unificado y Fijo (1 modelo y 1 esfuerzo por rol):** erradicación
+>    de bifurcaciones y ambigüedades en la asignación de roles.
+> 3. **Guardrails Mecánicos Estrictos:**
+>    - Sello obligatorio en toda respuesta: `[ROL · MODELO · turno N]`.
+>    - Negaciones por artefacto y ruta física (el rol es el directorio donde escribe).
+>    - Obligación de nombrar la regla violada antes de corregir.
+>    - Evidencia literal no reformateada (`comando | tee archivo`).
+> 4. **Hook anti-huellas (`commit-msg`):** interceptor git con `grep -iqE` que
+>    bloquea firmas o menciones de IA en commits del repositorio.
+> 5. **Hibridación Software vs. Datos:** preservación de la matriz de complejidad
+>    para el alcance, expedientes temáticos por ciclo y Paradas de Observación.
 
 ---
 
-## 1. Los Roles (por modelo y parámetros)
+## 1. Los Roles (Roster Unificado v3.0: 1 Modelo y 1 Esfuerzo Fijo)
 
 | Rol | Quién | Configuración | Fases | Responsabilidad |
 |---|---|---|---|---|
-| **Director / Auditor Técnico** | Pueblac (humano) | — | Gates G0, G0′, G1, G2 | Define la visión y prioridades, autoriza los gates, **rota los artefactos entre modelos** (Modo M), arbitra conflictos y da la aprobación FINAL. Nada se commitea sin su visto bueno. |
-| **Asesor Estratégico del Director** | **Gemini 3.6 Flash** (en Antigravity) | Conversación propia, separada de la del Auditor | **Gates G0, G0′, G1, G2** (a demanda del Director) | Traductor pedagógico y copiloto. Explica al Director qué está aprobando, en lenguaje ordinario, y le devuelve la decisión reducida al eje **reversibilidad × impacto**. **No decide, no vota, no produce artefactos del expediente.** Ver §1.1. |
-| **Arquitecto Macro / Estratega** | Claude **Opus 5** | `effort: low` o `medium` | **F0 y F1** | Planificación macro, descomposición en micro-tareas con DoD, diseño conceptual, clasificación de complejidad (§2) y **predeclaración de las Paradas de Observación** (§3.1). Entregables **breves de alta inteligencia**: decide mucho, escribe poco. Custodia de expedientes y del checklist. |
-| **Especificador y Diseñador Técnico** | Claude **Opus 5** (Alta) o Claude **Sonnet 5** (Media/Baja) | `effort: high` | **F3; F5 en Alta** | Redacción del **Paquete de Especificación** (`spec_mtNN.md`): contratos, schemas aplicados, extractos verificados, **glosa pedagógica inline** (§4.3). En complejidad **Alta**, el mismo rol (Opus) ejecuta además la verificación F5 — juicio semántico sobre el código real. |
-| **Ingeniero** | Claude **Sonnet 5** | Estándar | **F4, toda complejidad** | Implementación FIEL a la spec. Desde el 10-08 es un rol único, sin split por complejidad (antes Sonnet/Haiku según §2) — ver §10.7. |
-| **Sintetizador y Anti-Bluff Interno** | Claude **Haiku 4.5** | Estándar | **F5 (Media/Baja) y preparación de F6** | Re-ejecución determinista del DoD sobre el código real, parseo del `git diff` literal, verificación formal de citas y **empaquetado del prompt de auditoría** para Gemini. No emite juicios de diseño: ante ambigüedad, ESCALA (§2.1). |
-| **Auditor Externo Adversarial** | **Gemini 3.1 Pro High** o **Gemini Flash** | Conversación NUEVA (contexto cero) | **F2 y F6** | Auditoría adversarial del DISEÑO antes del código y del CÓDIGO después, bajo contrato de citas, trazas y trampas. **Pro High** para arquitectura, seguridad, core y SIEMPRE la Ronda 1 de F6; **Flash** solo rondas 2+ o complejidad Baja (§2). |
-| **Innovador** | Skill `innovador` | — | fuera de ciclo | Detecta mejoras fuera del plan. Propone, nunca implementa. |
-| **Depurador de Agentes** | Skill `depurador_agentes` (la invoca el Director) | — | a demanda | Detecta bucles de error/alucinación en **cualquiera de las IAs del ciclo** y prescribe la intervención. |
+| **Director / Auditor Técnico** | Pueblac (humano) | — | Gates G0, G0′, G1, G2 | Define la visión y prioridades, autoriza los gates, arbitra conflictos y da la aprobación FINAL. Nada se commitea sin su visto bueno. |
+| **Asesor Estratégico del Director** | **Gemini 3.8 Flash** | `effort: high` (en Antigravity) | **Gates G0, G0′, G1, G2** (a demanda del Director) | Traductor pedagógico y copiloto. Explica al Director qué está aprobando en lenguaje ordinario, reduciendo la decisión al eje **reversibilidad × impacto**. **No decide, no vota, no produce artefactos del expediente.** Ver §1.1. |
+| **Arquitecto Macro / Estratega** | Claude **Fable 5.1** | `effort: high` | **F0 y F1** | Planificación macro, descomposición en micro-tareas con DoD, diseño conceptual, clasificación de complejidad (§2) y **predeclaración de las Paradas de Observación** (§3.1). Custodia del plan y checklist. |
+| **Especificador Técnico** | Claude **Opus 5** | `effort: high` | **F3** | Redacción del **Paquete de Especificación** (`spec_mtNN.md`): contratos, schemas aplicados, extractos de código verificados y **glosa pedagógica inline** (§4.3). |
+| **Ingeniero** | Claude **Sonnet 5** | `effort: high` | **F4** | Implementación FIEL a la spec en los repositorios autorizados. Informe de entrega con evidencia literal no reformateada (`comando \| tee archivo`). |
+| **Verificador Semántico** | Claude **Opus 5** | `effort: high` | **F5** | Re-ejecución determinista del DoD sobre el código real, compuerta empírica, veredicto binario CONFORME / NO CONFORME. Sesión NUEVA en frío obligatoria por Ruta B. |
+| **Auditor Externo Adversarial** | **Gemini 3.1 Pro** | `effort: high` | **F2 y F6** | Auditoría adversarial cross-vendor del DISEÑO antes del código (F2) y del CÓDIGO después (F6), bajo contrato de citas, trazas, trampas y `git diff` literal. Contexto cero, sin compartir hilo con el Asesor. |
+| **Innovador** | Skill `innovador` | — | fuera de ciclo | Detecta mejoras fuera del plan. Propone con evidencia, nunca implementa. |
+| **Depurador de Agentes** | Skill `depurador_agentes` (la invoca el Director) | — | a demanda | Detecta bucles de error/alucinación en cualquiera de las IAs del ciclo y prescribe la intervención. |
 
 ### 1.1 Asesor Estratégico del Director (nuevo en v2.6)
 
@@ -141,40 +126,28 @@ cross-vendor de F6.
 
 ---
 
-## 2. Matriz de asignación por complejidad de la micro-tarea
+## 2. Matriz de Complejidad y Fases
 
-La complejidad la **clasifica el Arquitecto en F0** y la **ratifica el
-Director en G0**, antes de F3. Queda anotada en el checklist (`[Alta]` /
-`[Media]` / `[Baja]`). En caso de duda entre dos niveles, se asigna el
-superior.
+En v3.0, **la asignación de modelos es FIJA y UNIFICADA (1 modelo y 1 esfuerzo por rol)** para erradicar bifurcaciones y sobrecargas de configuración:
 
-| Complejidad | Ejemplos | Spec (F3) | Impl (F4) | Verif (F5) | Audit (F2/F6) |
-|---|---|---|---|---|---|
-| **Alta** | Core, algoritmos RAG, schema Firestore, pipeline de IA | **Opus 5** (`effort: high`) | **Sonnet 5** | **Opus 5** (`effort: high`) | **Gemini 3.1 Pro High** |
-| **Media** | UI features, handlers de API, integraciones | Sonnet 5 (`effort: high`) | **Sonnet 5** | Haiku 4.5 | F2: **Flash** · F6 r1: **Gemini 3.1 Pro High** · F6 r2+: **Flash** |
-| **Baja / Trivial** | CSS, fixes simples, docs, types | Sonnet 5 (`effort: high`) | **Sonnet 5** | Haiku 4.5 | **Gemini Flash** |
+| Fase | Rol | Modelo Oficial (Único) | Esfuerzo |
+|---|---|---|---|
+| **F0 / F1** | Arquitecto Macro | **Claude Fable 5.1** | `effort: high` |
+| **F2 (Auditoría Diseño)** | Auditor Externo | **Gemini 3.1 Pro** | `effort: high` |
+| **F3 (Especificación)** | Especificador Técnico | **Claude Opus 5** | `effort: high` |
+| **F4 (Implementación)** | Ingeniero | **Claude Sonnet 5** | `effort: high` |
+| **F5 (Verificación)** | Verificador Semántico | **Claude Opus 5** | `effort: high` |
+| **F6 (Auditoría Código)** | Auditor Externo | **Gemini 3.1 Pro** | `effort: high` |
+| **Gates (Asesor)** | Asesor Estratégico | **Gemini 3.8 Flash** | `effort: high` |
 
-Notas de aplicación:
+La complejidad de la micro-tarea (`[Alta]`, `[Media]`, `[Baja]`) la **clasifica el Arquitecto en F0** y la **ratifica el Director en G0**, determinando **el flujo de compuertas**:
 
-- **Rondas de F6:** la Ronda 1 usa SIEMPRE **Gemini 3.1 Pro High**, incluso
-  en Media — la primera mirada adversarial al código no se abarata.
-  **Flash** solo para rondas 2+ o complejidad Baja.
-- **F0/F1 (Opus) aplican a toda meta**; la ronda de diseño F1→F2 es
-  obligatoria en Alta y Media. En **Baja**, el Director puede autorizar en
-  G0 colapsar F1/F2 — la MT pasa de G0 directo a F3; F5 y F6 siguen siendo
-  obligatorias.
-- **Cambio trivial atómico** (typo, una línea de doc, texto de UI): el
-  Director puede autorizar la **vía rápida** — ejecución directa sin ciclo
-  completo, con anotación en el checklist
-  `[vía rápida v2.6 autorizada por el Director]` y aprobación antes de
-  commit. Es la única excepción al ciclo.
-- **Indisponibilidad de un modelo:** el Director decide la sustitución
-  dentro de la tabla de roles. Si Gemini no está disponible, NO hay cierre
-  de ciclo: la sesión corta en el artefacto pendiente. Se anota en bitácora.
-  (Precedente: la sustitución de Fable por Opus del 10-08-2026, §10.7.)
-- **Indisponibilidad del Asesor:** no bloquea nada. El gate se concede igual
-  con el AVISO y la glosa pedagógica del propio artefacto (§4.3), que es lo
-  que garantiza que el Director pueda decidir aunque el Asesor no esté.
+| Complejidad | Ejemplos | Flujo de Fases y Compuertas |
+|---|---|---|
+| **Alta** | Core, algoritmos RAG, schema Firestore, pipelines críticos | **Ciclo Completo Obligatorio:** F0→G0→F1→F2→G1→F3→F4→F5→F6→G2. Sin colapsos permitidos. |
+| **Media** | UI features, handlers de API, integraciones, audio | **Ciclo Estándar:** F0→G0→F1→F2→G1→F3→F4→F5→F6→G2. |
+| **Baja** | CSS, refactors menores, docs, types, micro-fixes | **Ciclo Ágil:** En G0 el Director puede autorizar colapsar F1/F2 (pasa de G0 directo a F3); F5 y F6 son siempre obligatorios. |
+| **Trivial Atómica** | Typo, corrección de una línea de texto | **Vía Rápida v3.0:** Ejecución directa autorizada por el Director en el checklist y aprobación antes de commit. |
 
 ### 2.1 Regla de escalada
 
@@ -484,66 +457,56 @@ VUELVE A   : {rol que recibe el resultado} con {qué archivo se
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-Reglas del AVISO:
-- **Un artefacto sin AVISO no cierra fase.**
-- **`ADJUNTOS` es exhaustivo**: lo listado es obligatorio transportarlo; lo
-  no listado no se adjunta.
-- **`MODELO` es vinculante**: indica qué modelo y configuración abrir para
-  la fase siguiente, según §2.
-- **`OBSERVABLE` es nuevo en v2.6**: dice al Director si esta fase le deja
-  algo que ver. Evita que llegue a G2 sin haber tocado nada.
-- Cada rol **verifica que el artefacto recibido le corresponde** (campo
-  `TURNO DE`) y rechaza los ajenos con una línea, sin ejecutarlos. Este
-  rechazo solo opera si la sesión fue inicializada con su rol (§6).
-- En Modo M el `DESTINO` es una instrucción de operación para el Director;
-  en Modo A es la llamada que hace el orquestador.
-
 ---
 
-## 6. Modos de operación
+## 6. Modos de operación y Emisión Determinista (v3.0)
 
-### Modo M — Manual (DEFAULT)
+### 6.1 Emisión Determinista de Arranques (`scripts/emitir_arranque.py`)
 
-El Director transporta cada artefacto entre las IAs:
-- **Arquitecto**: sesión de Claude Code con Opus 5, `effort: low/medium`.
-- **Especificador**: sesión de Claude Opus 5 en Alta / Sonnet 5 en
-  Media-Baja (`effort: high`) — conversación nueva por meta.
-- **Ingeniero**: sesión nueva de Sonnet 5 (toda complejidad desde el
-  10-08); recibe SOLO el Paquete de Especificación (+ repo). Práctica
-  consolidada: **rotación asistida** — el Arquitecto lanza al Ingeniero
-  como subagente con contexto limpio y la spec archivada.
-- **Verificador / Sintetizador**: sesión o subagente según §2.
-- **Auditor**: conversación NUEVA de Gemini por ronda, sin herencia de hilo.
-- **Asesor** (§1.1): conversación propia en Antigravity, **separada de la
-  del Auditor**, convocada por el Director en los gates.
+En v3.0 se elimina la redacción o copia manual de prompts de arranque en frío. Todo arranque se genera de forma mecánica y determinista mediante el script central:
 
-**Inicialización de identidad (obligatoria):** toda sesión nueva de
-Especificador, Ingeniero, Verificador, Sintetizador o Auditor arranca con un
-prompt de rol de una línea ANTES del primer artefacto:
+```bash
+# Ver cadena de mando y roles vigentes
+python3 scripts/emitir_arranque.py --lista
 
-> "Rol: {Especificador | Ingeniero | Verificador | Sintetizador | Auditor}
-> del ciclo {expediente}, metodología v2.6 del ecosistema Express. Confirma
-> recepción sin accionar; acepta únicamente artefactos cuyo campo TURNO DE
-> diga {rol}."
+# Emitir el arranque de un rol
+python3 scripts/emitir_arranque.py arquitecto "Planificar ciclo de persistencia"
+python3 scripts/emitir_arranque.py especificador "Especificar MT-01" --insumo auditorias/.../diseno_f1.md
+python3 scripts/emitir_arranque.py ingeniero "Implementar MT-01" --insumo auditorias/.../spec_mt01.md
+python3 scripts/emitir_arranque.py verificador "Verificar MT-01" --insumo auditorias/.../entrega_mt01.md
+python3 scripts/emitir_arranque.py auditor "Auditar F6 MT-01" --insumo auditorias/.../prompt_f6.md
+```
 
-Sin esta inicialización, la regla de rechazo de artefactos ajenos (§5) no
-tiene base para operar. **Desde el 10-08 esta disciplina pesa más que
-antes**: en complejidad Alta, Opus ocupa Arquitecto, Especificador y
-Verificador — la inicialización de identidad es lo único que garantiza que
-cada una de esas sesiones arranque realmente en frío (§10.7).
+**Propiedades del emisor determinista:**
+- **Sin rutas relativas rotas:** Resuelve automáticamente las rutas absolutas del workspace y de los repositorios autorizados desde `.claude/settings.json`.
+- **Fail-closed en insumos:** Si se emite un rol que exige `--insumo` sin él o apuntando a un archivo que no existe en disco, **aborta con `exit 1`**. No despacha a ninguna IA hacia una alucinación.
+- **Bloque autocontenido en disco:** Escribe el bloque listo para el portapapeles en `bloques/bloque_<rol>.txt` (ignorado por git).
 
-**Working tree limpio:** F4 arranca sobre la rama base sin cambios sin
-commitear de otras micro-tareas. Una MT en vuelo a la vez por componente.
+### 6.2 Guardrails Mecánicos y Físicos (Importados de kit_coordinador)
 
-Costo asumido: toil humano de rotación (mitigado por la rotación asistida).
-Beneficio: el Director ve pasar todos los artefactos y cada IA queda
-aislada de verdad.
+1. **Sello de rol obligatorio:** **Cada** respuesta del agente empieza obligatoriamente por su sello de identidad:
+   `[ROL · MODELO · turno N]`
+   Convierte la deriva en algo visible de un vistazo en el turno 30. Un agente que deja de sellar ya derivó.
+2. **Negaciones por artefacto y ruta física:** Lo que un rol NO hace se escribe como rutas físicas y archivos que no puede tocar (ej. *"no toco código en los repositorios"*, *"no escribo órdenes"*). Un modelo no sabe si está siendo "autoritario" o "complaciente"; sí sabe qué archivo está editando.
+3. **Nombrar la regla violada antes de corregir:** Ante una corrección del Director, el agente responde PRIMERO con una línea identificando la regla violada. Solo después aplica el arreglo. Si no la identifica, debe preguntar.
+4. **Evidencia literal no reformateada (`comando | tee archivo`):** La salida de pruebas y terminal se pega TAL CUAL sale del comando. No se reformatea, no se alinea y no se resume. Una salida embellecida por el LLM se considera inválida.
+5. **Hook anti-huellas (`hooks/commit-msg`):** Hook git instalado en `.git/hooks/commit-msg` que intercepta mensajes de commit. Exige mensajes de una sola línea y bloquea cualquier mención o huella de IA.
 
-### Modo A — Automatizado (variante propuesta, NO habilitada; requiere ciclo propio)
+### 6.3 Modo M — Manual con Emisión CLI (DEFAULT v3.0)
 
-El Arquitecto orquesta desde Claude Code: lanza Especificador, Ingeniero y
-Verificador como subagentes y llama al Auditor vía API. El humano interviene
-únicamente en los gates.
+El Director es el custodio de los gates y transporta los bloques emitidos:
+- **Arquitecto (Claude Fable 5.1 High):** Recibe el encargo emitido con `emitir_arranque.py arquitecto`.
+- **Especificador (Claude Opus 5 High):** Recibe la orden y diseña la spec F3.
+- **Ingeniero (Claude Sonnet 5 High):** Ejecuta la implementación. Admite **Ruta A** (subagente asistido lanzado por el Especificador) o **Ruta B** (sesión nueva abierta por el Director).
+- **Verificador (Claude Opus 5 High):** Sesión NUEVA en frío obligatoria por **Ruta B**. NUNCA Ruta A.
+- **Auditor (Gemini 3.1 Pro High):** Conversación NUEVA en Gemini, cross-vendor, sin herencia de contexto.
+- **Asesor (Gemini 3.8 Flash High):** Conversación propia en Antigravity, separada del Auditor.
+
+### 6.4 Modo A — Automatizado (en NexoOrchestrator)
+
+La infraestructura del orquestador autónomo vive en el repositorio **NexoOrchestrator**
+desde el 09-08-2026 y no se ejecuta directamente en NexoExpress. En Modo A el humano
+interviene únicamente en los gates.
 
 **Salvaguardas mínimas si algún día se habilita** (condición necesaria, no
 suficiente):
@@ -754,3 +717,17 @@ esa es la comparación correcta, no los tokens de unos paréntesis.
    revierta o Fable 5 vuelva a estar disponible en condiciones aceptables.
    No requiere un nuevo ciclo de diseño para revertirse — basta con otra
    entrada en este punto.
+
+8. 🚀 **v3.0 adoptada el 06-09-2026 por orden del Director: Rigor Físico, Emisión Determinista y Roster Unificado.**
+   Se integran las defensas duras de `kit_coordinador`:
+   - Emisor mecánico de arranques `scripts/emitir_arranque.py` con configuración central en `coordinador.json` y repositorios autorizados en `.claude/settings.json`.
+   - Roster oficial y fijo (1 modelo y 1 esfuerzo por rol, sin bifurcaciones):
+     - Asesor: Gemini 3.8 Flash High
+     - Arquitecto: Claude Fable 5.1 High
+     - Especificador: Claude Opus 5 High
+     - Ingeniero: Claude Sonnet 5 High
+     - Verificador: Claude Opus 5 High
+     - Auditor: Gemini 3.1 Pro High
+   - Guardrails duros: sello de rol `[ROL · MODELO · turno N]`, negaciones físicas por ruta/artefacto, nombrar regla violada antes de corregir, y evidencia literal no reformateada (`| tee`).
+   - Hook git `commit-msg` anti-huellas activo en `.git/hooks/commit-msg`.
+   - Se preserva la matriz de complejidad (Alta/Media/Baja) para la profundidad del ciclo, las Paradas de Observación tangibles y los expedientes por ciclo.
