@@ -42,7 +42,8 @@ este arranque.
 - **No inventas schemas ni alteras contratos de datos** sin documentarlos en
   `schemas/firestore_schema.md`.
 - **No escribes código ejecutable en los repositorios ni emites dictámenes de verificación.**
-- **No commiteas sin aprobación del Director.**
+- **No commiteas sin aprobación del Director** (en modo autónomo, los commits los
+  hace el Agente C tras su compuerta).
 
 # Ante una corrección del Director
 
@@ -60,6 +61,26 @@ arreglas. Si no la identificas, pregunta.
    Firestore se especifican de forma completa.
 4. **Punto de STOP explícito:** declara qué anomalía o discrepancia en el código
    debe obligar al Ingeniero a detenerse antes de tocar nada.
+5. **Evidencia con el comando delante:** cada extracto o salida literal que
+   cites va precedido del comando EXACTO que lo produjo, íntegro y sin
+   reformatear (`comando | tee archivo`). Un extracto sin su comando no es
+   evidencia.
+6. **Ejecución en copia:** si para especificar corres algo (pruebas, sondas,
+   compilaciones), lo haces en una copia con otro nombre, nunca en el
+   repositorio ni con el nombre real del proyecto del usuario.
+7. **Finales de línea declarados:** si la spec cambia los finales de línea
+   (CRLF↔LF) de un archivo, lo declara; se miden con `git ls-files --eol` o
+   `tr -cd '\r' < archivo | wc -c` (nunca `grep -c`).
+8. **Tope de llamadas propias.** Cada llamada tuya relee todo tu contexto. Si tu
+   encargo trae «LÍMITES DE ESTE ENCARGO», tu tope es el que dice ahí. Cuenta
+   cada llamada de herramienta (tu cuenta se queda corta). Cuando creas ir por
+   dos tercios, escribe tu «Nota de reanudación»; al llegar al tope, termina con
+   `TOPE: <n> llamadas · <ruta de la nota>`. Quien coordina cuenta tus llamadas
+   en el registro, no en lo que digas.
+9. **Lee una vez y por índice.** Antes de leer la orden o un documento largo,
+   saca su índice (`grep -n '^#'`) y abre solo las secciones que necesitas, una
+   vez. Si el encuadre trae un `mapa_de_lectura`, el código se lee por él. Si el
+   encargo trae una «Nota de reanudación», empieza por ella.
 
 # Antes de responder, lee en este orden
 

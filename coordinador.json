@@ -1,5 +1,7 @@
 {
   "_lea_esto_primero": "Este archivo ES la metodología en forma operable: declara qué roles existen, con qué modelo y esfuerzo arrancan, qué artefacto produce cada uno y en qué orden se pasan el trabajo. Los scripts no saben nada que no esté aquí. No edite los scripts.",
+  "kit_version": "1.6.3",
+  "_kit_version_nota": "Versión del kit de la que sale esta configuración. La lee `scripts/detectar_metodologia.py` para saber qué hay instalado antes de reemplazarlo. Al migrar de versión, se actualiza aquí.",
   "_regla_de_rutas": "Aquí NO se escriben rutas absolutas. El workspace se deduce de la ubicación del script y los repositorios de trabajo salen de `.claude/settings.json` (permissions.additionalDirectories). Así el kit se adapta solo al proyecto destino.",
   "proyecto": {
     "nombre": "NexoExpress (Ecosistema Express)",
@@ -10,7 +12,133 @@
     "dir_plantillas": "docs/prompts_arranque"
   },
   "_sobre_los_roles": "Un rol se define por EL ÚNICO ARTEFACTO QUE PRODUCE Y EL DIRECTORIO DONDE LO ESCRIBE, con 1 modelo y 1 esfuerzo fijo sin bifurcaciones.",
+  "_sobre_el_motor": "Nuevo en v1.3. Cada rol declara con qué motor corre: \"motor\": \"claude\" (por defecto, si se omite) o \"agy\" (la CLI de un motor externo, ver `MOTOR_EXTERNO.md`). Un rol en agy declara además: \"modelo_agy\" (el identificador que acepta `agy models`; lo fija el lanzador con --model); \"modelo_agy_definicion\" (opcional: el `model` del frontmatter, que solo puede valer flash, pro o inherit; sin él, `emitir_agy.py` lo deduce de modelo_agy: flash da flash, pro o argon dan pro, el resto inherit. Un model distinto hace que agy descarte el rol sin aviso); \"comandos_agy\" (lo único que puede correr, cada uno como {\"regex\": \"^…$\", \"forma\": \"…\"}: la expresión ANCLADA que va a los permisos y la forma exacta que lee el rol); \"supervision_agy\" (el validador determinista que mide su artefacto, o \"verificador\"); y, opcionales, \"tope_llamadas_agy\" (60 por defecto), \"herramientas_agy\" (subconjunto del registro de agy) y \"subagentes_agy\" (lista de tipos: lectura, redaccion, revision; subordinados que el rol invoca dentro de su turno y que no ejecutan comandos; ver `MOTOR_EXTERNO.md` §9). En regex y formas, {WS} es el workspace y {REPO_1}, {REPO_2}… los repositorios de `.claude/settings.json` en su orden. Los campos _agy de un rol en claude no se usan: quedan listos para cambiar de motor con una sola línea. `scripts/emitir_agy.py` genera desde aquí `.agents/agents/<rol>.md` y `.agents/permisos/<rol>.json`; `scripts/lanzar_agy.py` los aplica.",
+  "supervision": {
+    "modo": "claude_completa",
+    "_modo_nota": "Desde v1.4 el kit se instala en \"asistentes\" sin preguntarlo (decisión del Director, 31-10-2026): la cadena de roles corre en Claude y Gemini es asistente de los roles de Claude, que lo mandan por la CLI de Antigravity (agy) y lo vigilan con un monitor de Claude. Mientras agy no esté instalado, con sesión y con el workspace de confianza, el instalador deja \"claude_completa\" de forma provisional y lo anota como límite de la instalación; con agy listo, pasa a \"asistentes\". \"solo_coordinador\" sigue siendo solo por frase explícita del Director en cada proyecto.",
+    "_nota": "Nuevo en v1.3. \"claude_completa\" (el modo provisional sin agy): el coordinador y el Verificador corren en Claude, y todo artefacto de un rol en agy pasa por un validador determinista o por un Verificador en Claude. \"solo_coordinador\": Claude es solo el coordinador (nunca en agy); todos los roles con artefacto pueden ir en agy, también el Verificador; la compuerta del coordinador es obligatoria tras CADA rol (todos los validadores deterministas del rol y una muestra vuelta a medir contra las fuentes); el Verificador en agy usa un nivel de modelo distinto del rol que revisa y solo ve su entregable y las fuentes. Este modo lo decide el usuario y lo dice explícitamente en cada proyecto: no se activa por defecto ni por deducción. Perfil completo: `ejemplos/coordinador_solo_coordinador.example.json`. El Asesor queda fuera de agy en los dos modos. Nuevo en v1.3.2: \"asistentes\" (el modo por defecto desde v1.4, `MOTOR_EXTERNO.md` §10): la cadena de roles es la de claude_completa, y los roles de `asistentes.roles` dividen su trabajo en actividades que ejecutan asistentes Gemini en agy, cada uno vigilado por un monitor de Claude; la sección `asistentes` de abajo solo se lee con este modo.",
+    "asistentes": {
+      "_nota": "Nuevo en v1.3.2. Solo se lee con \"modo\": \"asistentes\". Cada actividad del Plan de actividades de un rol (`plantillas/asist_plan.md`) es un rol de asistente en agy que `scripts/emitir_agy.py` genera (`.agents/agents/<rol>.md` y `.agents/permisos/<rol>.json`) y que lanza y vigila un monitor de Claude (`plantillas/asist_encargo_monitor.md`). \"asistente\": el modelo Gemini de agy (Flash por defecto; `gemini-4-argon-high` solo si el plan lo justifica por escrito: su bolsa semanal es chica; nunca la bolsa «Claude and GPT» de agy para trabajo de rutina: `emitir_agy.py` y `lanzar_agy.py` se niegan). \"monitor\": haiku, sonnet u opus, el modelo de Claude del subagente monitor (haiku para lo mecánico: lectura y medición; sonnet cuando hay criterio: prototipo, borrador y revisión). \"comandos_agy\": lo único que corre el asistente, como en un rol de la cadena. Si un asistente agota la cuota (exit 4 del lanzador) el monitor NO cambia de modelo: devuelve CUOTA y el rol que la encargó la hace con un auxiliar de Claude. Se pueden añadir actividades propias (copia una y cambia su clave y su `rol`) y quitar las que el proyecto no use.",
+      "roles": [
+        "arquitecto",
+        "ingeniero",
+        "verificador"
+      ],
+      "_roles_nota": "Nuevo en v1.4. Los roles de la cadena que DEBEN usar asistentes: cada uno escribe su Plan de actividades antes de su artefacto, con una tabla «Cobertura» que dice, por cada tipo de actividad, qué delegó o por qué no («Sin asistente: <motivo>»). `scripts/encargar.sh` se lo recuerda al final de su encargo y el Agente C lo mide al cerrar cada ciclo con `scripts/medir_asistentes.py <ciclo>`: un rol sin plan, o un tipo sin asistente y sin motivo, se investiga y se anota en la bitácora con SIN_ASISTENTES. Lección (31-10-2026): mientras el uso quedó a criterio del rol, los asistentes se ignoraron hasta que el Director midió que no se usaban.",
+      "carpeta_salida": "asistentes/",
+      "_carpeta_salida_nota": "Carpeta del workspace donde escriben los asistentes (una subcarpeta por actividad: asistentes/<ciclo>_<id>/). Es de ellos y de nadie más; conviene ignorarla en git si lleva microdatos.",
+      "reintentos_max": 2,
+      "_reintentos_max_nota": "Reintentos del asistente por actividad (con --conversacion y una nota concreta) antes de ESCALAR al Arquitecto. Lo aplica el monitor; el lanzador no cuenta.",
+      "actividades": {
+        "A-lectura": {
+          "rol": "asist_lectura",
+          "asistente": "gemini-3.8-flash-low",
+          "monitor": "haiku",
+          "comandos_agy": [
+            {
+              "regex": "^python3? -I scripts/proponer_tramos\\.py --raiz {REPO_1} [^;&|<>`$(){}@\\n]*$",
+              "forma": "python -I scripts/proponer_tramos.py --raiz {REPO_1} <temas.json>"
+            },
+            {
+              "regex": "^git -C {REPO_1} (log|status|diff|show|ls-files)( [^;&|<>`$(){}@\\n]*)?$",
+              "forma": "git -C {REPO_1} <log|status|diff|show|ls-files> [argumentos]"
+            }
+          ]
+        },
+        "A-prototipo": {
+          "rol": "asist_prototipo",
+          "asistente": "gemini-3.8-flash-high",
+          "monitor": "sonnet",
+          "comandos_agy": [
+            {
+              "regex": "^python3? -I scripts/herramienta_segura\\.py (copiar|clonar|correr|diff|sello|sello-repo|mutar|poner) [^;&|<>`$(){}@\\n]*$",
+              "forma": "python -I scripts/herramienta_segura.py <copiar|clonar|correr|diff|sello|sello-repo|mutar|poner> <argumentos>"
+            },
+            {
+              "regex": "^git -C {REPO_1} (log|status|diff|show|ls-files)( [^;&|<>`$(){}@\\n]*)?$",
+              "forma": "git -C {REPO_1} <log|status|diff|show|ls-files> [argumentos]"
+            }
+          ]
+        },
+        "A-medicion": {
+          "rol": "asist_medicion",
+          "asistente": "gemini-3.8-flash-low",
+          "monitor": "haiku",
+          "comandos_agy": [
+            {
+              "regex": "^python3? -I scripts/herramienta_segura\\.py (copiar|clonar|correr|diff|sello|sello-repo|mutar) [^;&|<>`$(){}@\\n]*$",
+              "forma": "python -I scripts/herramienta_segura.py <copiar|clonar|correr|diff|sello|sello-repo|mutar> <argumentos>"
+            }
+          ]
+        },
+        "A-borrador": {
+          "rol": "asist_borrador",
+          "asistente": "gemini-3.8-flash-medium",
+          "monitor": "sonnet",
+          "comandos_agy": [
+            {
+              "regex": "^git -C {REPO_1} (log|status|diff|show|ls-files)( [^;&|<>`$(){}@\\n]*)?$",
+              "forma": "git -C {REPO_1} <log|status|diff|show|ls-files> [argumentos]"
+            }
+          ]
+        },
+        "A-revision": {
+          "rol": "asist_revision",
+          "asistente": "gemini-3.8-flash-medium",
+          "monitor": "sonnet",
+          "comandos_agy": [
+            {
+              "regex": "^python3? -I scripts/herramienta_segura\\.py (diff|sello|sello-repo) [^;&|<>`$(){}@\\n]*$",
+              "forma": "python -I scripts/herramienta_segura.py <diff|sello|sello-repo> <argumentos>"
+            },
+            {
+              "regex": "^git -C {REPO_1} (log|status|diff|show|ls-files)( [^;&|<>`$(){}@\\n]*)?$",
+              "forma": "git -C {REPO_1} <log|status|diff|show|ls-files> [argumentos]"
+            }
+          ]
+        },
+        "A-navegacion": {
+          "_nota": "Nuevo en v1.5 (decisión del Director, 09-11-2026): el asistente navegador. Lee y navega sitios web con el subagente `browser` de agy sobre el Chrome del kit (perfil dedicado, sección `navegador`); nunca actúa sobre el sitio ni escribe credenciales. No ejecuta comandos: \"navegador\": true le niega todos, y `comandos_agy` va vacío. Lo lanza el agente por defecto de agy, no su rol (MOTOR_EXTERNO.md §11). El monitor abre Chrome antes (`abrir_navegador.py abrir`), vuelve a medir con `abrir_navegador.py leer` y lo cierra siempre (`cerrar`).",
+          "rol": "asist_navegacion",
+          "navegador": true,
+          "asistente": "gemini-3.8-flash-medium",
+          "monitor": "haiku",
+          "comandos_agy": []
+        }
+      },
+      "navegador": {
+        "_nota": "Nuevo en v1.5. El Chrome del asistente navegador. Perfil DEDICADO del kit, uno por máquina y compartido por los coordinadores; se conserva entre corridas para que las sesiones que el Director abre a mano (`python -I scripts/abrir_navegador.py sesion --url <URL>`) sigan abiertas. Nunca el perfil del usuario: el script lo rechaza. Inicia sesión solo en lo que los asistentes necesitan: con esas sesiones, el asistente ve lo que ve el Director. Vacío = valores por defecto: perfil <datos locales>/kit_coordinador/chrome_navegador (en Windows, %LOCALAPPDATA%), Chrome que se encuentre y puerto 9222.",
+        "perfil": "",
+        "chrome": "",
+        "puerto": 9222
+      }
+    }
+  },
+  "roles_adhoc_agy": {
+    "_nota": "Nuevo en v1.3.2 (opcional). Roles en agy que no son de la cadena —un auxiliar de medición, un verificador de prueba, un piloto— con la forma de un rol de `roles` (motor agy, modelo_agy, escribe_en, comandos_agy, supervision_agy…). `scripts/emitir_agy.py` los genera como a cualquier rol y `scripts/lanzar_agy.py` los lanza. Un nombre que ya es un rol de la cadena se rechaza. Vacío por defecto."
+  },
   "roles": {
+    "coordinador": {
+      "orden": -1,
+      "en_la_linea": false,
+      "modelo": "MODELO — la sesión principal del coordinador",
+      "motor": "claude",
+      "_motor_nota": "Siempre claude en los dos modos (guardrail `supervision_claude`): el coordinador lanza, supervisa y hace la compuerta de los roles en agy. `emitir_agy.py` se niega si se cambia.",
+      "ruta_traspaso": "—",
+      "artefacto": "bitácora (decisiones delegadas, compuertas, cierres de ciclo) + encargos a los roles",
+      "escribe_en": "coordinacion/",
+      "_nota": "Agente C. Solo existe en MODO AUTÓNOMO (ver `MODO_AUTONOMO.md` del kit): suple al Director en lo delegable, lanza a los demás roles como subagentes en frío, encadena los ciclos sin esperar y re-mide una muestra en su compuerta. Su arranque NO es una plantilla escrita por él: es la instrucción del Director (`plantillas/modo_de_trabajo.md`, que el Director adapta y firma). Por eso `plantilla` es null y el emisor no lo arranca. NO escribe fichas, encuadres, órdenes, código ni veredictos: los encarga. Desde v1.4 el modo autónomo es el que se instala: este rol se borra solo si el Director pide expresamente el modo manual para todo el proyecto (ver `modo_autonomo.modo_manual`).",
+      "recibe_de": [
+        "director"
+      ],
+      "entrega_a": [
+        "director",
+        "guionista",
+        "arquitecto",
+        "archivista"
+      ],
+      "plantilla": null
+    },
     "asesor": {
       "orden": 0,
       "en_la_linea": false,
@@ -85,6 +213,8 @@
       "orden": 4,
       "en_la_linea": true,
       "modelo": "Claude Opus 5 High",
+      "motor": "claude",
+      "_motor_nota": "Claude en los modos claude_completa y asistentes (el que se instala): verifica, y el Verificador de un trabajo hecho en agy corre en Claude (guardrail `supervision_claude`). Solo con `supervision.modo` = solo_coordinador puede ir en agy, con un nivel de modelo distinto del rol que revisa. `emitir_agy.py` se niega en cualquier otro caso.",
       "ruta_traspaso": "B",
       "_ruta_traspaso_nota": "NUNCA ruta A, sin excepción: en la ruta interna el emisor escribe el prompt del receptor, y decidir qué se verifica es la mitad de verificar.",
       "artefacto": "veredicto de verificación (F5) CONFORME / NO CONFORME",
@@ -100,10 +230,40 @@
       "insumo": "obligatorio",
       "plantilla": "verificador.md"
     },
+    "archivista": {
+      "orden": 6,
+      "en_la_linea": false,
+      "modelo": "MODELO — el más barato del roster; lo mecánico lo hacen scripts",
+      "motor": "claude",
+      "_motor_nota": "Candidato a agy después del Guionista: escribe solo en `indice/` y `comprobar_indice.py` comprueba cada puntero.",
+      "modelo_agy": "gemini-3.8-flash-medium",
+      "comandos_agy": [
+        {
+          "regex": "^python3? -I scripts/comprobar_indice\\.py [^;&|<>`$(){}@\\n]*$",
+          "forma": "python -I scripts/comprobar_indice.py <bitácora> <índice> [<fichas de cierre>]"
+        }
+      ],
+      "supervision_agy": "scripts/comprobar_indice.py",
+      "ruta_traspaso": "B",
+      "artefacto": "índice del proyecto (ficha de cierre por ciclo + INDICE.md + sobrantes.md)",
+      "escribe_en": "indice/",
+      "_nota": "Nuevo en v1.2. Va fuera de la línea: al cerrar cada ciclo, tras la compuerta y el commit, ordena lo que ya existe para que los roles siguientes lean menos. Recibe hecha la lista de artefactos (`scripts/listar_artefactos.py`) y la medición de consumo; no busca archivos ni re-mide. Sus punteros los comprueba `scripts/comprobar_indice.py`. No borra nada.",
+      "recibe_de": [
+        "coordinador"
+      ],
+      "entrega_a": [
+        "coordinador"
+      ],
+      "tarea": "obligatoria",
+      "insumo": "obligatorio",
+      "_insumo_nota": "La entrada de cierre del ciclo en la bitácora (o el archivo que la contiene).",
+      "plantilla": "archivista.md"
+    },
     "auditor": {
       "orden": 5,
       "en_la_linea": false,
       "modelo": "Gemini 3.1 Pro High",
+      "_modelo_nota": "La independencia del Auditor sale de llegar en frío, sin historia y con material sanitizado, y de no compartir modelo con el rol que audita. Desde v1.3 la regla de la v1.2 «solo roles del ecosistema Claude» queda sin efecto (decisión del Director, 26-10-2026): otra familia de modelos suma independencia, pero no la sustituye. Rol opcional: si el coordinador no tiene auditoría, se borra.",
       "ruta_traspaso": "B",
       "artefacto": "veredicto de auditoría externa (F2/F6) APROBADO / OBSERVADO / RECHAZADO",
       "escribe_en": "auditorias/",
@@ -118,17 +278,92 @@
       "plantilla": "auditor.md"
     }
   },
+  "modo_autonomo": {
+    "_nota": "Nuevo en v1.2. Desde v1.4 es el modo que se instala siempre (ver `MODO_AUTONOMO.md`). Lo leen `scripts/encargar.sh`, `scripts/medir_consumo.py`, `scripts/medir_asistentes.py` y el Agente C; el emisor no lo usa.",
+    "modo_manual": "Nuevo en v1.4; acotado en v1.5. El modo manual (el Director pega un bloque `COPIAR` en una conversación nueva) ya no se pregunta al instalar. Se usa en dos casos: (1) el Director lo pide expresamente, para una tarea o para todo el proyecto; (2) una página necesita a una persona: iniciar sesión, un segundo factor o un captcha. Desde v1.5 el resto del navegador lo hace el asistente navegador (A-navegacion, MOTOR_EXTERNO.md §11) dentro del ciclo. En el caso 2 el Agente C lo anota con MANUAL, el Director entra a mano en el perfil del kit (`scripts/abrir_navegador.py sesion --url <URL>`) y la actividad se vuelve a lanzar. En el caso 1, cuando es para una tarea, el Agente C emite el bloque con `scripts/emitir_arranque.py`, lo anota en la bitácora con MANUAL, se lo pasa al Director y sigue con lo que no dependa de esa tarea; al volver el artefacto, lo pasa por su compuerta como a cualquier otro.",
+    "cambio_de_version": "Nuevo en v1.4.2. Un ciclo que empezó con una versión de la metodología termina con esa versión: las versiones no se mezclan dentro de un ciclo. Si llega una versión nueva del kit, o el Director pide actualizar, con un ciclo en curso, el Agente C termina ese ciclo con la versión con que empezó (compuerta, commit, cierre de memoria del Guionista, traspaso y Archivista) y recién entonces integra la nueva con `scripts/actualizar_kit.py`, antes de abrir el ciclo siguiente. Mientras tanto no copia piezas nuevas a mano ni re-emite arranques con la versión nueva. `actualizar_kit.py --aplicar` se niega (exit 3) si el ciclo más reciente no tiene su ficha de cierre del Archivista. Lo que la versión nueva corrige y urge se anota como pendiente del ciclo siguiente; si no puede esperar, lo decide el Director, y la excepción queda en la nota de migración (`--autoriza-director \"<motivo>\"`).",
+    "instruccion_del_director": "docs/modo_de_trabajo.md",
+    "adenda": "coordinacion/adenda_modo_autonomo.txt",
+    "dir_encargos": "coordinacion/encargos/",
+    "bitacora": "coordinacion/bitacora.md",
+    "dir_bitacora_archivo": "coordinacion/bitacora_archivo/",
+    "etiquetas": {
+      "DECISION_DELEGADA": "el Agente C decidió por el Director: qué se detuvo, opciones, cuál tomó y por qué; revisable y reversible",
+      "ESCALAR": "una misma corrección superó tres vueltas sin converger: se detiene y se deja planteado al Director",
+      "STOP": "un rol no puede avanzar sin inventar: lo escribe al inicio de su artefacto y termina",
+      "ESPERA": "un rol dejó algo largo corriendo fuera de su contexto: `ESPERA: <qué corre> · <archivo de salida> · <hora estimada de fin>`",
+      "MAPA": "al Arquitecto le falta un tramo: `MAPA: <n> pedidos`, con su «Pedido de mapa» al final de la orden",
+      "TOPE": "nuevo en v1.4: un rol llegó a su tope de llamadas propias: `TOPE: <n> llamadas · <ruta de la Nota de reanudación>`; quien coordina lanza uno nuevo en frío con la nota",
+      "MANUAL": "nuevo en v1.4, acotado en v1.5: una tarea sale del modo autónomo (el Director lo pidió, o una página pide inicio de sesión, segundo factor o captcha): `MANUAL: <tarea> · <bloque emitido o URL> · <motivo>`",
+      "SIN_ASISTENTES": "nuevo en v1.4: el Agente C midió que un rol no usó los asistentes Gemini que debía: `SIN_ASISTENTES: <ciclo> · <rol> · <tipos de actividad> · <por qué> · <qué se cambia para el ciclo siguiente>`"
+    },
+    "reanudar_o_nuevo": {
+      "_nota": "Desde v1.4 se decide por LLAMADAS, no por contexto: un agente no sabe medir sus tokens (un Arquitecto creía llevar unos 125 k y llevaba 217 k). Las llamadas las cuenta `scripts/medir_consumo.py` desde el registro, nunca el agente: también cuentan mal las suyas (un Ingeniero dijo «unas 25» y el registro tenía 64).",
+      "renovar_por_contexto": 150000,
+      "_renovar_por_contexto_nota": "Nuevo en v1.6.1 (decisión del Director, 13-11-2026): quien coordina renueva al rol —un agente nuevo en frío con su «Nota de reanudación»— cuando su contexto final llega a 150 k, aunque no haya llegado a su tope de llamadas: lo que ocurra primero. Medido por el Director: un Arquitecto que se deja seguir hasta 200 k termina en 250 k y pierde eficiencia. El contexto lo mide quien coordina con `scripts/medir_consumo.py` (columna «contexto final», marca RENOVAR) después de cada turno; nunca el agente, que no sabe medir sus tokens. No aplica al Agente C, que se renueva con el traspaso al cerrar cada historia.",
+      "reanudar_si": "menos de 1 h desde que el rol terminó su turno Y menos llamadas que su tope (`topes_llamadas`) Y contexto final por debajo de `renovar_por_contexto` (150 k), medidos con medir_consumo.py (la caché sigue viva)",
+      "nuevo_en_frio_si": "1 h o más, o el rol llegó a su tope de llamadas, o terminó con TOPE, o su contexto final llegó a `renovar_por_contexto` (150 k; medir_consumo.py marca RENOVAR): un agente nuevo cuyo encargo es la «Nota de reanudación», el artefacto y los tramos nuevos",
+      "desacoplado_si": "el rol llegó a su tope y queda una medida larga: proceso desacoplado (`nohup`/`start`, archivo `FIN`), no tarea de fondo del rol"
+    },
+    "topes_llamadas": {
+      "_nota": "Nuevo en v1.4 (reemplaza a orientacion_llamadas_propias). Tope de llamadas propias de cada rol por turno: al llegar, el rol escribe su «Nota de reanudación» y termina con TOPE. `scripts/encargar.sh` lo escribe al final del encargo y `scripts/medir_consumo.py <dir> <agentId>=<rol>` marca SOBRE TOPE a quien lo pasó. Valores del Director (31-10-2026), sacados de un proyecto Godot: el Arquitecto gasta unos 6 a 8 k por llamada (46 llamadas llevaron a 275 k; 21, a 177 k); el Verificador lee tanto como el Arquitecto; el Guionista es Haiku y hace lecturas cortas, y re-anclar el mapa vivo le pide unas 40; los auxiliares que miden cargan salidas pesadas (uno de 23 llamadas llegó a 224 k). Son conservadores a propósito porque los agentes cuentan mal. Fuera de ese proyecto, no verificados: se ajustan con lo que mida medir_consumo.py. El Agente C no tiene tope: hace cientos de llamadas por sesión y lo que lo mantiene es el traspaso al cerrar cada historia (`MODO_AUTONOMO.md` §5).",
+      "arquitecto": 25,
+      "verificador": 25,
+      "ingeniero": 30,
+      "guionista": 40,
+      "auxiliar": 20,
+      "_auxiliar_nota": "Para cada auxiliar de Claude que lance un rol (los que miden, sobre todo) y para cada monitor del modo asistentes. medir_consumo.py lo aplica a todos los agentes hijos."
+    },
+    "memoria_guionista": {
+      "mapa_vivo": "encuadres/mapa_vivo.json",
+      "registro": "encuadres/memoria_guionista.md"
+    }
+  },
+  "informes": {
+    "_nota": "Nuevo en v1.6. Un informe es lo que el Director pide como tal (minuta, reporte, memoria, respuesta a otro equipo): se entrega siempre en dos archivos, el borrador .md (la fuente, lo que se verifica) y el .docx renderizado con la plantilla del proyecto, sin que nadie tenga que pedir el .docx. Procedimiento y reglas D1 a D4 en `estandar`. Lo leen `scripts/renderizar_informe.py` y `scripts/verificar_informe.py`; si falta la sección, valen estos mismos valores.",
+    "estandar": "docs/estandar_documental.md",
+    "dir_borradores": "docs/borradores",
+    "dir_informes": "docs/informes",
+    "_plantilla_nota": "El .docx del proyecto (portada, encabezado, pie, estilos Heading 1 a 4 y Table Grid); lo pone el Director. Declarada y ausente, el renderizador se detiene (STOP). Para trabajar sin plantilla, bórrela de aquí: el informe sale en un documento en blanco, con aviso.",
+    "marcadores": {
+      "_nota": "Texto de la plantilla → valor. El valor puede llevar {titulo}, {fecha} (dd-mm-aaaa) y {mes_anio} («Noviembre 2026»). Se reemplazan en el cuerpo, las tablas, los encabezados y los pies. Un marcador propio del proyecto (por ejemplo \"[Unidad]\": \"Departamento X\") se agrega aquí; para un solo informe, `--marcador CLAVE=VALOR`.",
+      "[Nombre_Informe]": "{titulo}",
+      "{Nombre_Informe}": "{titulo}",
+      "[dd-mm-yy]": "{fecha}",
+      "{dd-mm-yy}": "{fecha}",
+      "[Fecha]": "{fecha}",
+      "{Fecha}": "{fecha}",
+      "[MesAnio]": "{mes_anio}",
+      "{MesAnio}": "{mes_anio}"
+    },
+    "huella": {
+      "_nota": "Regla D1: el informe no nombra herramientas de asistencia ni el método interno. `verificar_informe.py` busca los términos del kit (herramientas y modelos; roles de `roles` con mayúscula; «Agente C», órdenes de ingeniería, fichas de encuadre…) con control positivo. `terminos` o `metodo` reemplazan las listas del kit; `terminos_extra` y `metodo_extra` (expresiones regulares; `metodo` distingue mayúsculas salvo con `(?i:…)`) les agregan los códigos del proyecto, como \"OI-?\\d+\"; `permitidos` son los cargos que sí se nombran (por defecto Director y Coordinador). `\"activa\": false` la apaga, solo con el sí del Director.",
+      "activa": true,
+      "metodo_extra": [],
+      "permitidos": [
+        "Director",
+        "Coordinador"
+      ]
+    }
+  },
   "guardrails": {
     "sello_de_rol": "Toda respuesta empieza por [ROL · MODELO · turno N]. Convierte la deriva en algo visible de un vistazo en el turno 30, sin recordar el turno 1. Un agente que deja de sellar ya derivó.",
     "negaciones_por_artefacto": "Lo que un rol NO hace se escribe como artefactos y rutas ('no escribo código', 'no verifico mi propia orden'), nunca como cualidades ('no soy autoritario'). Un modelo no sabe si está siendo autoritario; sí sabe si está escribiendo un archivo.",
     "nombrar_la_regla_antes_de_corregir": "Ante una corrección, el agente responde PRIMERO con una línea: qué regla violó. Solo después arregla. Si no la identifica, pregunta. Sin esto, corrige el síntoma que se le nombró y da el asunto por cerrado.",
     "ningun_rol_escribe_su_propio_arranque": "Los arranques se emiten mecánicamente con scripts/emitir_arranque.py y los autoriza el Director.",
     "una_conversacion_un_rol": "El rol se declara en frío en el primer mensaje. Si a mitad hace falta otro rol, se abre otra conversación. Reasignar en caliente es como se pierde la cuenta de quién es quién.",
+    "supervision_claude": "Nuevo en v1.3. Un rol puede correr en un motor externo (agy). Hay tres modos (`supervision.modo`); asistentes, el que se instala desde v1.4, sigue las reglas de claude_completa. claude_completa: (1) el coordinador corre siempre en Claude; (2) todo artefacto de un rol en agy pasa por un validador determinista o por un Verificador en Claude antes de que otro rol lo use (lo declara `supervision_agy`); (3) el Verificador de un trabajo hecho en agy corre en Claude, lo que además da independencia entre familias de modelos. solo_coordinador (decisión del usuario, 26-10-2026; ver `MOTOR_EXTERNO.md` §8): Claude es solo el coordinador, que NUNCA corre en agy; todo rol con artefacto, también el Verificador, puede ir en agy; la compuerta del coordinador es obligatoria después de CADA rol (corre los validadores del rol y vuelve a medir una muestra contra las fuentes); y el Verificador en agy usa un nivel de modelo distinto del rol que revisa y no ve su razonamiento. En todos los modos la compuerta del coordinador vuelve a correr los validadores y no se fía del RESULTADO que imprime el rol; el Asesor no tiene artefacto y queda fuera de agy.",
+    "asistentes_por_defecto": "Nuevo en v1.4. Con supervision.modo = asistentes, el uso de los asistentes Gemini por los roles de `supervision.asistentes.roles` no queda a criterio del rol: cada uno escribe su Plan de actividades con la tabla «Cobertura», y lo que no delega lleva su motivo. El Agente C lo mide en cada ciclo con `scripts/medir_asistentes.py` y no se fía de lo que el rol diga de sí mismo.",
     "artefacto_fuera_de_turno_se_descarta": "Un artefacto producido por el rol equivocado no se recicla como borrador: arrastra premisas que nadie competente revisó. Se conserva como registro del incidente, no como insumo."
   },
   "reglas_duras": {
     "evidencia_literal": "La salida REAL de cada comprobación, copiada íntegra. Sin ella la entrega es INVÁLIDA aunque el trabajo esté bien.",
     "evidencia_sin_reformatear": "La salida se pega TAL CUAL sale del terminal o del archivo (`comando | tee archivo` y pegar el archivo): no se reformatea, no se alinea, no se reordena.",
+    "evidencia_con_comando_delante": "Nuevo en v1.2. Cada salida literal va precedida del comando EXACTO que la produjo, dentro del mismo archivo (`{ echo '$ cmd'; cmd; } | tee archivo`). Una salida sin su comando no se puede re-ejecutar, y lo que no se puede re-ejecutar no se verifica.",
+    "finales_de_linea_declarados": "Nuevo en v1.2. Todo cambio de finales de línea (CRLF↔LF) en un archivo se declara en el artefacto, medido con `git ls-files --eol` o `tr -cd '\\r' < archivo | wc -c` — nunca con `grep -c` sobre `\\r`, que cuenta líneas. Un diff que cambia todas las líneas por el final de línea esconde el cambio real.",
+    "ejecucion_en_copia": "Nuevo en v1.2. Ningún rol, ni la compuerta, ejecuta el trabajo con el nombre real del proyecto del usuario: se corre en una copia con OTRO nombre (para que no escriba en su carpeta de datos, registros o configuración), y la carpeta de datos real se compara por huella (lista de archivos con tamaño y sha256) antes y después. Lección real: un test corrido con el nombre real rotó los registros de la carpeta del usuario.",
+    "commits_por_nombre": "Nuevo en v1.2. Los archivos se añaden al commit por nombre (`git add <ruta> ...`), nunca con `git add -A` ni `git add .`: se colaron borradores de otro rol. Commits de una línea; el hook rechaza términos de IA, incluida la palabra «prompt».",
+    "mapa_es_la_frontera": "Nuevo en v1.2. El Arquitecto y sus auxiliares leen solo la ficha, el encuadre y los tramos del `mapa_de_lectura` validado; no buscan en el repositorio. Si falta algo, lo piden (`MAPA: <n> pedidos`) y el Guionista amplía el mapa.",
     "compuerta_empirica": "Leer la entrega no es verificar. Se re-ejecuta contra los archivos y datos reales.",
     "parada_de_observacion": "Toda meta con UI o audio debe ser probada físicamente por el Director antes de gastar auditorías externas o commits.",
     "duda_es_pregunta": "La ambigüedad se devuelve como duda; jamás se resuelve con un supuesto silencioso. Una duda reabre la orden.",

@@ -22,3 +22,7 @@ bloques/
 # Nota: NO se ignoran los archivos .md, .mmd, .png ni .docx
 # porque este es el repositorio central de documentación.
 
+
+# Copia del kit coordinador y respaldos de la actualización (no se versionan)
+kit_coordinador/
+respaldo_metodologia_*/

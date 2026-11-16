@@ -1,0 +1,75 @@
+
+# ADENDA — MODO AUTÓNOMO (la añade el Agente C; prevalece sobre tu plantilla donde choquen)
+
+El Director no está en el circuito. Lo suple el **Agente C** (coordinador), que
+recibe tu respuesta final. Ver la instrucción del Director en el workspace
+(`docs/modo_de_trabajo.md`).
+
+1. **No hay "primera respuesta" de espera.** Lee lo que tu arranque manda leer y
+   produce tu artefacto COMPLETO en una sola pasada, escrito en tu directorio.
+2. **Dudas:** van en una sección `Dudas` de tu artefacto, cada una con la
+   opción que recomiendas. Si una duda te impide avanzar sin inventar, escribe
+   `STOP: <motivo>` al inicio del artefacto y termina. No resuelvas en silencio.
+3. **Repositorio de trabajo:** los de `.claude/settings.json`
+   (`permissions.additionalDirectories`): ActaExpressWeb (rama de desarrollo
+   `linux`, según `docs/estado_actual.md`), BitacoraExpress y ActaExpress
+   (Android, en pausa); la rama de estos dos no está documentada en el
+   coordinador: la dice la orden, y si no la dice es una duda. El coordinador es
+   NexoExpress, rama `main`. ActaExpressWeb lee sus credenciales de un `.env` en
+   su raíz (lo carga `dev.sh`): no imprimas ni copies su contenido; solo se
+   comprueban los nombres de las claves. Toda herramienta externa se carga por
+   variable de entorno, nunca con la ruta escrita a mano. No cambies de rama, no hagas commit, no hagas push,
+   no borres nada que no puedas recuperar. Los commits los hace el Agente C.
+4. **Ejecución en copia:** todo lo que ejecute el trabajo (tests, sondas,
+   capturas, cargas) corre en una **copia con otro nombre**, nunca con el nombre
+   real del proyecto del usuario, para no escribir en su carpeta de datos.
+   **Esto incluye importar o preparar el proyecto:** la ruta que pasas a la
+   herramienta es siempre la de la copia, nunca la del repositorio, aunque la
+   corrida sea sin ventana. Con el nombre real escribe en la carpeta del usuario,
+   y un registro rotado puede borrar archivos suyos (incidente medido). Si tu
+   tarea toca esa carpeta, toma su huella (archivos, tamaños, sha256) antes y
+   después y decláralo.
+5. **Idioma:** español en artefactos; el código sigue el estilo existente.
+6. **Evidencia:** cada salida literal va precedida del comando exacto que la
+   produjo y vive en un archivo (`{ echo '$ cmd'; cmd; } 2>&1 | tee archivo`)
+   citado por ruta y sha256. Todo cambio de finales de línea (CRLF↔LF) se
+   declara, medido con `git ls-files --eol` o `tr -cd '\r' < archivo | wc -c`
+   (nunca `grep -c` con `\r`). Los criterios de alcance de un diff se verifican
+   reconstruyendo el archivo esperado (base + texto de la orden), no con
+   ventanas de hunks.
+7. **Sin esperas:** lo que tarde más de unos 2 minutos va a un proceso en
+   segundo plano que escribe a un archivo. Terminas con
+   `ESPERA: <qué corre> · <archivo de salida> · <hora estimada de fin>` y una
+   «Nota de reanudación» (máximo 30 líneas: qué está hecho, qué decidiste y
+   dónde, qué falta, qué leer para seguir) escrita para que **otro agente en
+   frío** pueda terminar con ella. Si ya vas por dos tercios de tu tope de
+   llamadas (punto 10), lanza lo largo **desacoplado** (`nohup` o `start`, con
+   un archivo `FIN`), no como tarea de fondo tuya: una tarea de fondo te
+   reanuda sola al terminar.
+   Toda espera termina sola: al aparecer un archivo `FIN` o al llegar a su
+   tope (con `TIMEOUT`). Un `sleep N` suelto nunca es una espera. Al terminar,
+   no dejas shells de espera vivos; si el sistema de permisos no te deja
+   cerrarlos, los declaras con su hora de fin y no intentas rodear el permiso.
+8. **Auxiliares:** si lanzas auxiliares o monitores, les pasas por escrito
+   estas mismas reglas (copias, evidencia, esperas), su tope de llamadas y los
+   tramos que necesitan, nunca «lee el documento entero».
+9. **Respuesta final al Agente C:** la ruta de tu artefacto, un resumen de
+   máximo 10 líneas, y tus dudas, STOP, ESPERA o MAPA. No pegues el artefacto
+   entero.
+10. **Tope de llamadas, no de contexto:** el tuyo está en «LÍMITES DE ESTE
+    ENCARGO», al final. No sabes medir tu contexto y tu cuenta de llamadas se
+    queda corta (medido: un Ingeniero dijo «unas 25» y el registro tenía 64).
+    A dos tercios del tope escribes tu «Nota de reanudación»; al llegar,
+    terminas con `TOPE: <n> llamadas · <ruta de la nota>`. El Agente C cuenta
+    tus llamadas en el registro.
+11. **Asistentes Gemini:** si «LÍMITES DE ESTE ENCARGO» dice que el modo
+    asistentes es obligatorio para tu rol, tu Plan de actividades con su tabla
+    «Cobertura» va antes de tu artefacto. El Agente C mide en disco qué se
+    lanzó; lo que no delegaste necesita un motivo que se pueda comprobar.
+12. **Informes:** si tu encargo es un informe para el Director, sigues el
+    estándar documental del proyecto (`informes.estandar` de coordinador.json):
+    borrador .md en `informes.dir_borradores`, `scripts/verificar_informe.py
+    <borrador> --solo-borrador`, `scripts/renderizar_informe.py <borrador>` y
+    `scripts/verificar_informe.py <borrador>` hasta CONFORME. Entregas las dos
+    rutas (.md y .docx), la tabla de fuentes de cada cifra y la salida literal
+    del verificador. El .docx no se edita a mano.

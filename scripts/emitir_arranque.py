@@ -108,6 +108,13 @@ def resolver_insumo(valor: str) -> str:
     return str(p)
 
 
+def modelo_de(r: dict) -> str:
+    """El sello lleva el modelo que de verdad corre: en un rol con motor agy, `modelo_agy`."""
+    if r.get("motor") == "agy":
+        return f"{r.get('modelo_agy') or '?'} (agy)"
+    return r.get("modelo", "")
+
+
 def cadena_de_mando() -> str:
     """El orden de los mandatos, renderizado desde la configuración."""
     en_linea = sorted((r for r in (CFG.get("roles") or {}).values()
@@ -143,7 +150,7 @@ def main() -> int:
         print(f"Cadena de mando: {cadena_de_mando()}\n")
         for nombre, r in sorted(ROLES.items(), key=lambda x: x[1].get("orden", 99)):
             linea = "" if r.get("en_la_linea") else "  (fuera de la línea)"
-            print(f"  {nombre:<12} {r.get('modelo', '?')}{linea}")
+            print(f"  {nombre:<12} {modelo_de(r) or '?'}{linea}")
             print(f"  {'':<12} produce {r.get('artefacto', '?')} → "
                   f"{r.get('escribe_en', '?')}")
             print(f"  {'':<12} ruta de traspaso {r.get('ruta_traspaso', '?')} · "
@@ -183,7 +190,7 @@ def main() -> int:
         "WORKSPACE_PATH": str(BASE),
         "REPOS_AUTORIZADOS": "\n".join(f"   - `{r}`" for r in repos),
         "RAIZ_INSUMOS": str(repos[0].parent),
-        "MODELO": cfg.get("modelo", ""),
+        "MODELO": modelo_de(cfg),
         "ARTEFACTO": cfg.get("artefacto", ""),
         "DIR_ARTEFACTO": str(BASE / cfg.get("escribe_en", "")),
         "CADENA_DE_MANDO": cadena_de_mando(),
@@ -219,7 +226,7 @@ def main() -> int:
 
     print(bloque)
     print()
-    print(f"[arranque {rol} · {cfg.get('modelo', '?')} · {valores['FECHA']} · "
+    print(f"[arranque {rol} · {modelo_de(cfg) or '?'} · {valores['FECHA']} · "
           f"{len(repos)} repositorio(s) · su artefacto va a "
           f"{cfg.get('escribe_en', '?')}]", file=sys.stderr)
     print(f"[bloque escrito en {destino} — ábralo, Ctrl+A, Ctrl+C]",
